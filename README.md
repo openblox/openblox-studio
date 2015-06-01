@@ -1,2 +1,2 @@
 # OpenBlox-Studio
-TODO: Description about how awesome this IDE for the OpenBlox game engine is.
+OpenBlox Studio is the IDE suggested for use in the development of games using the OpenBlox game engine.
