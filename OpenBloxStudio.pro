@@ -1,4 +1,4 @@
-QT = core gui websockets
+QT = core gui widgets websockets opengl
 win32{
 	LIBS += -lws2_32 -lcurldll -lidn -lfmodex
 }else{
@@ -8,7 +8,7 @@ LIBS += -lcrypto -lssl -lz -lSDL2 -lSDL2_ttf -lSDL2_image
 HEADERS = OpenBlox/lua_src/*.h OpenBlox/raknet/*.h OpenBlox/src/ob_enum/*.h OpenBlox/src/ob_type/*.h OpenBlox/src/ob_lua/*.h OpenBlox/src/ob_instance/*.h OpenBlox/src/openblox/*.h src/*.h
 SOURCES = OpenBlox/lua_src/*.c OpenBlox/raknet/*.cpp OpenBlox/src/ob_enum/*.cpp OpenBlox/src/ob_type/*.cpp OpenBlox/src/ob_lua/*.cpp OpenBlox/src/ob_instance/*.cpp OpenBlox/src/openblox/*.cpp src/*.cpp
 CONFIG += c++11 debug
-DEFINES += GXX_EXPERIMENTAL_CXX0X
+DEFINES += GXX_EXPERIMENTAL_CXX0X OPENBLOX_STUDIO
 RESOURCES =
 INCLUDEPATH += OpenBlox/src/ob_enum OpenBlox/src/ob_instance OpenBlox/src/ob_lua OpenBlox/src/ob_type OpenBlox/src/openblox src
 
