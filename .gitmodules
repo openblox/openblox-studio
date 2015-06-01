@@ -1,0 +1,3 @@
+[submodule "OpenBlox"]
+	path = OpenBlox
+	url = https://github.com/Myzilla-Web-Resources/OpenBlox.git
