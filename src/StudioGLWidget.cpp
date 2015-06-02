@@ -4,6 +4,7 @@
 
 #include <QtGui>
 
+#include <DataModel.h>
 
 #ifndef GL_MULTISAMPLE
 	#define GL_MULTISAMPLE 0x809D
@@ -22,8 +23,10 @@ namespace ob_studio{
 
 	QGLFormat StudioGLWidget::makeFormat(){
 		QGLFormat format = QGLFormat();
+		format.setDepthBufferSize(24);
 		format.setSampleBuffers(true);
 		format.setSamples(OPENBLOX_AA_SAMPLES);
+		format.setDoubleBuffer(true);
 
 		return format;
 	}
@@ -37,8 +40,6 @@ namespace ob_studio{
 	}
 
 	void StudioGLWidget::initializeGL(){
-		OpenBlox::mw = SDL_CreateWindowFrom((void*)this->winId());
-
 		OpenBlox::OBGame* game = OpenBlox::OBGame::getInstance();
 		if(!game){
 			throw OpenBlox::OBException("game is NULL!");
@@ -55,15 +56,11 @@ namespace ob_studio{
 	}
 
 	void StudioGLWidget::resizeGL(int width, int height){
-		SDL_Event sdlevent;
-		sdlevent.type = SDL_WINDOWEVENT;
-		sdlevent.window.windowID = SDL_GetWindowID(OpenBlox::mw);
-		sdlevent.window.event = SDL_WINDOWEVENT_RESIZED;
-		sdlevent.window.data1 = width;
-		sdlevent.window.data2 = height;
-
-		SDL_PushEvent(&sdlevent);
-		SDL_SetWindowSize(OpenBlox::mw, width, height);
+		OpenBlox::OBGame* game = OpenBlox::OBGame::getInstance();
+		if(!game){
+			throw OpenBlox::OBException("game is NULL!");
+		}
+		game->resized();
 	}
 
 	void StudioGLWidget::mousePressEvent(QMouseEvent* event){

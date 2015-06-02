@@ -9,6 +9,12 @@ namespace ob_studio{
 	class StudioWindow: public QMainWindow{
 		public:
 			StudioWindow();
+
+			StudioGLWidget* glWidget;
+			QTextEdit* output;
+
+		private slots:
+			void about(bool checked);
 	};
 }
 #endif

@@ -4,6 +4,27 @@
 
 #include "StudioWindow.h"
 
+#include <DataModel.h>
+#include <LogService.h>
+
+ob_studio::StudioWindow* win = NULL;
+
+namespace OpenBlox{
+#ifdef OPENBLOX_STUDIO
+	void GetDisplaySize(int* width, int* height){
+		if(!win){
+			return;
+		}
+		ob_studio::StudioGLWidget* gl = win->glWidget;
+
+		*width = gl->width();
+		*height = gl->height();
+	}
+#endif
+
+	bool mw = true;
+}
+
 void checkSDLError(int line = -1){
 	#ifndef NDEBUG
 	{
@@ -20,6 +41,35 @@ void checkSDLError(int line = -1){
 	#endif
 }
 
+void handle_log_event(std::vector<ob_type::VarWrapper> evec){
+	if(!win){
+		LOGI("Lost output message");
+		return;
+	}
+	LOGI("evt size: %i", evec.size());
+	if(evec.size() == 2){
+		QString msg = reinterpret_cast<ob_type::StringWrapper*>(evec[0].wrapped)->val;
+		ob_enum::MessageType msgType = (ob_enum::MessageType)(reinterpret_cast<ob_enum::LuaEnumItem*>(evec[0].wrapped)->value);
+
+		switch(msgType){
+			case ob_enum::MessageType::MessageOutput:
+			case ob_enum::MessageType::MessageInfo: {
+				win->output->append(msg);
+				break;
+			}
+			case ob_enum::MessageType::MessageWarning: {
+				win->output->append(msg);
+				break;
+			}
+			case ob_enum::MessageType::MessageError: {
+				win->output->append(msg);
+				break;
+			}
+			default: break;
+		}
+	}
+}
+
 int main(int argc, char** argv){
 	QApplication app(argc, argv);
 
@@ -27,14 +77,13 @@ int main(int argc, char** argv){
 	app.setApplicationVersion("0.1.1");
 	app.setOrganizationDomain("myzillawr.tk");
 	app.setOrganizationName("Myzilla Web Resources");
-	app.setAttribute(Qt::AA_NativeWindows, true);
 
 	QCommandLineParser parser;
 	parser.setApplicationDescription("OpenBlox Studio");
 	parser.addHelpOption();
 	parser.addVersionOption();
 
-	QCommandLineOption initScriptOption("script", "Script to run on initialization.", "res://init.lua");
+	QCommandLineOption initScriptOption("script", "Script to run on initialization.", "null");
 	parser.addOption(initScriptOption);
 
 	parser.process(app);
@@ -45,9 +94,18 @@ int main(int argc, char** argv){
 		initScript = parser.value(initScriptOption).trimmed();
 	}
 
+	LOGI("Init Script: %s", initScript.toStdString().c_str());
 	OpenBlox::OBGame* gameInst = new OpenBlox::OBGame(initScript, true);
 
 	OpenBlox::static_init::execute();
+
+	ob_instance::DataModel* dm = gameInst->getDataModel();
+	if(dm){
+		ob_instance::LogService* ls = dm->logService;
+		if(ls){
+			ls->MessageOut->Connect(handle_log_event);
+		}
+	}
 
 	SDL_SetMainReady();
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
@@ -71,23 +129,21 @@ int main(int argc, char** argv){
 		return 1;
 	}
 
+	win = new ob_studio::StudioWindow();
+	win->show();
+
 	QThread* taskThread = new OpenBlox::TaskThread();
 	taskThread->start();
 
-	ob_studio::StudioWindow win;
-
-	win.show();
-
-	while(win.isVisible()){
+	while(win->isVisible()){
 		SDL_Event event;
 		while(SDL_PollEvent(&event)){
 			OpenBlox::ProcessEvent(gameInst, event);
 		}
 		app.processEvents();
-		//gameInst->render();
-		//SDL_GL_SwapWindow(OpenBlox::mw);
 		QThread::msleep(10);
 	}
+	return 0;
 }
 
 
