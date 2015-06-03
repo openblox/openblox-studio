@@ -74,10 +74,10 @@ namespace ob_studio{
 	}
 
 	void StudioWindow::about(bool checked){
-		QMessageBox::about(this, tr("About Dock Widgets"),
-		tr("The <b>Dock Widgets</b> example demonstrates how to "
-		"use Qt's dock widgets. You can enter your own text, "
-		"click a customer to add a customer name and "
+		QMessageBox::about(this, tr("About OpenBlox Studio"),
+		tr("<b>OpenBlox Studio</b>"
+		"Version 0.1.1"
+		"OpenBlox"
 		"address, and click standard paragraphs to add them."));
 	}
 }
