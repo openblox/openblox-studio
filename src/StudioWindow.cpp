@@ -1,5 +1,7 @@
 #include "StudioWindow.h"
 
+#include "InstanceTreeItem.h"
+
 namespace ob_studio{
 	StudioWindow::StudioWindow(){
 		glWidget = new StudioGLWidget();
@@ -35,15 +37,6 @@ namespace ob_studio{
 
 		QMenu* viewMenu = menuBar()->addMenu("View");
 
-		viewMenu->addAction("Explorer")->setEnabled(false);
-		viewMenu->addAction("Properties")->setEnabled(false);
-		viewMenu->addAction("Output")->setEnabled(false);
-
-		viewMenu->addSeparator();
-
-		QMenu* viewToolbarsMenu = viewMenu->addMenu("Toolbars");
-		viewToolbarsMenu->addAction("Command");
-
 		menuBar()->addSeparator();
 
 		QAction* aboutAct = new QAction("About", this);
@@ -59,7 +52,7 @@ namespace ob_studio{
 		setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 
 		//Output
-		QDockWidget *dock = new QDockWidget(tr("Output"), this);
+		QDockWidget* dock = new QDockWidget(tr("Output"), this);
 		dock->setFloating(false);
 		dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
 
@@ -67,17 +60,46 @@ namespace ob_studio{
 
 		output = new QTextEdit();
 		output->setReadOnly(true);
-		output->acceptRichText();
 
 		dock->setWidget(output);
 		addDockWidget(Qt::BottomDockWidgetArea, dock);
+
+		viewMenu->addAction(dock->toggleViewAction());
+
+		//Explorer
+		dock = new QDockWidget(tr("Explorer"), this);
+		dock->setFloating(false);
+		dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
+
+		dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+
+		explorer = new QTreeWidget();
+
+		OpenBlox::OBGame* game = OpenBlox::OBGame::getInstance();
+		if(game){
+			explorer->addTopLevelItem(new InstanceTreeItem((ob_instance::Instance*)game->getDataModel()));
+		}
+
+		dock->setWidget(explorer);
+		addDockWidget(Qt::RightDockWidgetArea, dock);
+
+		viewMenu->addAction(dock->toggleViewAction());
+
+		//Last View Menu things
+		viewMenu->addSeparator();
+
+		QMenu* viewToolbarsMenu = viewMenu->addMenu("Toolbars");
+		viewToolbarsMenu->addAction("Command");
+
+		statusBar();
 	}
 
 	void StudioWindow::about(bool checked){
+		Q_UNUSED(checked)
+
 		QMessageBox::about(this, tr("About OpenBlox Studio"),
-		tr("<b>OpenBlox Studio</b>"
-		"Version 0.1.1"
-		"OpenBlox"
-		"address, and click standard paragraphs to add them."));
+		tr("<b>OpenBlox Studio</b><br/>"
+		"Version 0.1.1<br/>"
+		"OpenBlox"));
 	}
 }

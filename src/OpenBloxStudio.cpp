@@ -46,32 +46,34 @@ void handle_log_event(std::vector<ob_type::VarWrapper> evec){
 		LOGI("Lost output message");
 		return;
 	}
-	LOGI("evt size: %i", evec.size());
 	if(evec.size() == 2){
 		QString msg = reinterpret_cast<ob_type::StringWrapper*>(evec[0].wrapped)->val;
-		ob_enum::MessageType msgType = (ob_enum::MessageType)(reinterpret_cast<ob_enum::LuaEnumItem*>(evec[0].wrapped)->value);
+		ob_enum::LuaEnumItem* msgType = reinterpret_cast<ob_enum::LuaEnumItem*>(evec[1].wrapped);
 
-		switch(msgType){
-			case ob_enum::MessageType::MessageOutput:
-			case ob_enum::MessageType::MessageInfo: {
-				win->output->append(msg);
-				break;
-			}
-			case ob_enum::MessageType::MessageWarning: {
-				win->output->append(msg);
-				break;
-			}
-			case ob_enum::MessageType::MessageError: {
-				win->output->append(msg);
-				break;
-			}
-			default: break;
+		//ob_enum::LuaEnumItem* MessageOutput = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageOutput);
+		//ob_enum::LuaEnumItem* MessageInfo = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageInfo);
+		ob_enum::LuaEnumItem* MessageWarning = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageWarning);
+		ob_enum::LuaEnumItem* MessageError = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageError);
+
+		if(msgType == MessageError){
+			win->output->append("<font color=\"#FF3300\">" + msg + "</font><br/>");
+		}else if(msgType == MessageWarning){
+			win->output->append("<font color=\"#F26100\">" + msg + "</font><br/>");
+		}else{
+			win->output->append(msg + "<br/>");
 		}
 	}
 }
 
 int main(int argc, char** argv){
 	QApplication app(argc, argv);
+
+	QFile f(":qdarkstyle/style.qss");
+	if(f.exists()){
+		f.open(QFile::ReadOnly | QFile::Text);
+		QTextStream ts(&f);
+		app.setStyleSheet(ts.readAll());
+	}
 
 	app.setApplicationName("OpenBlox Studio");
 	app.setApplicationVersion("0.1.1");

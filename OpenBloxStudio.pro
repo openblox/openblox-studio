@@ -9,7 +9,7 @@ HEADERS = OpenBlox/lua_src/*.h OpenBlox/raknet/*.h OpenBlox/src/ob_enum/*.h Open
 SOURCES = OpenBlox/lua_src/*.c OpenBlox/raknet/*.cpp OpenBlox/src/ob_enum/*.cpp OpenBlox/src/ob_type/*.cpp OpenBlox/src/ob_lua/*.cpp OpenBlox/src/ob_instance/*.cpp OpenBlox/src/openblox/*.cpp src/*.cpp
 CONFIG += c++11 debug
 DEFINES += GXX_EXPERIMENTAL_CXX0X OPENBLOX_STUDIO
-RESOURCES =
+RESOURCES += style.qrc
 INCLUDEPATH += OpenBlox/src/ob_enum OpenBlox/src/ob_instance OpenBlox/src/ob_lua OpenBlox/src/ob_type OpenBlox/src/openblox src
 
 _JENKINS = $$(JENKINS_HOME)

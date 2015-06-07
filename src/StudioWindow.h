@@ -12,6 +12,7 @@ namespace ob_studio{
 
 			StudioGLWidget* glWidget;
 			QTextEdit* output;
+			QTreeWidget* explorer;
 
 		private slots:
 			void about(bool checked);
