@@ -3,8 +3,8 @@
 .project
 debug/
 release/
-object_script.OpenBlox.Debug
-object_script.OpenBlox.Release
+object_script.OpenBloxStudio.Debug
+object_script.OpenBloxStudio.Release
 QtMakefile
 QtMakefile.Debug
 QtMakefile.Release
