@@ -8,3 +8,6 @@ object_script.OpenBlox.Release
 QtMakefile
 QtMakefile.Debug
 QtMakefile.Release
+res/
+lua_src/
+raknet/

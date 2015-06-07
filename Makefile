@@ -23,3 +23,11 @@ release:	QtMakefile
 	$(MAKE) -f QtMakefile release
 
 .PHONY: all clean debug clean-debug release clean-release
+
+symlinks:
+	rm -fr lua_src
+	ln -s OpenBlox/lua_src lua_src
+	rm -fr raknet
+	ln -s OpenBlox/raknet raknet
+	rm -fr res
+	ln -s OpenBlox/res res
