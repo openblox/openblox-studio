@@ -124,10 +124,10 @@ win32{
 		Qt5Gui.commands = cp $$[QT_INSTALL_BINS]/Qt5Gui.dll release
 		Qt5Gui.target = release/Qt5Gui.dll
 		
-		Qt5OpenGL.commands = cp $$[QT_INSTALL_BINS]/Qt5OpenGL.dll debug
+		Qt5OpenGL.commands = cp $$[QT_INSTALL_BINS]/Qt5OpenGL.dll release
 		Qt5OpenGL.target = release/Qt5OpenGL.dll
 		
-		Qt5Widgets.commands = cp $$[QT_INSTALL_BINS]/Qt5Widgets.dll debug
+		Qt5Widgets.commands = cp $$[QT_INSTALL_BINS]/Qt5Widgets.dll release
 		Qt5Widgets.target = release/Qt5Widgets.dll
 
 		QMAKE_EXTRA_TARGETS += icudt53 icuin53 icuuc53 libgcc_s_dw2-1 libstdc++-6 libwinpthread-1 libcurl libidn-11 Qt5Core Qt5Gui Qt5OpenGL Qt5Widgets Qt5WebSockets Qt5Network fmodex
