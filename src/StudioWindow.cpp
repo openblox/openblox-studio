@@ -4,6 +4,19 @@
 
 namespace ob_studio{
 	QMap<ob_instance::Instance*, InstanceTreeItem*> treeItemMap;
+	QMap<QString, QIcon> classIconMap;
+
+	QIcon getClassIcon(QString className){
+		if(classIconMap.contains(className)){
+			return classIconMap[className];
+		}
+		QIcon ico = QIcon(":rc/class_icons/_unknown.png");
+		if(QFile(":rc/class_icons/" + className + ".png").exists()){
+			ico = QIcon(":rc/class_icons/" + className + ".png");
+		}
+		classIconMap[className] = ico;
+		return ico;
+	}
 
 	void addChildrenOfInstance(QTreeWidgetItem* parentItem, ob_instance::Instance* inst);
 
@@ -14,6 +27,7 @@ namespace ob_studio{
 
 		InstanceTreeItem* kidItem = new InstanceTreeItem(kid);
 		treeItemMap[kid] = kidItem;
+		kidItem->setIcon(0, getClassIcon(kid->getClassName()));
 
 		kid->Changed->Connect([=](std::vector<ob_type::VarWrapper> evec){
 			Q_UNUSED(evec)
