@@ -3,6 +3,60 @@
 #include "InstanceTreeItem.h"
 
 namespace ob_studio{
+	QMap<ob_instance::Instance*, InstanceTreeItem*> treeItemMap;
+
+	void addChildrenOfInstance(QTreeWidgetItem* parentItem, ob_instance::Instance* inst);
+
+	void addChildOfInstance(QTreeWidgetItem* parentItem, ob_instance::Instance* kid){
+		if(!parentItem || !kid){
+			return;
+		}
+
+		InstanceTreeItem* kidItem = new InstanceTreeItem(kid);
+		treeItemMap[kid] = kidItem;
+
+		kid->Changed->Connect([=](std::vector<ob_type::VarWrapper> evec){
+			Q_UNUSED(evec)
+
+			kidItem->setText(0, kid->getName());
+		});
+		kid->ChildAdded->Connect([=](std::vector<ob_type::VarWrapper> evec){
+			if(evec.size() == 1){
+				ob_instance::Instance* newGuy = reinterpret_cast<ob_instance::Instance*>(evec[0].wrapped);
+				if(treeItemMap.contains(newGuy)){
+					kidItem->addChild(treeItemMap[newGuy]);
+				}else{
+					addChildOfInstance(kidItem, newGuy);
+				}
+			}
+		});
+		kid->ChildRemoved->Connect([=](std::vector<ob_type::VarWrapper> evec){
+			if(evec.size() == 1){
+				ob_instance::Instance* newGuy = reinterpret_cast<ob_instance::Instance*>(evec[0].wrapped);
+				if(treeItemMap.contains(newGuy)){
+					kidItem->removeChild(treeItemMap[newGuy]);
+				}
+			}
+		});
+
+		addChildrenOfInstance(kidItem, kid);
+
+		parentItem->addChild(kidItem);
+	}
+
+	void addChildrenOfInstance(QTreeWidgetItem* parentItem, ob_instance::Instance* inst){
+		if(!parentItem || !inst){
+			return;
+		}
+		std::vector<ob_instance::Instance*> kids = inst->GetChildren();
+		for(std::vector<ob_instance::Instance*>::size_type i = 0; i < kids.size(); i++){
+			ob_instance::Instance* kid = kids[i];
+			if(kid){
+				addChildOfInstance(parentItem, kid);
+			}
+		}
+	}
+
 	StudioWindow::StudioWindow(){
 		glWidget = new StudioGLWidget();
 		setCentralWidget(glWidget);
@@ -74,10 +128,15 @@ namespace ob_studio{
 		dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
 
 		explorer = new QTreeWidget();
+		explorer->setSelectionMode(QAbstractItemView::ExtendedSelection);
+		explorer->setSelectionBehavior(QAbstractItemView::SelectItems);
+		explorer->header()->close();
+
+		QTreeWidgetItem* rootItem = explorer->invisibleRootItem();
 
 		OpenBlox::OBGame* game = OpenBlox::OBGame::getInstance();
 		if(game){
-			explorer->addTopLevelItem(new InstanceTreeItem((ob_instance::Instance*)game->getDataModel()));
+			addChildrenOfInstance(rootItem, (ob_instance::Instance*)game->getDataModel());
 		}
 
 		dock->setWidget(explorer);

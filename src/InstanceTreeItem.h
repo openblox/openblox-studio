@@ -11,6 +11,8 @@ namespace ob_studio{
 			InstanceTreeItem(ob_instance::Instance* inst, QTreeWidget* parent = 0);
 			virtual ~InstanceTreeItem();
 
+			ob_instance::Instance* GetInstance();
+
 		private:
 			ob_instance::Instance* inst;
 	};

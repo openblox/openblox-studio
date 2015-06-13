@@ -13,6 +13,7 @@
 namespace ob_studio{
 	StudioGLWidget::StudioGLWidget(QWidget* parent) : QGLWidget(makeFormat(), parent){
 		setAutoFillBackground(false);
+		setAttribute(Qt::WA_NoSystemBackground);
 
 		QTimer *timer = new QTimer(this);
 		connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -56,6 +57,9 @@ namespace ob_studio{
 	}
 
 	void StudioGLWidget::resizeGL(int width, int height){
+		Q_UNUSED(width)
+		Q_UNUSED(height)
+
 		OpenBlox::OBGame* game = OpenBlox::OBGame::getInstance();
 		if(!game){
 			throw OpenBlox::OBException("game is NULL!");
