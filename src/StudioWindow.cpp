@@ -162,9 +162,30 @@ namespace ob_studio{
 		viewMenu->addSeparator();
 
 		QMenu* viewToolbarsMenu = viewMenu->addMenu("Toolbars");
-		viewToolbarsMenu->addAction("Command");
 
 		statusBar();
+
+		QToolBar* commandBar = new QToolBar("Command");
+		commandBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
+		viewToolbarsMenu->addAction(commandBar->toggleViewAction());
+
+		//START COMMAND BAR
+		cmdBar = new QComboBox();
+		cmdBar->setEditable(true);
+
+		//Setup QLineEdit in QComboBox
+		QLineEdit* cmdEdit = cmdBar->lineEdit();
+		cmdEdit->setPlaceholderText("Run a command");
+		connect(cmdEdit, &QLineEdit::returnPressed, this, &StudioWindow::commandBarReturn);
+
+		cmdBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		commandBar->setBaseSize(300, 20);
+		commandBar->setMinimumWidth(300);
+
+		commandBar->addWidget(cmdBar);
+
+		addToolBar(Qt::BottomToolBarArea, commandBar);
+		//END COMMAND BAR
 	}
 
 	void StudioWindow::about(bool checked){
@@ -174,5 +195,30 @@ namespace ob_studio{
 		tr("<b>OpenBlox Studio</b><br/>"
 		"Version 0.1.1<br/>"
 		"OpenBlox"));
+	}
+
+	void StudioWindow::commandBarReturn(){
+		QLineEdit* cmdEdit = cmdBar->lineEdit();
+		QString text = cmdEdit->text();
+
+		output->append("> " + text + "<br/>");
+
+		OpenBlox::OBGame* game = OpenBlox::OBGame::getInstance();
+		if(!game){
+			return;
+		}
+
+		lua_State* L = game->newLuaState();
+		lua_pop(L, 13);
+		lua_resume(L, 0);
+
+		int s = luaL_loadstring(L, text.toStdString().c_str());
+		if(s == 0){
+			s = lua_pcall(L, 0, LUA_MULTRET, 0);
+		}
+
+		if(s != 0){
+			game->handle_lua_errors(L);
+		}
 	}
 }

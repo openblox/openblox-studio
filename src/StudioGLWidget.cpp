@@ -18,9 +18,13 @@ namespace ob_studio{
 		QTimer *timer = new QTimer(this);
 		connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 		timer->start(10);
+
+		axis_text_textures = new GLuint[3];
 	}
 
-	StudioGLWidget::~StudioGLWidget(){}
+	StudioGLWidget::~StudioGLWidget(){
+		glDeleteTextures(3, &axis_text_textures[0]);
+	}
 
 	QGLFormat StudioGLWidget::makeFormat(){
 		QGLFormat format = QGLFormat();
@@ -46,6 +50,76 @@ namespace ob_studio{
 			throw OpenBlox::OBException("game is NULL!");
 		}
 		game->initGL();
+
+		glGenTextures(3, &axis_text_textures[0]);
+	}
+
+	bool renderAxisWidgetText(GLuint tex, QString str, int x, int y){
+		return renderText(tex, OpenBlox::OBGame::getInstance()->internalBoldFont(), str, x, y, 0, 0, ob_enum::TextXAlignment::Left, ob_enum::TextYAlignment::Top, {255, 255, 255, 255});
+	}
+
+	void StudioGLWidget::drawAxisWidget(){
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, width(), height(), 0, -1000., 1000.);
+		glTranslated(0., 0., 0.);
+		glMatrixMode(GL_MODELVIEW);
+
+		double l = 25;
+		double o = 2;
+
+		double cx = 5 + l;
+		double cy = height() - 5 - l;
+		double xx, xy, yx, yy, zx, zy;
+
+		float fvViewMatrix[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX, fvViewMatrix);
+		glLoadIdentity();
+
+		xx = l * fvViewMatrix[0];
+		xy = l * fvViewMatrix[1];
+		yx = l * fvViewMatrix[4];
+		yy = l * fvViewMatrix[5];
+		zx = l * fvViewMatrix[8];
+		zy = l * fvViewMatrix[9];
+
+		glLineWidth(1);
+
+		float currentColor[4];
+		glGetFloatv(GL_CURRENT_COLOR, currentColor);
+
+		const GLubyte red[] = {
+			255, 0, 0, 255
+		};
+
+		const GLubyte green[] = {
+			0, 255, 0, 255
+		};
+
+		const GLubyte blue[] = {
+			0, 0, 255, 255
+		};
+
+		glBegin(GL_LINES);
+		{
+			glColor4ubv(red);
+			glVertex2d(cx, cy);
+			glVertex2d(cx + xx, cy + xy);
+
+			glColor4ubv(green);
+			glVertex2d(cx, cy);
+			glVertex2d(cx + yx, cy + yy);
+
+			glColor4ubv(blue);
+			glVertex2d(cx, cy);
+			glVertex2d(cx + zx, cy + zy);
+		}
+		glEnd();
+		renderAxisWidgetText(axis_text_textures[0], "X", cx + xx + o, cy + xy + o);
+		renderAxisWidgetText(axis_text_textures[1], "Y", cx + yx + o, cy + yy + o);
+		renderAxisWidgetText(axis_text_textures[2], "Z", cx + zx + o, cy + zy + o);
+
+		glColor4fv(currentColor);
 	}
 
 	void StudioGLWidget::paintGL(){
@@ -54,6 +128,7 @@ namespace ob_studio{
 			throw OpenBlox::OBException("game is NULL!");
 		}
 		game->render();
+		drawAxisWidget();
 	}
 
 	void StudioGLWidget::resizeGL(int width, int height){

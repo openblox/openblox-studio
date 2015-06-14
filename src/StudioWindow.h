@@ -13,9 +13,11 @@ namespace ob_studio{
 			StudioGLWidget* glWidget;
 			QTextEdit* output;
 			QTreeWidget* explorer;
+			QComboBox* cmdBar;
 
 		private slots:
 			void about(bool checked);
+			void commandBarReturn();
 	};
 }
 #endif

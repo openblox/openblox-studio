@@ -65,20 +65,34 @@ void handle_log_event(std::vector<ob_type::VarWrapper> evec){
 	}
 }
 
+void defaultValues(QSettings* settings){
+	settings->setValue("first_run", false);
+}
+
 int main(int argc, char** argv){
 	QApplication app(argc, argv);
-
-	QFile f(":qdarkstyle/style.qss");
-	if(f.exists()){
-		f.open(QFile::ReadOnly | QFile::Text);
-		QTextStream ts(&f);
-		app.setStyleSheet(ts.readAll());
-	}
 
 	app.setApplicationName("OpenBlox Studio");
 	app.setApplicationVersion("0.1.1");
 	app.setOrganizationDomain("myzillawr.tk");
 	app.setOrganizationName("Myzilla Web Resources");
+
+	QSettings settings;
+	bool firstRun = settings.value("first_run", true).toBool();
+	if(firstRun){
+		defaultValues(&settings);
+	}
+
+	bool useDarkTheme = settings.value("dark_theme", true).toBool();
+
+	if(useDarkTheme){
+		QFile f(":qdarkstyle/style.qss");
+		if(f.exists()){
+			f.open(QFile::ReadOnly | QFile::Text);
+			QTextStream ts(&f);
+			app.setStyleSheet(ts.readAll());
+		}
+	}
 
 	QCommandLineParser parser;
 	parser.setApplicationDescription("OpenBlox Studio");
@@ -96,7 +110,6 @@ int main(int argc, char** argv){
 		initScript = parser.value(initScriptOption).trimmed();
 	}
 
-	LOGI("Init Script: %s", initScript.toStdString().c_str());
 	OpenBlox::OBGame* gameInst = new OpenBlox::OBGame(initScript, true);
 
 	OpenBlox::static_init::execute();
@@ -132,6 +145,18 @@ int main(int argc, char** argv){
 	}
 
 	win = new ob_studio::StudioWindow();
+
+	settings.beginGroup("main_window");
+	{
+		if(settings.contains("geometry")){
+			win->restoreGeometry(settings.value("geometry").toByteArray());
+		}
+		if(settings.contains("state")){
+			win->restoreState(settings.value("state").toByteArray());
+		}
+	}
+	settings.endGroup();
+
 	win->show();
 
 	QThread* taskThread = new OpenBlox::TaskThread();
@@ -145,6 +170,14 @@ int main(int argc, char** argv){
 		app.processEvents();
 		QThread::msleep(10);
 	}
+
+	settings.beginGroup("main_window");
+	{
+		settings.setValue("geometry", win->saveGeometry());
+		settings.setValue("state", win->saveState());
+	}
+	settings.endGroup();
+
 	return 0;
 }
 
