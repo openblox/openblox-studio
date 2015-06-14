@@ -121,7 +121,7 @@ namespace ob_studio{
 
 		//Output
 		QDockWidget* dock = new QDockWidget(tr("Output"), this);
-		dock->setFloating(false);
+		dock->setObjectName("studio_output");
 		dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
 
 		dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -136,7 +136,7 @@ namespace ob_studio{
 
 		//Explorer
 		dock = new QDockWidget(tr("Explorer"), this);
-		dock->setFloating(false);
+		dock->setObjectName("studio_explorer");
 		dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
 
 		dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -166,6 +166,7 @@ namespace ob_studio{
 		statusBar();
 
 		QToolBar* commandBar = new QToolBar("Command");
+		commandBar->setObjectName("studio_command_bar");
 		commandBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
 		viewToolbarsMenu->addAction(commandBar->toggleViewAction());
 
