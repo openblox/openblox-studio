@@ -209,19 +209,21 @@ namespace ob_studio{
 			return;
 		}
 
-		lua_State* L = game->newLuaState();
-		lua_resume(L, NULL, 0);
+		ob_lua::LuaState* LS = game->newLuaState();
+		lua_State* L = LS->L;
+		//lua_resume(L, NULL, 0);
 
 		int s = luaL_loadstring(L, text.toStdString().c_str());
 		if(s == 0){
-			s = lua_pcall(L, 0, LUA_MULTRET, 0);
+			//s = lua_pcall(L, 0, LUA_MULTRET, 0);
+			s = lua_resume(L, NULL, 0);
 		}
 
-		if(s != 0){
+		if(s != 0 && s != LUA_YIELD){
 			game->handle_lua_errors(L);
 		}
-
-		lua_pop(game->getGlobalLuaState(), 1);//Pop that state off the global state.
-		LOGI("Returned from global");
+		if(s == LUA_OK){
+			ob_lua::killState(L);
+		}
 	}
 }
