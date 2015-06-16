@@ -1,13 +1,17 @@
 <RCC>
 	<qresource>
-		<file>rc/class_icons/_unknown.png</file>
 		<file>rc/class_icons/Camera.png</file>
+		<file>rc/class_icons/ContentProvider.png</file>
 		<file>rc/class_icons/CoreGui.png</file>
 		<file>rc/class_icons/Folder.png</file>
 		<file>rc/class_icons/Frame.png</file>
 		<file>rc/class_icons/ImageLabel.png</file>
+		<file>rc/class_icons/Instance.png</file>
 		<file>rc/class_icons/Lighting.png</file>
 		<file>rc/class_icons/LogService.png</file>
+		<file>rc/class_icons/NetworkClient.png</file>
+		<file>rc/class_icons/NetworkReplicator.png</file>
+		<file>rc/class_icons/NetworkServer.png</file>
 		<file>rc/class_icons/Player.png</file>
 		<file>rc/class_icons/Players.png</file>
 		<file>rc/class_icons/RunService.png</file>

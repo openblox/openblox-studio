@@ -10,9 +10,12 @@ namespace ob_studio{
 		if(classIconMap.contains(className)){
 			return classIconMap[className];
 		}
-		QIcon ico = QIcon(":rc/class_icons/_unknown.png");
-		if(QFile(":rc/class_icons/" + className + ".png").exists()){
-			ico = QIcon(":rc/class_icons/" + className + ".png");
+		QString icop = ":rc/class_icons/" + className + ".png";
+		QIcon ico;
+		if(QFile(icop).exists()){
+			ico = QIcon(icop);
+		}else{
+			ico = getClassIcon(OpenBlox::ClassFactory::getInstance()->getParentClassName(className));
 		}
 		classIconMap[className] = ico;
 		return ico;
@@ -69,6 +72,38 @@ namespace ob_studio{
 				addChildOfInstance(parentItem, kid);
 			}
 		}
+	}
+
+	void addDM(QTreeWidgetItem* parentItem, ob_instance::Instance* inst){
+		if(!parentItem || !inst){
+			return;
+		}
+		std::vector<ob_instance::Instance*> kids = inst->GetChildren();
+		for(std::vector<ob_instance::Instance*>::size_type i = 0; i < kids.size(); i++){
+			ob_instance::Instance* kid = kids[i];
+			if(kid){
+				addChildOfInstance(parentItem, kid);
+			}
+		}
+
+		inst->ChildAdded->Connect([=](std::vector<ob_type::VarWrapper> evec){
+			if(evec.size() == 1){
+				ob_instance::Instance* newGuy = reinterpret_cast<ob_instance::Instance*>(evec[0].wrapped);
+				if(treeItemMap.contains(newGuy)){
+					parentItem->addChild(treeItemMap[newGuy]);
+				}else{
+					addChildOfInstance(parentItem, newGuy);
+				}
+			}
+		});
+		inst->ChildRemoved->Connect([=](std::vector<ob_type::VarWrapper> evec){
+			if(evec.size() == 1){
+				ob_instance::Instance* newGuy = reinterpret_cast<ob_instance::Instance*>(evec[0].wrapped);
+				if(treeItemMap.contains(newGuy)){
+					parentItem->removeChild(treeItemMap[newGuy]);
+				}
+			}
+		});
 	}
 
 	StudioWindow::StudioWindow(){
@@ -150,7 +185,7 @@ namespace ob_studio{
 
 		OpenBlox::OBGame* game = OpenBlox::OBGame::getInstance();
 		if(game){
-			addChildrenOfInstance(rootItem, (ob_instance::Instance*)game->getDataModel());
+			addDM(rootItem, (ob_instance::Instance*)game->getDataModel());
 		}
 
 		dock->setWidget(explorer);
