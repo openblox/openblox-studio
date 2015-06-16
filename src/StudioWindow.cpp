@@ -210,8 +210,7 @@ namespace ob_studio{
 		}
 
 		lua_State* L = game->newLuaState();
-		lua_pop(L, 13);
-		lua_resume(L, 0);
+		lua_resume(L, NULL, 0);
 
 		int s = luaL_loadstring(L, text.toStdString().c_str());
 		if(s == 0){
@@ -221,5 +220,8 @@ namespace ob_studio{
 		if(s != 0){
 			game->handle_lua_errors(L);
 		}
+
+		lua_pop(game->getGlobalLuaState(), 1);//Pop that state off the global state.
+		LOGI("Returned from global");
 	}
 }
