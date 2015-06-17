@@ -56,11 +56,11 @@ void handle_log_event(std::vector<ob_type::VarWrapper> evec){
 		ob_enum::LuaEnumItem* MessageError = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageError);
 
 		if(msgType == MessageError){
-			win->output->append("<font color=\"#FF3300\">" + msg + "</font><br/>");
+			win->output->append("<font color=\"#FF3300\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
 		}else if(msgType == MessageWarning){
-			win->output->append("<font color=\"#F26100\">" + msg + "</font><br/>");
+			win->output->append("<font color=\"#F26100\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
 		}else{
-			win->output->append(msg + "<br/>");
+			win->output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
 		}
 	}
 }

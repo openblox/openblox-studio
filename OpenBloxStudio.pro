@@ -1,6 +1,6 @@
 QT = core gui widgets websockets opengl
 win32{
-	LIBS += -lws2_32 -lcurldll -lidn -lfmodex
+	LIBS += -lws2_32 -lcurldll -lidn -lfmod
 }else{
 	LIBS += -lGL -lcurl -lfmodex64
 }
@@ -56,8 +56,8 @@ win32{
 		Qt5Networkd.commands = cp $$[QT_INSTALL_BINS]/Qt5Networkd.dll debug
 		Qt5Networkd.target = debug/Qt5Networkd.dll
 		
-		fmodex.commands = cp $$[QT_INSTALL_BINS]/fmodex.dll debug
-		fmodex.target = debug/fmodex.dll
+		fmod.commands = cp $$[QT_INSTALL_BINS]/fmod.dll debug
+		fmod.target = debug/fmod.dll
 
 		Qt5Guid.commands = cp $$[QT_INSTALL_BINS]/Qt5Guid.dll debug
 		Qt5Guid.target = debug/Qt5Guid.dll
@@ -68,8 +68,8 @@ win32{
 		Qt5Widgetsd.commands = cp $$[QT_INSTALL_BINS]/Qt5Widgetsd.dll debug
 		Qt5Widgetsd.target = debug/Qt5Widgetsd.dll
 
-		QMAKE_EXTRA_TARGETS += icudt53 icuin53 icuuc53 libgcc_s_dw2-1 libstdc++-6 libwinpthread-1 libcurl libidn-11 Qt5Cored Qt5Guid Qt5OpenGLd Qt5Widgetsd Qt5WebSocketsd Qt5Networkd fmodex
-		PRE_TARGETDEPS += debug/icudt53.dll debug/icuin53.dll debug/icuuc53.dll debug/libgcc_s_dw2-1.dll debug/libstdc++-6.dll debug/libwinpthread-1.dll debug/libcurl.dll debug/libidn-11.dll debug/Qt5Cored.dll debug/Qt5Guid.dll debug/Qt5OpenGLd.dll debug/Qt5Widgetsd.dll debug/Qt5WebSocketsd.dll debug/Qt5Networkd.dll debug/fmodex.dll
+		QMAKE_EXTRA_TARGETS += icudt53 icuin53 icuuc53 libgcc_s_dw2-1 libstdc++-6 libwinpthread-1 libcurl libidn-11 Qt5Cored Qt5Guid Qt5OpenGLd Qt5Widgetsd Qt5WebSocketsd Qt5Networkd fmod
+		PRE_TARGETDEPS += debug/icudt53.dll debug/icuin53.dll debug/icuuc53.dll debug/libgcc_s_dw2-1.dll debug/libstdc++-6.dll debug/libwinpthread-1.dll debug/libcurl.dll debug/libidn-11.dll debug/Qt5Cored.dll debug/Qt5Guid.dll debug/Qt5OpenGLd.dll debug/Qt5Widgetsd.dll debug/Qt5WebSocketsd.dll debug/Qt5Networkd.dll debug/fmod.dll
 		
 		!isEmpty(_JENKINS){
 			SDL2.commands = cp $$[QT_INSTALL_BINS]/SDL2.dll release
@@ -118,8 +118,8 @@ win32{
 		Qt5Network.commands = cp $$[QT_INSTALL_BINS]/Qt5Network.dll release
 		Qt5Network.target = release/Qt5Network.dll
 		
-		fmodex.commands = cp $$[QT_INSTALL_BINS]/fmodex.dll release
-		fmodex.target = release/fmodex.dll
+		fmod.commands = cp $$[QT_INSTALL_BINS]/fmod.dll release
+		fmod.target = release/fmod.dll
 
 		Qt5Gui.commands = cp $$[QT_INSTALL_BINS]/Qt5Gui.dll release
 		Qt5Gui.target = release/Qt5Gui.dll
@@ -130,8 +130,8 @@ win32{
 		Qt5Widgets.commands = cp $$[QT_INSTALL_BINS]/Qt5Widgets.dll release
 		Qt5Widgets.target = release/Qt5Widgets.dll
 
-		QMAKE_EXTRA_TARGETS += icudt53 icuin53 icuuc53 libgcc_s_dw2-1 libstdc++-6 libwinpthread-1 libcurl libidn-11 Qt5Core Qt5Gui Qt5OpenGL Qt5Widgets Qt5WebSockets Qt5Network fmodex
-		PRE_TARGETDEPS += release/icudt53.dll release/icuin53.dll release/icuuc53.dll release/libgcc_s_dw2-1.dll release/libstdc++-6.dll release/libwinpthread-1.dll release/libcurl.dll release/libidn-11.dll release/Qt5Core.dll release/Qt5Gui.dll release/Qt5OpenGL.dll release/Qt5Widgets.dll release/Qt5WebSockets.dll release/Qt5Network.dll release/fmodex.dll
+		QMAKE_EXTRA_TARGETS += icudt53 icuin53 icuuc53 libgcc_s_dw2-1 libstdc++-6 libwinpthread-1 libcurl libidn-11 Qt5Core Qt5Gui Qt5OpenGL Qt5Widgets Qt5WebSockets Qt5Network fmod
+		PRE_TARGETDEPS += release/icudt53.dll release/icuin53.dll release/icuuc53.dll release/libgcc_s_dw2-1.dll release/libstdc++-6.dll release/libwinpthread-1.dll release/libcurl.dll release/libidn-11.dll release/Qt5Core.dll release/Qt5Gui.dll release/Qt5OpenGL.dll release/Qt5Widgets.dll release/Qt5WebSockets.dll release/Qt5Network.dll release/fmod.dll
 
 		!isEmpty(_JENKINS){
 			SDL2.commands = cp $$[QT_INSTALL_BINS]/SDL2.dll release
