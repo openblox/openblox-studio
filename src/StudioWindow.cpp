@@ -136,7 +136,8 @@ namespace ob_studio{
 
 		editMenu->addSeparator();
 
-		editMenu->addAction("Settings");
+		QAction* settingsAct = editMenu->addAction("Settings");
+		connect(settingsAct, &QAction::triggered, this, &StudioWindow::showSettings);
 
 		QMenu* viewMenu = menuBar()->addMenu("View");
 
@@ -206,7 +207,9 @@ namespace ob_studio{
 		viewToolbarsMenu->addAction(commandBar->toggleViewAction());
 
 		//START COMMAND BAR
+		//TODO: Implement saving history of commands
 		cmdBar = new QComboBox();
+		cmdBar->setMaxCount(10);
 		cmdBar->setEditable(true);
 
 		//Setup QLineEdit in QComboBox
@@ -231,6 +234,11 @@ namespace ob_studio{
 		tr("<b>OpenBlox Studio</b><br/>"
 		"Version 0.1.1<br/>"
 		"OpenBlox"));
+	}
+
+	void StudioWindow::showSettings(bool checked){
+		Q_UNUSED(checked)
+		//TODO
 	}
 
 	void StudioWindow::commandBarReturn(){

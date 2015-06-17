@@ -17,6 +17,7 @@ namespace ob_studio{
 
 		private slots:
 			void about(bool checked);
+			void showSettings(bool checked);
 			void commandBarReturn();
 	};
 }
