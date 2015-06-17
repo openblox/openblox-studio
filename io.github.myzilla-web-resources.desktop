@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OpenBlox Studio
+Comment=Create and modify games for the OpenBlox game engine
+TryExec=openblox-studio
+Exec=openblox-studio %f
+# Icon=/usr/share/openblox-studio/icon.svg
+Icon=/usr/share/openblox/icon.png
+MimeType=application/xml;application/vnd.openblox.game-binary;application/vnd.openblox.game+xml
+Categories=Development;IDE;Qt
