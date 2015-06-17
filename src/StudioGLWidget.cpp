@@ -55,7 +55,11 @@ namespace ob_studio{
 	}
 
 	bool renderAxisWidgetText(GLuint tex, QString str, int x, int y){
-		return renderText(tex, OpenBlox::OBGame::getInstance()->internalBoldFont(), str, x, y, 0, 0, ob_enum::TextXAlignment::Left, ob_enum::TextYAlignment::Top, {255, 255, 255, 255});
+		TTF_Font* fnt = OpenBlox::OBGame::getInstance()->internalBoldFont();
+		if(fnt){
+			return renderText(tex, fnt, str, x, y, 0, 0, ob_enum::TextXAlignment::Left, ob_enum::TextYAlignment::Top, {255, 255, 255, 255});
+		}
+		return false;
 	}
 
 	void StudioGLWidget::drawAxisWidget(){
