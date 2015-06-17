@@ -77,7 +77,11 @@ int main(int argc, char** argv){
 	app.setOrganizationDomain("myzillawr.tk");
 	app.setOrganizationName("Myzilla Web Resources");
 
+	#ifdef __linux
+	QSettings settings("openblox-studio", "openblox-studio");
+	#else
 	QSettings settings;
+	#endif
 	bool firstRun = settings.value("first_run", true).toBool();
 	if(firstRun){
 		defaultValues(&settings);

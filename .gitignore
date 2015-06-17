@@ -11,3 +11,6 @@ QtMakefile.Release
 res/
 lua_src/
 raknet/
+res
+lua_src
+raknet
