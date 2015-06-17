@@ -67,6 +67,7 @@ void handle_log_event(std::vector<ob_type::VarWrapper> evec){
 
 void defaultValues(QSettings* settings){
 	settings->setValue("first_run", false);
+	settings->setValue("dark_theme", true);
 }
 
 int main(int argc, char** argv){
@@ -77,7 +78,9 @@ int main(int argc, char** argv){
 	app.setOrganizationDomain("myzillawr.tk");
 	app.setOrganizationName("Myzilla Web Resources");
 
-	#ifdef __linux
+	#ifdef _WIN32
+	QSettings settings("Myzilla Web Resources", "OpenBloxStudio");
+	#elif defined(__linux)
 	QSettings settings("openblox-studio", "openblox-studio");
 	#else
 	QSettings settings;
