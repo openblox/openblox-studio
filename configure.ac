@@ -48,7 +48,6 @@ AS_IF([test "x$syslua" != "xlua"],
 PKG_CHECK_MODULES([LLUA], [lua])
 
 PKG_CHECK_MODULES([LQT], [
-	Qt5
 	Qt5Core
 	Qt5Gui
 	Qt5Widgets
