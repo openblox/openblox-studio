@@ -1,5 +1,5 @@
 .\" Copyright (c) 2015 Mark Otaris <mark.otaris@openmailbox.org>
-.\" John M Harris, Jr. <jharris@johnmh.me>
+.\" Copyright (c) 2017 John M Harris, Jr. <johnmh@openblox.org>
 .\"
 .\" This file is part of OpenBlox Studio.
 .\"
@@ -16,7 +16,7 @@
 .\" You should have received a copy of the GNU General Public License
 .\" along with OpenBlox Studio.  If not, see <http://www.gnu.org/licenses/>.
 .\"
-.TH OPENBLOX-STUDIO 1 2015-06-16 "OpenBlox Studio" "OpenBlox User's Manual"
+.TH OPENBLOX-STUDIO 1 2017-03-20 "OpenBlox Studio" "OpenBlox User's Manual"
 .SH NAME
 openblox-studio \- Integrated development environment for the OpenBlox game engine.
 .SH SYNOPSIS
@@ -32,18 +32,13 @@ the creation of games usable with the OpenBlox game engine.
 Display this help.
 .IP "-v, --version"
 Display version information.
-.IP --script\ \fIscript-file\fP
-Run this script on initialization. The URL used to locate the script can
-use any URL scheme supported by libcurl, and may also use the res URL
-scheme internal to OpenBlox.
 .SH EXIT STATUS
 This program exits with 0 on success and 1 on failure.
 .SH BUGS
-The list of known bugs is available at <https://myzillawr.tk/bugs/>.
+The list of known bugs is available at <https://bugs.openblox.org/>.
 This is also where you can report bugs you find while using the program.
 .SH EXAMPLE
-.IP "openblox-studio --script res://init.lua"
-Start OpenBlox Studio and run the script in the file \fIinit.lua\fP in the
-\fIres\fP folder.
+.IP "openblox-studio path/to/game.obgx"
+Start OpenBlox Studio and open the game 'game.obgx'
 .SH AUTHOR
-John M Harris, Jr. (jharris@johnmh.me)
+John M. Harris, Jr. (johnmh@openblox.org)

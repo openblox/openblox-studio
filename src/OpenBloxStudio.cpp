@@ -1,46 +1,34 @@
-#include <OpenBlox.h>
+/*
+ * Copyright (C) 2017 John M. Harris, Jr. <johnmh@openblox.org>
+ *
+ * This file is part of OpenBlox Studio.
+ *
+ * OpenBlox Studio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenBlox Studio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include <openblox.h>
 
 #include <QApplication>
 
 #include "StudioWindow.h"
 
-#include <DataModel.h>
-#include <LogService.h>
+#include <instance/DataModel.h>
+/*#include <instance/LogService.h>*/
 
-ob_studio::StudioWindow* win = NULL;
+OB::Studio::StudioWindow* win = NULL;
 
-namespace OpenBlox{
-#ifdef OPENBLOX_STUDIO
-	void GetDisplaySize(int* width, int* height){
-		if(!win){
-			return;
-		}
-		ob_studio::StudioGLWidget* gl = win->glWidget;
-
-		*width = gl->width();
-		*height = gl->height();
-	}
-#endif
-
-	bool mw = true;
-}
-
-void checkSDLError(int line = -1){
-	#ifndef NDEBUG
-	{
-		const char *error = SDL_GetError();
-		if(*error != '\0'){
-			if(line != -1){
-				LOGW("SDL Error: %s (Line: %i)", error, line);
-			}else{
-				LOGW("SDL Error: %s", error);
-			}
-			SDL_ClearError();
-		}
-	}
-	#endif
-}
-
+/*
 void handle_log_event(std::vector<ob_type::VarWrapper> evec){
 	if(!win){
 		LOGI("Lost output message");
@@ -64,6 +52,7 @@ void handle_log_event(std::vector<ob_type::VarWrapper> evec){
 		}
 	}
 }
+*/
 
 void defaultValues(QSettings* settings){
 	settings->setValue("first_run", false);
@@ -75,11 +64,11 @@ int main(int argc, char** argv){
 
 	app.setApplicationName("OpenBlox Studio");
 	app.setApplicationVersion("0.1.1");
-	app.setOrganizationDomain("myzillawr.tk");
-	app.setOrganizationName("Myzilla Web Resources");
+	app.setOrganizationDomain("openblox.org");
+	app.setOrganizationName("OpenBlox");
 
 	#ifdef _WIN32
-	QSettings settings("Myzilla Web Resources", "OpenBloxStudio");
+	QSettings settings("OpenBlox", "OpenBloxStudio");
 	#elif defined(__linux)
 	QSettings settings("openblox-studio", "openblox-studio");
 	#else
@@ -105,53 +94,20 @@ int main(int argc, char** argv){
 	parser.setApplicationDescription("OpenBlox Studio");
 	parser.addHelpOption();
 	parser.addVersionOption();
-
-	QCommandLineOption initScriptOption("script", "Script to run on initialization.", "null");
-	parser.addOption(initScriptOption);
-
+	
 	parser.process(app);
 
-	QString initScript = QString::null;
+    OB::OBEngine* eng = new OB::OBEngine();
 
-	if(parser.isSet(initScriptOption)){
-		initScript = parser.value(initScriptOption).trimmed();
-	}
-
-	OpenBlox::OBGame* gameInst = new OpenBlox::OBGame(initScript, true);
-
-	OpenBlox::static_init::execute();
-
-	ob_instance::DataModel* dm = gameInst->getDataModel();
+	shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
 	if(dm){
-		ob_instance::LogService* ls = dm->logService;
+		/*OB::Instance::LogService* ls = dm->logService;
 		if(ls){
 			ls->MessageOut->Connect(handle_log_event);
-		}
+			}*/
 	}
 
-	SDL_SetMainReady();
-	if(SDL_Init(SDL_INIT_VIDEO) < 0){
-		LOGE("%s: %s", "Unable to initialize SDL", "");
-		SDL_Quit();
-		return 1;
-	}
-
-	checkSDLError(__LINE__);
-
-	if(TTF_Init() == -1){
-		LOGE("%s: %s", "Unable to init SDL_TTF", TTF_GetError());
-		SDL_Quit();
-		return 1;
-	}
-
-	int flags = IMG_INIT_JPG | IMG_INIT_PNG;
-	if((IMG_Init(flags) & flags) != flags){
-		LOGE("Failed to load required JPEG and PNG support.");
-		SDL_Quit();
-		return 1;
-	}
-
-	win = new ob_studio::StudioWindow();
+	win = new OB::Studio::StudioWindow();
 
 	settings.beginGroup("main_window");
 	{
@@ -166,14 +122,7 @@ int main(int argc, char** argv){
 
 	win->show();
 
-	QThread* taskThread = new OpenBlox::TaskThread();
-	taskThread->start();
-
 	while(win->isVisible()){
-		SDL_Event event;
-		while(SDL_PollEvent(&event)){
-			OpenBlox::ProcessEvent(gameInst, event);
-		}
 		app.processEvents();
 		QThread::msleep(10);
 	}
