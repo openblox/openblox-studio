@@ -4,8 +4,8 @@ bin_PROGRAMS = openblox-studio
 openblox_studio_SOURCES = OpenBloxStudio.cpp \
 	StudioGLWidget.cpp \
 	StudioWindow.cpp \
-	InstanceTreeItem.cpp
-
+	InstanceTreeItem.cpp \
+	qrc_resources.cpp
 # Linker options
 openblox_studio_LDADD = @LOPENBLOX_CFLAGS@ @LIRRLICHT_CFLAGS@ @LLUA_LIBS@ @LQT_LIBS@
 
