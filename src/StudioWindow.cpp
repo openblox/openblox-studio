@@ -166,31 +166,72 @@ namespace OB{
 
 			//Menus
 			QMenu* fileMenu = menuBar()->addMenu("File");
-			fileMenu->addAction("New");
-			fileMenu->addAction("Open...");
-			fileMenu->addAction("Close")->setEnabled(false);
+			
+			QAction* newAction = fileMenu->addAction("New");
+			newAction->setIcon(QIcon::fromTheme("document-new"));
+			newAction->setShortcut(QKeySequence::New);
+			
+			QAction* openAction = fileMenu->addAction("Open");
+			openAction->setIcon(QIcon::fromTheme("document-open"));
+			openAction->setShortcut(QKeySequence::Open);
 
 			fileMenu->addSeparator();
 
-			fileMenu->addAction("Save")->setEnabled(false);
-			fileMenu->addAction("Save As...")->setEnabled(false);
+			QAction* saveAction = fileMenu->addAction("Save");
+			saveAction->setEnabled(false);
+			saveAction->setIcon(QIcon::fromTheme("document-save"));
+			saveAction->setShortcut(QKeySequence::Save);
+			
+			QAction* saveAsAction = fileMenu->addAction("Save As");
+			saveAsAction->setEnabled(false);
+			saveAsAction->setIcon(QIcon::fromTheme("document-save-as"));
+			saveAsAction->setShortcut(QKeySequence::SaveAs);
+			
 			fileMenu->addSeparator();
-			fileMenu->addAction("Exit");
+			
+			QAction* closeAction = fileMenu->addAction("Close");
+			closeAction->setIcon(QIcon::fromTheme("window-close"));
+			closeAction->setShortcut(QKeySequence::Quit);
+			connect(closeAction, &QAction::triggered, this, &StudioWindow::closeStudio);
 
 			QMenu* editMenu = menuBar()->addMenu("Edit");
-			editMenu->addAction("Undo");
-			editMenu->addAction("Redo");
+			QAction* undoAction = editMenu->addAction("Undo");
+			undoAction->setIcon(QIcon::fromTheme("edit-undo"));
+			undoAction->setEnabled(false);
+			undoAction->setShortcut(QKeySequence::Undo);
+			
+			QAction* redoAction = editMenu->addAction("Redo");
+			redoAction->setIcon(QIcon::fromTheme("edit-redo"));
+			redoAction->setEnabled(false);
+			redoAction->setShortcut(QKeySequence::Redo);
 
 			editMenu->addSeparator();
 
-			editMenu->addAction("Cut")->setEnabled(false);
-			editMenu->addAction("Copy")->setEnabled(false);
-			editMenu->addAction("Paste")->setEnabled(false);
-			editMenu->addAction("Duplicate")->setEnabled(false);
+			QAction* cutAction = editMenu->addAction("Cut");
+			cutAction->setIcon(QIcon::fromTheme("edit-cut"));
+			cutAction->setEnabled(false);
+			cutAction->setShortcut(QKeySequence::Cut);
+			
+			QAction* copyAction = editMenu->addAction("Copy");
+			copyAction->setIcon(QIcon::fromTheme("edit-copy"));
+			copyAction->setEnabled(false);
+			copyAction->setShortcut(QKeySequence::Copy);
+
+			QAction* pasteAction = editMenu->addAction("Paste");
+			pasteAction->setIcon(QIcon::fromTheme("edit-paste"));
+			pasteAction->setEnabled(false);
+			pasteAction->setShortcut(QKeySequence::Paste);
+
+			QAction* deleteAction = editMenu->addAction("Delete");
+		    deleteAction->setIcon(QIcon::fromTheme("edit-delete"));
+			deleteAction->setEnabled(false);
+			deleteAction->setShortcut(QKeySequence::Delete);
 
 			editMenu->addSeparator();
 
 			QAction* settingsAct = editMenu->addAction("Settings");
+			settingsAct->setIcon(QIcon::fromTheme("configure-shortcuts", QIcon::fromTheme("configure", QIcon::fromTheme("document-properties"))));
+			settingsAct->setShortcut(QKeySequence::Preferences);
 			connect(settingsAct, &QAction::triggered, this, &StudioWindow::showSettings);
 
 			QMenu* viewMenu = menuBar()->addMenu("View");
@@ -199,6 +240,7 @@ namespace OB{
 
 			QAction* aboutAct = new QAction("About", this);
 			aboutAct->setStatusTip("About OpenBlox Studio");
+			aboutAct->setIcon(QIcon::fromTheme("help-about"));
 			connect(aboutAct, &QAction::triggered, this, &StudioWindow::about);
 
 			QMenu* helpMenu = menuBar()->addMenu("Help");
@@ -287,6 +329,11 @@ namespace OB{
 		void StudioWindow::showSettings(bool checked){
 			Q_UNUSED(checked);
 			//TODO
+		}
+
+		void StudioWindow::closeStudio(bool checked){
+			Q_UNUSED(checked);
+		    close();
 		}
 
 		void StudioWindow::commandBarReturn(){

@@ -40,6 +40,7 @@ namespace OB{
 			private slots:
 				void about(bool checked);
 				void showSettings(bool checked);
+				void closeStudio(bool checked);
 				void commandBarReturn();
 		};
 	}
