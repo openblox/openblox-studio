@@ -119,32 +119,26 @@ namespace OB{
 				}
 			}
 		}
-
-		void dm_instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-		    QTreeWidgetItem* parentItem = (QTreeWidgetItem*)ud;
-
-			if(evec.size() == 1){
-			    shared_ptr<Instance::Instance> newGuy = dynamic_pointer_cast<Instance::Instance>(evec[0]->asInstance());
-				if(treeItemMap.contains(newGuy)){
-					parentItem->addChild(treeItemMap[newGuy]);
-				}else{
-					addChildOfInstance(parentItem, newGuy);
-				}
+		
+		void dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
+			StudioWindow* sw = (StudioWindow*)ud;
+			if(!sw){
+				return;
 			}
-		}
-
-		void dm_instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			QTreeWidgetItem* parentItem = (QTreeWidgetItem*)ud;
 			
-			if(evec.size() == 1){
-				shared_ptr<Instance::Instance> newGuy = dynamic_pointer_cast<Instance::Instance>(evec[0]->asInstance());
-				if(treeItemMap.contains(newGuy)){
-					parentItem->removeChild(treeItemMap[newGuy]);
+		    OBEngine* eng = OBEngine::getInstance();
+			if(eng){
+			    shared_ptr<Instance::DataModel> dm = eng->getDataModel();
+				if(dm){
+					if(sw->tabWidget && sw->glWidget){
+						int studioWidgetIdx = sw->tabWidget->indexOf(sw->glWidget);
+						sw->tabWidget->setTabText(studioWidgetIdx, QString(dm->Name.c_str()));
+					}
 				}
 			}
 		}
 
-		void addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst){			
+		void addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst, StudioWindow* sw){			
 			if(!parentItem || !inst){
 				return;
 			}
@@ -158,11 +152,15 @@ namespace OB{
 
 			inst->ChildAdded->Connect(instance_child_added_evt, parentItem);
 			inst->ChildRemoved->Connect(instance_child_removed_evt, parentItem);
+			inst->Changed->Connect(dm_changed_evt, sw);
 		}
 
 		StudioWindow::StudioWindow(){
-			glWidget = new StudioGLWidget();
-			setCentralWidget(glWidget);
+			glWidget = NULL;
+
+			tabWidget = new QTabWidget();
+			tabWidget->setTabsClosable(true);
+			setCentralWidget(tabWidget);
 
 			//Menus
 			QMenu* fileMenu = menuBar()->addMenu("File");
@@ -170,6 +168,7 @@ namespace OB{
 			QAction* newAction = fileMenu->addAction("New");
 			newAction->setIcon(QIcon::fromTheme("document-new"));
 			newAction->setShortcut(QKeySequence::New);
+			connect(newAction, &QAction::triggered, this, &StudioWindow::newInstance);
 			
 			QAction* openAction = fileMenu->addAction("Open");
 			openAction->setIcon(QIcon::fromTheme("document-open"));
@@ -238,13 +237,12 @@ namespace OB{
 
 			menuBar()->addSeparator();
 
-			QAction* aboutAct = new QAction("About", this);
+			QMenu* helpMenu = menuBar()->addMenu("Help");
+
+			QAction* aboutAct = helpMenu->addAction("About");
 			aboutAct->setStatusTip("About OpenBlox Studio");
 			aboutAct->setIcon(QIcon::fromTheme("help-about"));
 			connect(aboutAct, &QAction::triggered, this, &StudioWindow::about);
-
-			QMenu* helpMenu = menuBar()->addMenu("Help");
-			helpMenu->addAction(aboutAct);
 
 			//Dock Components
 
@@ -317,23 +315,36 @@ namespace OB{
 			//END COMMAND BAR
 		}
 
-		void StudioWindow::about(bool checked){
-			Q_UNUSED(checked);
-
+		void StudioWindow::about(){
 			QMessageBox::about(this, tr("About OpenBlox Studio"),
 							   tr("<b>OpenBlox Studio</b><br/>"
 								  "Version 0.1.1<br/>"
 								  "OpenBlox"));
 		}
 
-		void StudioWindow::showSettings(bool checked){
-			Q_UNUSED(checked);
+		void StudioWindow::showSettings(){
 			//TODO
 		}
 
-		void StudioWindow::closeStudio(bool checked){
-			Q_UNUSED(checked);
+		void StudioWindow::closeStudio(){
 		    close();
+		}
+
+		void StudioWindow::newInstance(){
+			if(glWidget){
+			    //New process of openblox_studio
+			}else{
+				glWidget = new StudioGLWidget();
+				int tabIdx = tabWidget->addTab(glWidget, "Game");
+			    QTabBar* tabBar = tabWidget->tabBar();
+				if(tabBar){
+					QWidget* tabBtn = tabBar->tabButton(tabIdx, QTabBar::RightSide);
+					if(tabBtn){
+						tabBtn->resize(0, 0);
+						tabBtn->setVisible(false);
+					}
+				}
+			}
 		}
 
 		void StudioWindow::commandBarReturn(){
@@ -381,7 +392,7 @@ namespace OB{
 		    OB::OBEngine* eng = OB::OBEngine::getInstance();
 			if(eng){
 				eng->init();
-				addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(eng->getDataModel()));
+				addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(eng->getDataModel()), this);
 			}
 
 		    cmdBar->lineEdit()->setDisabled(false);

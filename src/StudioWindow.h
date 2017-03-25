@@ -22,6 +22,8 @@
 
 #include <QMainWindow>
 
+#include <QTabWidget>
+
 #include "StudioGLWidget.h"
 
 namespace OB{
@@ -30,6 +32,7 @@ namespace OB{
 		  public:
 			StudioWindow();
 
+			QTabWidget* tabWidget;
 			StudioGLWidget* glWidget;
 			QTextEdit* output;
 			QTreeWidget* explorer;
@@ -38,9 +41,10 @@ namespace OB{
 			void initGL();
 
 			private slots:
-				void about(bool checked);
-				void showSettings(bool checked);
-				void closeStudio(bool checked);
+				void about();
+				void showSettings();
+				void newInstance();
+				void closeStudio();
 				void commandBarReturn();
 		};
 	}
