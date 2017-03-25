@@ -19,6 +19,8 @@
 
 #include "StudioWindow.h"
 
+#include <QtWidgets>
+
 #include "InstanceTreeItem.h"
 
 #include <openblox.h>

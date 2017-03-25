@@ -21,16 +21,16 @@
 #define OB_STUDIO_STUDIOGLWIDGET_H_
 
 #include <QWidget>
-#include <QtOpenGL>
+#include <QOpenGLWidget>
+//#include <QtOpenGL>
+#include <QOpenGLFunctions>
 
 namespace OB{
 	namespace Studio{
-		class StudioGLWidget: public QGLWidget{
+		class StudioGLWidget: public QOpenGLWidget, protected QOpenGLFunctions{
 		  public:
 			StudioGLWidget(QWidget* parent = 0);
 			virtual ~StudioGLWidget();
-
-			static QGLFormat makeFormat();
 
 			QSize minimumSizeHint() const;
 			QSize sizeHint() const;

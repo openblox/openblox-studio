@@ -25,32 +25,29 @@
 
 #include <QtGui>
 
-#ifndef GL_MULTISAMPLE
-	#define GL_MULTISAMPLE 0x809D
-#endif
-
 namespace OB{
 	namespace Studio{
-		StudioGLWidget::StudioGLWidget(QWidget* parent) : QGLWidget(makeFormat(), parent){
+		StudioGLWidget::StudioGLWidget(QWidget* parent) : QOpenGLWidget(parent){
 			setAutoFillBackground(false);
 			setAttribute(Qt::WA_NoSystemBackground);
+			setAttribute(Qt::WA_NoBackground);
 
 			QTimer* timer = new QTimer(this);
 			connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 			timer->start(10);
+			
+			setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);
+
+			QSurfaceFormat fmt = format();
+			fmt.setDepthBufferSize(24);
+			fmt.setSamples(2);
+			fmt.setSwapInterval(1);
+			fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+			fmt.setRenderableType(QSurfaceFormat::OpenGL);
+			setFormat(fmt);
 		}
 
 		StudioGLWidget::~StudioGLWidget(){}
-
-		QGLFormat StudioGLWidget::makeFormat(){
-			QGLFormat format = QGLFormat();
-			format.setDepthBufferSize(24);
-			format.setSampleBuffers(true);
-			format.setSamples(2);
-			format.setDoubleBuffer(true);
-
-			return format;
-		}
 
 		QSize StudioGLWidget::minimumSizeHint() const{
 			return QSize(640, 480);
@@ -90,6 +87,9 @@ namespace OB{
 				throw OB::OBException("game is NULL!");
 			}
 		    //eng->resized();
+			if(eng->isRunning()){
+				eng->render();
+			}
 		}
 
 		void StudioGLWidget::mousePressEvent(QMouseEvent* event){}

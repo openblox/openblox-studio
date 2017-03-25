@@ -23,6 +23,9 @@
 #include <QMainWindow>
 
 #include <QTabWidget>
+#include <QTextEdit>
+#include <QTreeWidget>
+#include <QComboBox>
 
 #include "StudioGLWidget.h"
 

@@ -20,6 +20,11 @@
 #include <openblox.h>
 
 #include <QApplication>
+#include <QSettings>
+#include <QFile>
+#include <QTextStream>
+#include <QCommandLineParser>
+#include <QThread>
 
 #include "StudioWindow.h"
 
