@@ -64,7 +64,7 @@ namespace OB{
 		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			shared_ptr<Instance::Instance> kid = kidItem->GetInstance();
 
-			kidItem->setText(0, QString(kid->Name.c_str()));
+			kidItem->setText(0, QString(kid->getName().c_str()));
 		}
 
 		void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
@@ -134,7 +134,7 @@ namespace OB{
 				if(dm){
 					if(sw->tabWidget && sw->glWidget){
 						int studioWidgetIdx = sw->tabWidget->indexOf(sw->glWidget);
-						sw->tabWidget->setTabText(studioWidgetIdx, QString(dm->Name.c_str()));
+						sw->tabWidget->setTabText(studioWidgetIdx, QString(dm->getName().c_str()));
 					}
 				}
 			}

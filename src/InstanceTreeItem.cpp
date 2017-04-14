@@ -24,7 +24,7 @@ namespace OB{
 		InstanceTreeItem::InstanceTreeItem(shared_ptr<Instance::Instance> inst, QTreeWidget* parent) : QTreeWidgetItem(parent){
 			this->inst = inst;
 
-			this->setText(0, QString(inst->Name.c_str()));
+			this->setText(0, QString(inst->getName().c_str()));
 		}
 
 		InstanceTreeItem::~InstanceTreeItem(){}
