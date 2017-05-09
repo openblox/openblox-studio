@@ -40,6 +40,7 @@ namespace OB{
 
 		  private:
 			std::vector<shared_ptr<Instance::Instance>> editingInstances;
+			std::map<std::string, PropertyItem*> curProps;
 		};
 	}
 }

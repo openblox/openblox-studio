@@ -35,10 +35,10 @@ namespace OB{
 		    std::string getPropertyType();
 			void setPropertyType(std::string type);
 
-			shared_ptr<Type::VarWrapper> getValue();
-			void setValue(shared_ptr<Type::VarWrapper> val);
-		    QString getTextValue();
-			void setTextValue(QString val);
+			virtual shared_ptr<Type::VarWrapper> getValue();
+			virtual void setValue(shared_ptr<Type::VarWrapper> val);
+		    virtual QString getTextValue();
+			virtual void setTextValue(QString val);
 			
 			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
@@ -48,6 +48,19 @@ namespace OB{
 		  private:
 			std::string propertyName;
 			std::string propertyType;
+		};
+
+		class StringPropertyItem: public PropertyItem{
+		  public:
+			StringPropertyItem(QString name);
+
+			virtual shared_ptr<Type::VarWrapper> getValue();
+			virtual void setValue(shared_ptr<Type::VarWrapper> val);
+		    virtual QString getTextValue();
+			virtual void setTextValue(QString val);
+
+		  private:
+			std::string val;
 		};
 	}
 }

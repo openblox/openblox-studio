@@ -28,10 +28,6 @@ namespace OB{
 		    propertyType = "unknown";
 
 			setText(0, name);
-			
-			if(parentItem != NULL){
-				
-			}
 		}
 
 	    PropertyItem::~PropertyItem(){}
@@ -69,5 +65,26 @@ namespace OB{
 	    void PropertyItem::setModelData(QWidget* editor){}
 
 		bool PropertyItem::editorEvent(QEvent* evt){}
+
+	    StringPropertyItem::StringPropertyItem(QString name) : PropertyItem(NULL, name){
+			setPropertyType("string");
+			val = "";
+		}
+
+		shared_ptr<Type::VarWrapper> StringPropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void StringPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asString();
+		}
+		
+		QString StringPropertyItem::getTextValue(){
+			return QString(val.c_str());
+		}
+		
+		void StringPropertyItem::setTextValue(QString val){
+			this->val = val.toStdString();
+		}
 	}
 }

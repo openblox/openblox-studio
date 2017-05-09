@@ -57,9 +57,6 @@ namespace OB{
 		void PropertyTreeWidget::updateSelection(std::vector<shared_ptr<Instance::Instance>> selectedInstances){
 			editingInstances = selectedInstances;
 
-			//Remove all props
-			clear();
-
 			std::set<std::string> sharedProperties;
 
 			if(!editingInstances.empty()){
@@ -77,22 +74,36 @@ namespace OB{
 						std::map<std::string, Instance::_PropertyInfo> tprops = inst->getProperties();
 
 						for(auto it = sharedProperties.begin(); it != sharedProperties.end();){
-							if(tprops.find(*it) == tprops.end()){
+							auto fIt = tprops.find(*it);
+							if(fIt == tprops.end()){
 							    it = sharedProperties.erase(it);
 							}else{
-								++it;
+								Instance::_PropertyInfo pInfo = fIt->second;
+								if(!pInfo.isPublic){
+									it = sharedProperties.erase(it);
+								}else{
+									Instance::_PropertyInfo pInfoOrig = props[*it];
+									if(pInfoOrig.type != pInfo.type){
+										it = sharedProperties.erase(it);
+									}else{
+										++it;
+									}
+								}
 							}
 						}
 					}
 				}
-			    
-				for(auto it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
-					std::string propName = *it;
-
-				    PropertyItem* itm = new PropertyItem(QString(propName.c_str()));
-				    addTopLevelItem(itm);
-				}
 		    }
+
+			clear();
+			curProps.clear();
+
+			for(auto it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
+				std::string propName = *it;
+
+				PropertyItem* itm = new PropertyItem(QString(propName.c_str()));
+				addTopLevelItem(itm);
+			}
 		}
 
 		void PropertyTreeWidget::updateValues(){
