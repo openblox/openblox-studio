@@ -321,5 +321,59 @@ namespace OB{
 				tree->setProp(propertyName, getValue());
 			}
 		}
+
+		// FloatPropertyItem
+
+	    FloatPropertyItem::FloatPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("float");
+			val = 0;
+			setText(1, getTextValue());
+		}
+
+		shared_ptr<Type::VarWrapper> FloatPropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void FloatPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asFloat();
+			setText(1, getTextValue());
+		}
+		
+		QString FloatPropertyItem::getTextValue(){
+			return QString::number(val);
+		}
+		
+		void FloatPropertyItem::setTextValue(QString val){
+			this->val = val.toFloat();
+			setText(1, getTextValue());
+		}
+
+		QWidget* FloatPropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+		    QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+		    spinBox->setGeometry(option.rect);
+		    spinBox->setFrame(false);
+			spinBox->setMinimum(-FLT_MAX);
+			spinBox->setMaximum(FLT_MAX);
+			
+		    return spinBox;
+		}
+
+		void FloatPropertyItem::setEditorData(QWidget* editor){
+		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+			if(spinBox){
+			    spinBox->setValue((double)val);
+			}
+		}
+
+	    void FloatPropertyItem::setModelData(QWidget* editor){
+		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+
+			if(spinBox){
+			    val = (float)spinBox->value();
+				setText(1, getTextValue());
+				
+				tree->setProp(propertyName, getValue());
+			}
+		}
 	}
 }
