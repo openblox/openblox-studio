@@ -32,6 +32,10 @@
 
 namespace OB{
 	namespace Studio{
+		std::string StudioWindow::pathToStudioExecutable = "";
+		
+		// Do I think the use of HTML here is horrible? Yes.
+		// Am I going to do something about it in the near future? Probably not.
 		void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud){
 		    StudioWindow* win = (StudioWindow*)ud;
 			
@@ -83,7 +87,16 @@ namespace OB{
 		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			shared_ptr<Instance::Instance> kid = kidItem->GetInstance();
 
-			kidItem->setText(0, QString(kid->getName().c_str()));
+			std::string prop = evec.at(0)->asString();
+
+			if(prop == "Name"){
+				kidItem->setText(0, QString(kid->getName().c_str()));
+				return;
+			}
+			if(prop == "Parent" || prop == "ParentLocked"){
+				kidItem->updateFlags();
+				return;
+			}
 		}
 
 		void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
@@ -292,10 +305,9 @@ namespace OB{
 
 			dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
 
-			explorer = new QTreeWidget();
-			explorer->setSelectionMode(QAbstractItemView::ExtendedSelection);
-			explorer->setSelectionBehavior(QAbstractItemView::SelectItems);
-			explorer->header()->close();
+			explorer = new InstanceTree();
+
+			connect(explorer, &QTreeWidget::itemSelectionChanged, this, &StudioWindow::selectionChanged);
 
 			dock->setWidget(explorer);
 			addDockWidget(Qt::RightDockWidgetArea, dock);
@@ -353,7 +365,14 @@ namespace OB{
 
 		void StudioWindow::newInstance(){
 			if(glWidget){
-			    //New process of openblox_studio
+				if(pathToStudioExecutable.length() > 0){
+					pid_t fr = fork();
+					if(fr == 0){
+						execlp(pathToStudioExecutable.c_str(), pathToStudioExecutable.c_str(),
+							   "--new",
+							   NULL);
+					}
+				}
 			}else{
 				glWidget = new StudioGLWidget();
 				int tabIdx = tabWidget->addTab(glWidget, "Game");
@@ -386,11 +405,9 @@ namespace OB{
 			}
 			
 			lua_State* L = Lua::initThread(gL);
-			//lua_resume(L, NULL, 0);
 
 			int s = luaL_loadstring(L, text.toStdString().c_str());
 			if(s == 0){
-				//s = lua_pcall(L, 0, LUA_MULTRET, 0);
 				s = lua_resume(L, NULL, 0);
 			}
 
@@ -401,6 +418,10 @@ namespace OB{
 			if(s == LUA_OK){
 				Lua::close_state(L);
 			}
+		}
+
+		void StudioWindow::selectionChanged(){
+			
 		}
 
 		void StudioWindow::initGL(){

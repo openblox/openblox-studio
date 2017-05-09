@@ -31,6 +31,7 @@ namespace OB{
 			setAutoFillBackground(false);
 			setAttribute(Qt::WA_NoSystemBackground);
 			setAttribute(Qt::WA_NoBackground);
+			setAttribute(Qt::WA_OpaquePaintEvent);
 
 			QTimer* timer = new QTimer(this);
 			connect(timer, SIGNAL(timeout()), this, SLOT(update()));

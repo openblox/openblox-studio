@@ -28,8 +28,6 @@
 
 #include "StudioWindow.h"
 
-OB::Studio::StudioWindow* win = NULL;
-
 void defaultValues(QSettings* settings){
 	settings->setValue("first_run", false);
 	settings->setValue("dark_theme", true);
@@ -37,6 +35,9 @@ void defaultValues(QSettings* settings){
 
 int main(int argc, char** argv){
 	QApplication app(argc, argv);
+
+	OB::Studio::StudioWindow::pathToStudioExecutable = std::string(argv[0]);
+	std::cout << "Exec: " << argv[0] << std::endl;
 
 	app.setApplicationName("OpenBlox Studio");
 	app.setApplicationVersion("0.1.1");
@@ -70,12 +71,15 @@ int main(int argc, char** argv){
 	parser.setApplicationDescription("OpenBlox Studio");
 	parser.addHelpOption();
 	parser.addVersionOption();
+
+	QCommandLineOption newOpt("new", "Starts a new game instance on initialization.");
+	parser.addOption(newOpt);
 	
 	parser.process(app);
 
     OB::OBEngine* eng = new OB::OBEngine();
 
-	win = new OB::Studio::StudioWindow();
+	OB::Studio::StudioWindow* win = new OB::Studio::StudioWindow();
 
 	settings.beginGroup("main_window");
 	{
@@ -89,6 +93,10 @@ int main(int argc, char** argv){
 	settings.endGroup();
 
 	win->show();
+
+	if(parser.isSet(newOpt)){
+		win->newInstance();
+	}
 
 	while(win->isVisible()){
 		app.processEvents();

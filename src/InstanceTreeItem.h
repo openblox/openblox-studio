@@ -31,6 +31,8 @@ namespace OB{
 			InstanceTreeItem(shared_ptr<Instance::Instance> inst, QTreeWidget* parent = 0);
 			virtual ~InstanceTreeItem();
 
+			void updateFlags();
+
 		    shared_ptr<Instance::Instance> GetInstance();
 
 		  private:

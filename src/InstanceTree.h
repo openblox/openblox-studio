@@ -17,42 +17,21 @@
  * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OB_STUDIO_STUDIOWINDOW_H_
-#define OB_STUDIO_STUDIOWINDOW_H_
+#ifndef OB_STUDIO_INSTANCETREE_H_
+#define OB_STUDIO_INSTANCETREE_H_
 
-#include <QMainWindow>
-
-#include <QTabWidget>
-#include <QTextEdit>
-#include <QComboBox>
-
-#include "InstanceTree.h"
-#include "StudioGLWidget.h"
+#include <QTreeWidgetItem>
 
 namespace OB{
 	namespace Studio{
-	    class StudioWindow: public QMainWindow{
+		class InstanceTree: public QTreeWidget{
 		  public:
-			StudioWindow();
+			InstanceTree();
+			virtual ~InstanceTree();
 
-			static std::string pathToStudioExecutable;
-
-			QTabWidget* tabWidget;
-			StudioGLWidget* glWidget;
-			QTextEdit* output;
-		    InstanceTree* explorer;
-			QComboBox* cmdBar;
-
-			void initGL();
-
-		    public slots:
-				void about();
-				void showSettings();
-				void newInstance();
-				void closeStudio();
-				void commandBarReturn();
-				void selectionChanged();
+			virtual void dropEvent(QDropEvent* evt);
 		};
 	}
 }
+
 #endif

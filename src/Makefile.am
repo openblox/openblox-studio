@@ -4,6 +4,7 @@ bin_PROGRAMS = openblox-studio
 openblox_studio_SOURCES = OpenBloxStudio.cpp \
 	StudioGLWidget.cpp \
 	StudioWindow.cpp \
+	InstanceTree.cpp \
 	InstanceTreeItem.cpp \
 	qrc_resources.cpp
 # Linker options

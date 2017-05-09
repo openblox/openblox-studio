@@ -25,9 +25,21 @@ namespace OB{
 			this->inst = inst;
 
 			this->setText(0, QString(inst->getName().c_str()));
+
+			updateFlags();
 		}
 
 		InstanceTreeItem::~InstanceTreeItem(){}
+
+		void InstanceTreeItem::updateFlags(){
+			Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDropEnabled | Qt::ItemIsEnabled;
+
+			if(!inst->ParentLocked){
+				flags = flags | Qt::ItemIsDragEnabled;
+			}
+			
+			setFlags(flags);
+		}
 
 	    shared_ptr<Instance::Instance> InstanceTreeItem::GetInstance(){
 			return inst;
