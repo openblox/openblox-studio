@@ -65,7 +65,9 @@ namespace OB{
 
 				// Push names of all properties to sharedProperties
 				for(auto it = props.begin(); it != props.end(); ++it){
-				    sharedProperties.insert(it->first);
+					if(it->second.isPublic){
+						sharedProperties.insert(it->first);
+					}
 				}
 
 				// Remove properties not all instances have
@@ -126,7 +128,7 @@ namespace OB{
 					if(pInfo.type == "string"){
 					    StringPropertyItem* pi = new StringPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
-							pi->setFlags(pi->Flags() & ~Qt::ItemIsEnabled);
+							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
@@ -136,7 +138,7 @@ namespace OB{
 					if(pInfo.type == "bool"){
 					    BoolPropertyItem* pi = new BoolPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
-							pi->setFlags(pi->Flags() & ~Qt::ItemIsEnabled);
+							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
@@ -146,7 +148,7 @@ namespace OB{
 					if(pInfo.type == "int"){
 					    IntPropertyItem* pi = new IntPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
-							pi->setFlags(pi->Flags() & ~Qt::ItemIsEnabled);
+							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
