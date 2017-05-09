@@ -19,6 +19,8 @@
 
 #include "PropertyTreeItemDelegate.h"
 
+#include "PropertyItem.h"
+
 namespace OB{
 	namespace Studio{
 		PropertyTreeItemDelegate::PropertyTreeItemDelegate(PropertyTreeWidget* treeWidget){
@@ -41,7 +43,10 @@ namespace OB{
 
 		QWidget* PropertyTreeItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem &option, const QModelIndex &index) const{
 			if(index.column() == 1){
-					
+				PropertyItem* pItem = treeWidget->propertyItemAt(index);
+				if(pItem){
+					return pItem->createEditor(parent, option);
+				}
 			}
 			return NULL;
 		}
@@ -51,7 +56,10 @@ namespace OB{
 				return;
 			}
 
-			
+			PropertyItem* pItem = treeWidget->propertyItemAt(index);
+			if(pItem){
+				return pItem->setEditorData(editor);
+			}
 		}
 
 	    void PropertyTreeItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex &index) const{
@@ -59,12 +67,18 @@ namespace OB{
 				return;
 			}
 
-			
+			PropertyItem* pItem = treeWidget->propertyItemAt(index);
+			if(pItem){
+				return pItem->setModelData(editor);
+			}
 		}
 
 		bool PropertyTreeItemDelegate::editorEvent(QEvent* evt, QAbstractItemModel* model, const QStyleOptionViewItem &option, const QModelIndex &index){
 			if(index.column() == 1){
-				
+				PropertyItem* pItem = treeWidget->propertyItemAt(index);
+				if(pItem){
+					return pItem->editorEvent(evt);
+				}
 			}
 
 			return false;

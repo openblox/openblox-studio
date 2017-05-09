@@ -26,6 +26,8 @@
 #include "PropertyTreeWidget.h"
 #include "PropertyTreeItemDelegate.h"
 
+#include "PropertyItem.h"
+
 namespace OB{
 	namespace Studio{
 		PropertyTreeWidget::PropertyTreeWidget(){
@@ -57,7 +59,6 @@ namespace OB{
 
 			//Remove all props
 			clear();
-			puts("Updating selection");
 
 			std::set<std::string> sharedProperties;
 
@@ -77,7 +78,6 @@ namespace OB{
 
 						for(auto it = sharedProperties.begin(); it != sharedProperties.end();){
 							if(tprops.find(*it) == tprops.end()){
-								std::cout << "-" << *it << ";" << std::endl;
 							    it = sharedProperties.erase(it);
 							}else{
 								++it;
@@ -85,18 +85,22 @@ namespace OB{
 						}
 					}
 				}
-				
-				std::cout << "Still have: " << std::endl;
+			    
 				for(auto it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
 					std::string propName = *it;
 
-					std::cout << propName.c_str() << std::endl;
+				    PropertyItem* itm = new PropertyItem(QString(propName.c_str()));
+				    addTopLevelItem(itm);
 				}
 		    }
 		}
 
 		void PropertyTreeWidget::updateValues(){
 			
+		}
+
+		PropertyItem* PropertyTreeWidget::propertyItemAt(const QModelIndex &index){
+			return dynamic_cast<PropertyItem*>(itemFromIndex(index));
 		}
 	}
 }

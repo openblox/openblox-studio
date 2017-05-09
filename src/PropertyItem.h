@@ -17,29 +17,37 @@
  * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OB_STUDIO_PROPERTYTREEWIDGET_H_
-#define OB_STUDIO_PROPERTYTREEWIDGET_H_
+#ifndef OB_STUDIO_PROPERTYITEM_H_
+#define OB_STUDIO_PROPERTYITEM_H_
 
-#include <QTreeWidgetItem>
-
-#include <instance/Instance.h>
+#include <PropertyTreeWidget.h>
+#include <QStyledItemDelegate>
 
 namespace OB{
 	namespace Studio{
-		class PropertyItem;
-		
-		class PropertyTreeWidget: public QTreeWidget{
+		class PropertyItem: public QTreeWidgetItem{
 		  public:
-		    PropertyTreeWidget();
-			virtual ~PropertyTreeWidget();
+		    PropertyItem(QString name);
+			PropertyItem(PropertyItem* parentItem, QString name);
+			virtual ~PropertyItem();
 
-			void updateSelection(std::vector<shared_ptr<Instance::Instance>> selectedInstances);
-			void updateValues();
+		    std::string getPropertyName();
+		    std::string getPropertyType();
+			void setPropertyType(std::string type);
 
-			PropertyItem* propertyItemAt(const QModelIndex &index);
+			shared_ptr<Type::VarWrapper> getValue();
+			void setValue(shared_ptr<Type::VarWrapper> val);
+		    QString getTextValue();
+			void setTextValue(QString val);
+			
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual void setEditorData(QWidget* editor);
+			virtual void setModelData(QWidget* editor);
+			virtual bool editorEvent(QEvent* evt);
 
 		  private:
-			std::vector<shared_ptr<Instance::Instance>> editingInstances;
+			std::string propertyName;
+			std::string propertyType;
 		};
 	}
 }
