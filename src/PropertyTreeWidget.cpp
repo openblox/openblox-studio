@@ -155,6 +155,16 @@ namespace OB{
 						updateValue(propName);
 						continue;
 					}
+					if(pInfo.type == "double"){
+					    DoublePropertyItem* pi = new DoublePropertyItem(this, QString(propName.c_str()));
+						if(pInfo.readOnly){
+							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
+						}
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
 				}
 		    }else{
 				for(auto i = curProps.begin(); i != curProps.end(); ++i){

@@ -26,6 +26,9 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
+
+#include <cfloat>
 
 namespace OB{
 	namespace Studio{
@@ -256,6 +259,60 @@ namespace OB{
 
 	    void IntPropertyItem::setModelData(QWidget* editor){
 		    QSpinBox* spinBox = dynamic_cast<QSpinBox*>(editor);
+
+			if(spinBox){
+			    val = spinBox->value();
+				setText(1, getTextValue());
+				
+				tree->setProp(propertyName, getValue());
+			}
+		}
+
+		// DoublePropertyItem
+
+	    DoublePropertyItem::DoublePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("double");
+			val = 0;
+			setText(1, getTextValue());
+		}
+
+		shared_ptr<Type::VarWrapper> DoublePropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void DoublePropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asDouble();
+			setText(1, getTextValue());
+		}
+		
+		QString DoublePropertyItem::getTextValue(){
+			return QString::number(val);
+		}
+		
+		void DoublePropertyItem::setTextValue(QString val){
+			this->val = val.toDouble();
+			setText(1, getTextValue());
+		}
+
+		QWidget* DoublePropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+		    QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+		    spinBox->setGeometry(option.rect);
+		    spinBox->setFrame(false);
+			spinBox->setMinimum(-DBL_MAX);
+			spinBox->setMaximum(DBL_MAX);
+			
+		    return spinBox;
+		}
+
+		void DoublePropertyItem::setEditorData(QWidget* editor){
+		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+			if(spinBox){
+			    spinBox->setValue(val);
+			}
+		}
+
+	    void DoublePropertyItem::setModelData(QWidget* editor){
+		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
 
 			if(spinBox){
 			    val = spinBox->value();

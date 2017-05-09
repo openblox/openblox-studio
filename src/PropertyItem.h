@@ -98,6 +98,23 @@ namespace OB{
 		  private:
 		    int val;
 		};
+
+		class DoublePropertyItem: public PropertyItem{
+		  public:
+		    DoublePropertyItem(PropertyTreeWidget* tree, QString name);
+
+			virtual shared_ptr<Type::VarWrapper> getValue();
+			virtual void setValue(shared_ptr<Type::VarWrapper> val);
+		    virtual QString getTextValue();
+			virtual void setTextValue(QString val);
+
+		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual void setEditorData(QWidget* editor);
+			virtual void setModelData(QWidget* editor);
+
+		  private:
+		    double val;
+		};
 	}
 }
 
