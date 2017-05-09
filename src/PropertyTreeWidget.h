@@ -34,7 +34,7 @@ namespace OB{
 			virtual ~PropertyTreeWidget();
 
 			void updateSelection(std::vector<shared_ptr<Instance::Instance>> selectedInstances);
-			void updateValues();
+			void updateValue(std::string prop);
 
 			PropertyItem* propertyItemAt(const QModelIndex &index);
 

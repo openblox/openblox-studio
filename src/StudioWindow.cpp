@@ -97,6 +97,17 @@ namespace OB{
 
 			std::string prop = evec.at(0)->asString();
 
+			if(static_win){
+				std::vector<shared_ptr<Instance::Instance>> selection = static_win->selectedInstances;
+
+				if(!selection.empty()){
+					if(std::find(selection.begin(), selection.end(), kid) != selection.end()){
+						static_win->properties->updateValue(prop);
+					}
+				}
+				
+			}
+
 			if(prop == "Name"){
 			    const QSignalBlocker sigBlock(kidItem->treeWidget());
 				kidItem->setText(0, QString(kid->getName().c_str()));
@@ -105,17 +116,6 @@ namespace OB{
 			if(prop == "Parent" || prop == "ParentLocked"){
 				kidItem->updateFlags();
 				return;
-			}
-
-			if(static_win){
-				std::vector<shared_ptr<Instance::Instance>> selection = static_win->selectedInstances;
-
-				if(!selection.empty()){
-					if(std::find(selection.begin(), selection.end(), kid) != selection.end()){
-						static_win->properties->updateValues();
-					}
-				}
-				
 			}
 		}
 

@@ -57,9 +57,8 @@ namespace OB{
 		void PropertyTreeWidget::updateSelection(std::vector<shared_ptr<Instance::Instance>> selectedInstances){
 			editingInstances = selectedInstances;
 
-			std::set<std::string> sharedProperties;
-
-			if(!editingInstances.empty()){
+		    if(!editingInstances.empty()){
+				std::set<std::string> sharedProperties;
 			    std::map<std::string, Instance::_PropertyInfo> props = editingInstances[0]->getProperties();
 
 				// Push names of all properties to sharedProperties
@@ -93,21 +92,67 @@ namespace OB{
 						}
 					}
 				}
-		    }
 
-			clear();
-			curProps.clear();
+				for(auto it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
+					std::string propName = *it;
 
-			for(auto it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
-				std::string propName = *it;
+					Instance::_PropertyInfo pInfo = props[propName];
 
-				PropertyItem* itm = new PropertyItem(QString(propName.c_str()));
-				addTopLevelItem(itm);
+				    PropertyItem* oldItem = curProps[propName];
+					if(oldItem){
+						if(oldItem->getPropertyType() == pInfo.type){
+							updateValue(propName);
+							continue;
+						}else{
+							invisibleRootItem()->removeChild(oldItem);
+							curProps.erase(propName);
+							delete oldItem;
+						}
+					}
+
+					if(pInfo.type == "string"){
+					    StringPropertyItem* pi = new StringPropertyItem(QString(propName.c_str()));
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
+				}
+		    }else{
+				clear();
+				curProps.clear();
 			}
 		}
 
-		void PropertyTreeWidget::updateValues(){
-			
+		void PropertyTreeWidget::updateValue(std::string prop){
+		    PropertyItem* propItem = curProps[prop];
+			if(propItem){
+				shared_ptr<Type::VarWrapper> toSet;
+				bool firstPass = true;
+				bool hasMultiple = false;
+
+				for(auto i = editingInstances.begin(); i != editingInstances.end(); ++i){
+					shared_ptr<Instance::Instance> inst = *i;
+					if(inst){
+						shared_ptr<Type::VarWrapper> iVal = inst->getProperty(prop);
+						if(firstPass){
+							toSet = iVal;
+							firstPass = false;
+						}else{
+							if(!iVal->valueEquals(toSet)){
+							    hasMultiple = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if(hasMultiple){
+					toSet = make_shared<Type::VarWrapper>();
+				}
+
+				propItem->setValue(toSet);
+			}
 		}
 
 		PropertyItem* PropertyTreeWidget::propertyItemAt(const QModelIndex &index){

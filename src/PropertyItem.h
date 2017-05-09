@@ -59,6 +59,10 @@ namespace OB{
 		    virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual void setEditorData(QWidget* editor);
+			virtual void setModelData(QWidget* editor);
+
 		  private:
 			std::string val;
 		};

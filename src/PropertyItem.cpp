@@ -19,6 +19,8 @@
 
 #include "PropertyItem.h"
 
+#include <QLineEdit>
+
 namespace OB{
 	namespace Studio{
 		PropertyItem::PropertyItem(QString name) : PropertyItem(NULL, name){}
@@ -28,6 +30,7 @@ namespace OB{
 		    propertyType = "unknown";
 
 			setText(0, name);
+			setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 		}
 
 	    PropertyItem::~PropertyItem(){}
@@ -66,9 +69,12 @@ namespace OB{
 
 		bool PropertyItem::editorEvent(QEvent* evt){}
 
+		//StringPropertyItem
+
 	    StringPropertyItem::StringPropertyItem(QString name) : PropertyItem(NULL, name){
 			setPropertyType("string");
 			val = "";
+			setText(1, QString(val.c_str()));
 		}
 
 		shared_ptr<Type::VarWrapper> StringPropertyItem::getValue(){
@@ -77,6 +83,7 @@ namespace OB{
 		
 		void StringPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asString();
+			setText(1, getTextValue());
 		}
 		
 		QString StringPropertyItem::getTextValue(){
@@ -85,6 +92,30 @@ namespace OB{
 		
 		void StringPropertyItem::setTextValue(QString val){
 			this->val = val.toStdString();
+			setText(1, getTextValue());
+		}
+
+		QWidget* StringPropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+			QLineEdit* lineEdit = new QLineEdit(parent);
+			lineEdit->setGeometry(option.rect);
+			lineEdit->setFrame(false);
+			
+		    return lineEdit;
+		}
+
+		void StringPropertyItem::setEditorData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+			if(lineEdit){
+				lineEdit->setText(getTextValue());
+			}
+		}
+
+	    void StringPropertyItem::setModelData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+
+			if(lineEdit){
+				setTextValue(lineEdit->text());
+			}
 		}
 	}
 }
