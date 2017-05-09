@@ -35,6 +35,7 @@ namespace OB{
 
 			void updateSelection(std::vector<shared_ptr<Instance::Instance>> selectedInstances);
 			void updateValue(std::string prop);
+			void setProp(std::string prop, shared_ptr<Type::VarWrapper> val);
 
 			PropertyItem* propertyItemAt(const QModelIndex &index);
 

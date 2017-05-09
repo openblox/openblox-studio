@@ -36,8 +36,11 @@ namespace OB{
 			setRootIsDecorated(false);
 			setColumnCount(2);
 			setSelectionBehavior(QAbstractItemView::SelectRows);
+			setSelectionMode(QAbstractItemView::NoSelection);
+			
 			setAcceptDrops(false);
 			setDragEnabled(false);
+			setSortingEnabled(true);
 
 			QStringList headerLabels;
 			headerLabels << "Property" << "Value";
@@ -93,6 +96,17 @@ namespace OB{
 					}
 				}
 
+			    //Remove properties that aren't valid anymore
+			    for(auto i = curProps.begin(); i != curProps.end();){
+					if(std::find(sharedProperties.begin(), sharedProperties.end(), i->first) == sharedProperties.end()){
+						invisibleRootItem()->removeChild(i->second);
+						delete i->second;
+						i = curProps.erase(i);
+					}else{
+						++i;
+					}
+				}
+
 				for(auto it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
 					std::string propName = *it;
 
@@ -111,7 +125,21 @@ namespace OB{
 					}
 
 					if(pInfo.type == "string"){
-					    StringPropertyItem* pi = new StringPropertyItem(QString(propName.c_str()));
+					    StringPropertyItem* pi = new StringPropertyItem(this, QString(propName.c_str()));
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
+					if(pInfo.type == "bool"){
+					    BoolPropertyItem* pi = new BoolPropertyItem(this, QString(propName.c_str()));
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
+					if(pInfo.type == "int"){
+					    IntPropertyItem* pi = new IntPropertyItem(this, QString(propName.c_str()));
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
 						updateValue(propName);
@@ -119,8 +147,11 @@ namespace OB{
 					}
 				}
 		    }else{
-				clear();
-				curProps.clear();
+				for(auto i = curProps.begin(); i != curProps.end(); ++i){
+				   invisibleRootItem()->removeChild(i->second);
+				   delete i->second;
+				   i = curProps.erase(i);
+				}
 			}
 		}
 
@@ -152,6 +183,15 @@ namespace OB{
 				}
 
 				propItem->setValue(toSet);
+			}
+		}
+
+		void PropertyTreeWidget::setProp(std::string prop, shared_ptr<Type::VarWrapper> val){
+			for(auto i = editingInstances.begin(); i != editingInstances.end(); ++i){
+				shared_ptr<Instance::Instance> inst = *i;
+				if(inst){
+					inst->setProperty(prop, val);
+				}
 			}
 		}
 

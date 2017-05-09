@@ -20,17 +20,22 @@
 #include "PropertyItem.h"
 
 #include <QLineEdit>
+#include <QPixmap>
+#include <QPixmapCache>
+#include <QApplication>
+#include <QPainter>
+#include <QMouseEvent>
+#include <QSpinBox>
 
 namespace OB{
 	namespace Studio{
-		PropertyItem::PropertyItem(QString name) : PropertyItem(NULL, name){}
-
-		PropertyItem::PropertyItem(PropertyItem* parentItem, QString name){
+		PropertyItem::PropertyItem(PropertyTreeWidget* tree, QString name){
+			this->tree = tree;
 		    propertyName = name.toStdString();
 		    propertyType = "unknown";
 
 			setText(0, name);
-			setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+			setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 		}
 
 	    PropertyItem::~PropertyItem(){}
@@ -69,9 +74,9 @@ namespace OB{
 
 		bool PropertyItem::editorEvent(QEvent* evt){}
 
-		//StringPropertyItem
+		// StringPropertyItem
 
-	    StringPropertyItem::StringPropertyItem(QString name) : PropertyItem(NULL, name){
+	    StringPropertyItem::StringPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("string");
 			val = "";
 			setText(1, QString(val.c_str()));
@@ -115,6 +120,138 @@ namespace OB{
 
 			if(lineEdit){
 				setTextValue(lineEdit->text());
+			}
+		}
+
+		// BoolPropertyItem
+
+	    QIcon getCheckBox(int val, bool disabled){
+			QPixmap pixmap;
+			if(!QPixmapCache::find(QString("CheckBoxState%1-%2").arg(val).arg(disabled), &pixmap)){
+			    QStyleOptionButton opt;
+				if(val < 0){
+					opt.state |= QStyle::State_NoChange;
+				}else{
+					opt.state |= val ? QStyle::State_On : QStyle::State_Off;
+				}
+				opt.state |= disabled ? QStyle::State_ReadOnly : QStyle::State_Enabled;
+				const QStyle* style = QApplication::style();
+				const int indicatorWidth = style->pixelMetric(QStyle::PM_IndicatorWidth, &opt);
+				const int indicatorHeight = style->pixelMetric(QStyle::PM_IndicatorHeight, &opt);
+				const int listViewIconSize = indicatorWidth;
+				const int pixmapWidth = indicatorWidth;
+				const int pixmapHeight = qMax(indicatorHeight, listViewIconSize);
+
+				opt.rect = QRect(0, 0, indicatorWidth, indicatorHeight);
+				pixmap = QPixmap(pixmapWidth, pixmapHeight);
+				pixmap.fill(Qt::transparent);
+				{
+					const int xoff = (pixmapWidth  > indicatorWidth)  ? (pixmapWidth  - indicatorWidth)  / 2 : 0;
+					const int yoff = (pixmapHeight > indicatorHeight) ? (pixmapHeight - indicatorHeight) / 2 : 0;
+					QPainter painter(&pixmap);
+					painter.translate(xoff, yoff);
+					style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &opt, &painter);
+				}
+
+				QPixmapCache::insert(QString("CheckBoxState%1-%2").arg(val).arg(disabled), pixmap);
+			}
+
+			return QIcon(pixmap);
+		}
+
+	    BoolPropertyItem::BoolPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("bool");
+			val = false;
+			setIcon(1, getCheckBox(val, flags() & Qt::ItemIsEnabled));
+		}
+
+		shared_ptr<Type::VarWrapper> BoolPropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void BoolPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asBool();
+			setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
+		}
+		
+		QString BoolPropertyItem::getTextValue(){
+		    if(val){
+				return "true";
+			}else{
+				return "false";
+			}
+		}
+		
+		void BoolPropertyItem::setTextValue(QString val){
+		    if(val == "true"){
+				val = true;
+			}else{
+				val = false;
+			}
+			setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
+		}
+
+	    bool BoolPropertyItem::editorEvent(QEvent* evt){
+			if((flags() & Qt::ItemIsEnabled) && (evt->type() == QEvent::MouseButtonRelease)){
+				QMouseEvent* mEvt = static_cast<QMouseEvent*>(evt);
+				if(mEvt && (mEvt->button() & Qt::LeftButton)){
+					val = !val;
+					setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
+					
+					tree->setProp(propertyName, getValue());
+				}
+			}
+		}
+
+		// IntPropertyItem
+
+	    IntPropertyItem::IntPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("int");
+			val = 0;
+			setText(1, getTextValue());
+		}
+
+		shared_ptr<Type::VarWrapper> IntPropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void IntPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asInt();
+			setText(1, getTextValue());
+		}
+		
+		QString IntPropertyItem::getTextValue(){
+			return QString::number(val);
+		}
+		
+		void IntPropertyItem::setTextValue(QString val){
+			this->val = val.toInt();
+			setText(1, getTextValue());
+		}
+
+		QWidget* IntPropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+		    QSpinBox* spinBox = new QSpinBox(parent);
+		    spinBox->setGeometry(option.rect);
+		    spinBox->setFrame(false);
+			spinBox->setMinimum(INT_MIN);
+			spinBox->setMaximum(INT_MAX);
+			
+		    return spinBox;
+		}
+
+		void IntPropertyItem::setEditorData(QWidget* editor){
+		    QSpinBox* spinBox = dynamic_cast<QSpinBox*>(editor);
+			if(spinBox){
+			    spinBox->setValue(val);
+			}
+		}
+
+	    void IntPropertyItem::setModelData(QWidget* editor){
+		    QSpinBox* spinBox = dynamic_cast<QSpinBox*>(editor);
+
+			if(spinBox){
+			    val = spinBox->value();
+				setText(1, getTextValue());
 			}
 		}
 	}
