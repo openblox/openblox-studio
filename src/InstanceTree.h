@@ -30,6 +30,9 @@ namespace OB{
 			virtual ~InstanceTree();
 
 			virtual void dropEvent(QDropEvent* evt);
+
+			public slots:
+				void itemEdited(QTreeWidgetItem* item);
 		};
 	}
 }

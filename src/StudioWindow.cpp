@@ -90,6 +90,7 @@ namespace OB{
 			std::string prop = evec.at(0)->asString();
 
 			if(prop == "Name"){
+			    const QSignalBlocker sigBlock(kidItem->treeWidget());
 				kidItem->setText(0, QString(kid->getName().c_str()));
 				return;
 			}

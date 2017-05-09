@@ -21,6 +21,8 @@
 
 #include <QtWidgets>
 
+#include <instance/Instance.h>
+
 #include "InstanceTreeItem.h"
 
 namespace OB{
@@ -32,6 +34,8 @@ namespace OB{
 			setDragEnabled(true);
 			setDragDropMode(QAbstractItemView::InternalMove);
 			header()->close();
+
+			connect(this, &QTreeWidget::itemChanged, this, &InstanceTree::itemEdited);
 		}
 
 		InstanceTree::~InstanceTree(){}
@@ -52,6 +56,16 @@ namespace OB{
 							}
 						}
 					}
+				}
+			}
+		}
+
+		void InstanceTree::itemEdited(QTreeWidgetItem* item){
+			InstanceTreeItem* iti = dynamic_cast<InstanceTreeItem*>(item);
+			if(iti){
+				shared_ptr<Instance::Instance> inst = iti->GetInstance();
+				if(inst){
+					inst->setName(iti->text(0).toStdString().c_str());
 				}
 			}
 		}
