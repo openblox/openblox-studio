@@ -315,6 +315,20 @@ namespace OB{
 
 			viewMenu->addAction(dock->toggleViewAction());
 
+			//Properties
+			dock = new QDockWidget(tr("Properties"), this);
+			dock->setObjectName("studio_properties");
+			dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
+
+			dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+
+			properties = new PropertyTreeWidget();
+
+			dock->setWidget(properties);
+			addDockWidget(Qt::RightDockWidgetArea, dock);
+
+			viewMenu->addAction(dock->toggleViewAction());
+
 			//Last View Menu things
 			viewMenu->addSeparator();
 

@@ -6,6 +6,8 @@ openblox_studio_SOURCES = OpenBloxStudio.cpp \
 	StudioWindow.cpp \
 	InstanceTree.cpp \
 	InstanceTreeItem.cpp \
+	PropertyTreeItemDelegate.cpp \
+	PropertyTreeWidget.cpp \
 	qrc_resources.cpp
 # Linker options
 openblox_studio_LDADD = $(LOPENBLOX_LIBS) $(LIRRLICHT_LIBS) $(LQT_LIBS)
