@@ -37,7 +37,6 @@ int main(int argc, char** argv){
 	QApplication app(argc, argv);
 
 	OB::Studio::StudioWindow::pathToStudioExecutable = std::string(argv[0]);
-	std::cout << "Exec: " << argv[0] << std::endl;
 
 	app.setApplicationName("OpenBlox Studio");
 	app.setApplicationVersion("0.1.1");
