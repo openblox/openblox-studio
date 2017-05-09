@@ -28,36 +28,7 @@
 
 #include "StudioWindow.h"
 
-#include <instance/DataModel.h>
-/*#include <instance/LogService.h>*/
-
 OB::Studio::StudioWindow* win = NULL;
-
-/*
-void handle_log_event(std::vector<ob_type::VarWrapper> evec){
-	if(!win){
-		LOGI("Lost output message");
-		return;
-	}
-	if(evec.size() == 2){
-		QString msg = reinterpret_cast<ob_type::StringWrapper*>(evec[0].wrapped)->val;
-		ob_enum::LuaEnumItem* msgType = reinterpret_cast<ob_enum::LuaEnumItem*>(evec[1].wrapped);
-
-		//ob_enum::LuaEnumItem* MessageOutput = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageOutput);
-		//ob_enum::LuaEnumItem* MessageInfo = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageInfo);
-		ob_enum::LuaEnumItem* MessageWarning = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageWarning);
-		ob_enum::LuaEnumItem* MessageError = ob_enum::LuaMessageType->getEnumItem((int)ob_enum::MessageType::MessageError);
-
-		if(msgType == MessageError){
-			win->output->append("<font color=\"#FF3300\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
-		}else if(msgType == MessageWarning){
-			win->output->append("<font color=\"#F26100\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
-		}else{
-			win->output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
-		}
-	}
-}
-*/
 
 void defaultValues(QSettings* settings){
 	settings->setValue("first_run", false);
@@ -103,14 +74,6 @@ int main(int argc, char** argv){
 	parser.process(app);
 
     OB::OBEngine* eng = new OB::OBEngine();
-
-	shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
-	if(dm){
-		/*OB::Instance::LogService* ls = dm->logService;
-		if(ls){
-			ls->MessageOut->Connect(handle_log_event);
-			}*/
-	}
 
 	win = new OB::Studio::StudioWindow();
 

@@ -26,10 +26,29 @@
 #include <openblox.h>
 #include <instance/Instance.h>
 #include <instance/DataModel.h>
+#include <instance/LogService.h>
 #include <type/Event.h>
+#include <type/Enum.h>
 
 namespace OB{
 	namespace Studio{
+		void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud){
+		    StudioWindow* win = (StudioWindow*)ud;
+			
+			if(evec.size() == 2){
+				QString msg = evec.at(0)->asString().c_str();
+				shared_ptr<OB::Type::LuaEnumItem> msgType = dynamic_pointer_cast<OB::Type::LuaEnumItem>(evec.at(1)->asType());
+
+				if(msgType->getValue() == (int)OB::Enum::MessageType::MessageError){
+					win->output->append("<font color=\"#FF3300\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+				}else if(msgType->getValue() == (int)OB::Enum::MessageType::MessageWarning){
+					win->output->append("<font color=\"#F26100\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+				}else{
+					win->output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
+				}
+			}
+		}
+		
 		QMap<shared_ptr<Instance::Instance>, InstanceTreeItem*> treeItemMap;
 		QMap<QString, QIcon> classIconMap;
 
@@ -376,11 +395,7 @@ namespace OB{
 			}
 
 			if(s != 0 && s != LUA_YIELD){
-				std::string lerr = Lua::handle_errors(L);
-
-				std::cerr << "A Lua error occurred:" << std::endl;
-				std::cerr << lerr << std::endl;
-
+			    Lua::handle_errors(L);
 				Lua::close_state(L);
 			}
 			if(s == LUA_OK){
@@ -394,7 +409,14 @@ namespace OB{
 		    OB::OBEngine* eng = OB::OBEngine::getInstance();
 			if(eng){
 				eng->init();
-				addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(eng->getDataModel()), this);
+				shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
+				if(dm){
+					shared_ptr<OB::Instance::LogService> ls = dm->getLogService();
+					if(ls){
+						ls->getMessageOut()->Connect(handle_log_event, this);
+					}
+					addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(dm), this);
+				}
 			}
 
 		    cmdBar->lineEdit()->setDisabled(false);
