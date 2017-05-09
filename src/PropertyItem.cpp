@@ -103,11 +103,15 @@ namespace OB{
 		}
 
 		QWidget* StringPropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-			QLineEdit* lineEdit = new QLineEdit(parent);
-			lineEdit->setGeometry(option.rect);
-			lineEdit->setFrame(false);
+			if(flags() & Qt::ItemIsEnabled){
+				QLineEdit* lineEdit = new QLineEdit(parent);
+				lineEdit->setGeometry(option.rect);
+				lineEdit->setFrame(false);
 			
-		    return lineEdit;
+				return lineEdit;
+			}else{
+				return NULL;
+			}
 		}
 
 		void StringPropertyItem::setEditorData(QWidget* editor){

@@ -125,6 +125,9 @@ namespace OB{
 
 					if(pInfo.type == "string"){
 					    StringPropertyItem* pi = new StringPropertyItem(this, QString(propName.c_str()));
+						if(pInfo.readOnly){
+							pi->setFlags(pi->Flags() & ~Qt::ItemIsEnabled);
+						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
 						updateValue(propName);
@@ -132,6 +135,9 @@ namespace OB{
 					}
 					if(pInfo.type == "bool"){
 					    BoolPropertyItem* pi = new BoolPropertyItem(this, QString(propName.c_str()));
+						if(pInfo.readOnly){
+							pi->setFlags(pi->Flags() & ~Qt::ItemIsEnabled);
+						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
 						updateValue(propName);
@@ -139,6 +145,9 @@ namespace OB{
 					}
 					if(pInfo.type == "int"){
 					    IntPropertyItem* pi = new IntPropertyItem(this, QString(propName.c_str()));
+						if(pInfo.readOnly){
+							pi->setFlags(pi->Flags() & ~Qt::ItemIsEnabled);
+						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
 						updateValue(propName);
