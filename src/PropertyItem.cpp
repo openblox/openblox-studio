@@ -72,7 +72,9 @@ namespace OB{
 
 	    void PropertyItem::setModelData(QWidget* editor){}
 
-		bool PropertyItem::editorEvent(QEvent* evt){}
+		bool PropertyItem::editorEvent(QEvent* evt){
+			return false;
+		}
 
 		// StringPropertyItem
 
@@ -120,6 +122,8 @@ namespace OB{
 
 			if(lineEdit){
 				setTextValue(lineEdit->text());
+
+				tree->setProp(propertyName, getValue());
 			}
 		}
 
@@ -252,6 +256,8 @@ namespace OB{
 			if(spinBox){
 			    val = spinBox->value();
 				setText(1, getTextValue());
+				
+				tree->setProp(propertyName, getValue());
 			}
 		}
 	}

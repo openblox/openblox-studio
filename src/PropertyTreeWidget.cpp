@@ -51,7 +51,6 @@ namespace OB{
 			hv->setStretchLastSection(true);
 			hv->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
-			setEditTriggers(QAbstractItemView::NoEditTriggers);
 			setItemDelegate(new PropertyTreeItemDelegate(this));
 		}
 
