@@ -45,6 +45,8 @@ namespace OB{
 			PropertyTreeWidget* properties;
 			QComboBox* cmdBar;
 
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
+
 			void initGL();
 
 		    public slots:

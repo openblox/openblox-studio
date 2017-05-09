@@ -21,6 +21,8 @@
 
 #include <QtWidgets>
 
+#include <set>
+
 #include "PropertyTreeWidget.h"
 #include "PropertyTreeItemDelegate.h"
 
@@ -55,41 +57,41 @@ namespace OB{
 
 			//Remove all props
 			clear();
+			puts("Updating selection");
 
-			std::vector<std::string> sharedProperties;
+			std::set<std::string> sharedProperties;
 
 			if(!editingInstances.empty()){
+			    std::map<std::string, Instance::_PropertyInfo> props = editingInstances[0]->getProperties();
+
 				// Push names of all properties to sharedProperties
-				for(int i = 0; i < editingInstances.size(); i++){
-					std::map<std::string, Instance::_PropertyInfo> props = editingInstances[i]->getProperties();
-
-					for(auto it = props.begin(); it != props.end(); ++it){
-						std::string propName = it->first;
-
-						if(std::find(sharedProperties.begin(), sharedProperties.end(), propName) != sharedProperties.end()){
-							sharedProperties.push_back(propName);
-						}
-					}
+				for(auto it = props.begin(); it != props.end(); ++it){
+				    sharedProperties.insert(it->first);
 				}
 
 				// Remove properties not all instances have
-				for(auto i = 0; i < editingInstances.size(); i++){
-					std::map<std::string, Instance::_PropertyInfo> props = editingInstances[i]->getProperties();
+				for(auto i = editingInstances.begin(); i != editingInstances.end(); ++i){
+					shared_ptr<Instance::Instance> inst = *i;
+					if(inst){
+						std::map<std::string, Instance::_PropertyInfo> tprops = inst->getProperties();
 
-					for(std::vector<std::string>::iterator it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
-						std::string propName = *it;
-
-						if(props.find(propName) == props.end()){
-							sharedProperties.erase(it);
+						for(auto it = sharedProperties.begin(); it != sharedProperties.end();){
+							if(tprops.find(*it) == tprops.end()){
+								std::cout << "-" << *it << ";" << std::endl;
+							    it = sharedProperties.erase(it);
+							}else{
+								++it;
+							}
 						}
 					}
 				}
-
-				// We've already ensured this Instance will have all of the properties we're gonna use
-				// No need to get more than one
-				std::map<std::string, Instance::_PropertyInfo> props = editingInstances[0]->getProperties();
-
 				
+				std::cout << "Still have: " << std::endl;
+				for(auto it = sharedProperties.begin(); it != sharedProperties.end(); ++it){
+					std::string propName = *it;
+
+					std::cout << propName.c_str() << std::endl;
+				}
 		    }
 		}
 

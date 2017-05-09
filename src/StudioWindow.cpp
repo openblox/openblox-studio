@@ -33,6 +33,7 @@
 namespace OB{
 	namespace Studio{
 		std::string StudioWindow::pathToStudioExecutable = "";
+		static StudioWindow* static_win = NULL;
 		
 		// Do I think the use of HTML here is horrible? Yes.
 		// Am I going to do something about it in the near future? Probably not.
@@ -84,8 +85,15 @@ namespace OB{
 		void addChildOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> kid);
 		
 		void instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
+			if(!ud){
+				return;
+			}
+			
 		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			shared_ptr<Instance::Instance> kid = kidItem->GetInstance();
+			if(!kid){
+				return;
+			}
 
 			std::string prop = evec.at(0)->asString();
 
@@ -97,6 +105,17 @@ namespace OB{
 			if(prop == "Parent" || prop == "ParentLocked"){
 				kidItem->updateFlags();
 				return;
+			}
+
+			if(static_win){
+				std::vector<shared_ptr<Instance::Instance>> selection = static_win->selectedInstances;
+
+				if(!selection.empty()){
+					if(std::find(selection.begin(), selection.end(), kid) != selection.end()){
+						static_win->properties->updateValues();
+					}
+				}
+				
 			}
 		}
 
@@ -191,6 +210,7 @@ namespace OB{
 		}
 
 		StudioWindow::StudioWindow(){
+			static_win = this;
 			glWidget = NULL;
 
 			tabWidget = new QTabWidget();
@@ -436,7 +456,21 @@ namespace OB{
 		}
 
 		void StudioWindow::selectionChanged(){
+			QList<QTreeWidgetItem*> selectedItems = explorer->selectedItems();
+
+			selectedInstances.clear();
+
+			for(int i = 0; i < selectedItems.size(); i++){
+				InstanceTreeItem* srcItem = dynamic_cast<InstanceTreeItem*>(selectedItems[i]);
+				if(srcItem){
+					shared_ptr<Instance::Instance> instPtr = srcItem->GetInstance();
+					if(instPtr){
+					    selectedInstances.push_back(instPtr);
+					}
+				}
+			}
 			
+			properties->updateSelection(selectedInstances);
 		}
 
 		void StudioWindow::initGL(){
