@@ -29,6 +29,9 @@
 
 #include "StudioWindow.h"
 
+#include <instance/NetworkServer.h>
+#include <instance/NetworkClient.h>
+
 void defaultValues(QSettings* settings){
 	settings->setValue("first_run", false);
 	settings->setValue("dark_theme", true);
@@ -57,7 +60,7 @@ int main(int argc, char** argv){
 	}
 
 	#define DARK_THEME_DEFAULT true
-	#ifndef WIN32
+	#ifndef _WIN32
 	#undef DARK_THEME_DEFAULT
 	#define DARK_THEME_DEFAULT false
 	#endif
@@ -79,6 +82,14 @@ int main(int argc, char** argv){
 
 	QCommandLineOption newOpt("new", "Starts a new game instance on initialization.");
 	parser.addOption(newOpt);
+
+	QCommandLineOption serverOpt("server", "Starts a NetworkServer on initialization.");
+	serverOpt.setDefaultValue("4490");
+	parser.addOption(serverOpt);
+
+	QCommandLineOption clientOpt("client", "Starts a NetworkClient on initialization.");
+    clientOpt.setDefaultValue("localhost:4490");
+	parser.addOption(clientOpt);
 	
 	parser.process(app);
 
@@ -115,8 +126,51 @@ int main(int argc, char** argv){
 	}
 	settings.endGroup();
 
-	if(parser.isSet(newOpt)){
+	if(parser.isSet(newOpt) || parser.isSet(serverOpt) || parser.isSet(clientOpt)){
 		win->newInstance();
+
+		if(parser.isSet(serverOpt)){
+			bool isInt;
+		    int port = parser.value(serverOpt).toInt(&isInt);
+
+			if(!isInt){
+			    port = OB_STUDIO_DEFAULT_PORT;
+			}
+
+			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
+			if(dm){
+				shared_ptr<OB::Instance::NetworkServer> ns = dynamic_pointer_cast<OB::Instance::NetworkServer>(dm->GetService("NetworkServer"));
+				if(ns){
+					ns->Start(port);
+				}
+			}
+		}
+
+		if(parser.isSet(clientOpt)){
+		    QStringList hostParts = parser.value(clientOpt).split(":");
+
+			std::string hostName = "localhost";
+		    int hostPort = OB_STUDIO_DEFAULT_PORT;
+			
+			if(hostParts.size() > 0){
+				hostName = hostParts[0].toStdString();
+				if(hostParts.size() > 1){
+					bool isInt;
+					hostPort = hostParts[1].toInt(&isInt);
+					if(!isInt){
+						hostPort = OB_STUDIO_DEFAULT_PORT;
+					}
+				}
+			}
+
+			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
+			if(dm){
+				shared_ptr<OB::Instance::NetworkClient> nc = dynamic_pointer_cast<OB::Instance::NetworkClient>(dm->GetService("NetworkClient"));
+				if(nc){
+					nc->Connect(hostName, hostPort);
+				}
+			}
+		}
 	}
 
 	while(win->isVisible()){
