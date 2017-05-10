@@ -55,7 +55,12 @@ int main(int argc, char** argv){
 		defaultValues(&settings);
 	}
 
-	bool useDarkTheme = settings.value("dark_theme", true).toBool();
+	#define DARK_THEME_DEFAULT true
+	#ifndef WIN32
+	#undefine DARK_THEME_DEFAULT
+	#define DARK_THEME_DEFAULT false
+	#endif
+	bool useDarkTheme = settings.value("dark_theme", DARK_THEME_DEFAULT).toBool();
 
 	if(useDarkTheme){
 		QFile f(":qdarkstyle/style.qss");
