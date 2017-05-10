@@ -365,6 +365,10 @@ namespace OB{
 			cmdBar = new QComboBox();
 			cmdBar->setMaxCount(50);
 			cmdBar->setEditable(true);
+			cmdBar->setInsertPolicy(QComboBox::InsertAtTop);
+			cmdBar->setDuplicatesEnabled(true);
+
+			cmdBar->setModel(new QStringListModel());
 
 			//Setup QLineEdit in QComboBox
 			QLineEdit* cmdEdit = cmdBar->lineEdit();

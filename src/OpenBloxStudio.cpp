@@ -25,6 +25,7 @@
 #include <QTextStream>
 #include <QCommandLineParser>
 #include <QThread>
+#include <QStringListModel>
 
 #include "StudioWindow.h"
 
@@ -100,6 +101,20 @@ int main(int argc, char** argv){
 
 	win->show();
 
+	QComboBox* cmdBar = win->cmdBar;
+	settings.beginGroup("command_history");
+	{
+		if(settings.contains("max_history")){
+			cmdBar->setMaxCount(settings.value("max_history").toInt());
+		}
+		if(settings.contains("history")){
+			cmdBar->addItems(settings.value("history").toStringList());
+			cmdBar->setCurrentIndex(cmdBar->count());
+			cmdBar->setCurrentText("");
+		}
+	}
+	settings.endGroup();
+
 	if(parser.isSet(newOpt)){
 		win->newInstance();
 	}
@@ -117,6 +132,12 @@ int main(int argc, char** argv){
 	}
 	settings.endGroup();
 	#endif
+
+	settings.beginGroup("command_history");
+	{
+	    settings.setValue("history", ((QStringListModel*)(cmdBar->model()))->stringList());
+	}
+	settings.endGroup();
 
 	return 0;
 }
