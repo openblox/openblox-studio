@@ -417,14 +417,15 @@ namespace OB{
 					STARTUPINFO si;
 					
 					CreateProcess(NULL,
-								  pathToStudioExecutable.c_str(),
+								  (LPSTR)pathToStudioExecutable.c_str(),
 								  NULL,
 								  NULL,
 								  FALSE,
 								  0,
 								  NULL,
 								  NULL,
-								  &si);
+								  &si,
+								  NULL);
 					#else
 					//Sane systems
 					pid_t fr = fork();
