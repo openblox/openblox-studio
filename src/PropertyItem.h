@@ -23,6 +23,8 @@
 #include <PropertyTreeWidget.h>
 #include <QStyledItemDelegate>
 
+#include <type/Color3.h>
+
 namespace OB{
 	namespace Studio{
 		class PropertyItem: public QTreeWidgetItem{
@@ -131,6 +133,22 @@ namespace OB{
 
 		  private:
 		    float val;
+		};
+
+		class Color3PropertyItem: public PropertyItem{
+		  public:
+		    Color3PropertyItem(PropertyTreeWidget* tree, QString name);
+
+			virtual shared_ptr<Type::VarWrapper> getValue();
+			virtual void setValue(shared_ptr<Type::VarWrapper> val);
+		    virtual QString getTextValue();
+
+		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual void setEditorData(QWidget* editor);
+			virtual void setModelData(QWidget* editor);
+
+		  private:
+		    shared_ptr<Type::Color3> val;
 		};
 	}
 }

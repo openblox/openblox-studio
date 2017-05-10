@@ -33,7 +33,7 @@
 namespace OB{
 	namespace Studio{
 		std::string StudioWindow::pathToStudioExecutable = "";
-		static StudioWindow* static_win = NULL;
+	    StudioWindow* StudioWindow::static_win = NULL;
 		
 		// Do I think the use of HTML here is horrible? Yes.
 		// Am I going to do something about it in the near future? Probably not.
@@ -97,12 +97,12 @@ namespace OB{
 
 			std::string prop = evec.at(0)->asString();
 
-			if(static_win){
-				std::vector<shared_ptr<Instance::Instance>> selection = static_win->selectedInstances;
+			if(StudioWindow::static_win){
+				std::vector<shared_ptr<Instance::Instance>> selection = StudioWindow::static_win->selectedInstances;
 
 				if(!selection.empty()){
 					if(std::find(selection.begin(), selection.end(), kid) != selection.end()){
-						static_win->properties->updateValue(prop);
+						StudioWindow::static_win->properties->updateValue(prop);
 					}
 				}
 				

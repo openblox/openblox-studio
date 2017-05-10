@@ -27,6 +27,9 @@
 #include <QMouseEvent>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QColorDialog>
+
+#include "StudioWindow.h"
 
 #include <cfloat>
 
@@ -373,6 +376,105 @@ namespace OB{
 				setText(1, getTextValue());
 				
 				tree->setProp(propertyName, getValue());
+			}
+		}
+
+		// Color3PropertyItem
+		
+		QIcon getColorAsIcon(const QColor &color){
+			QImage img(12, 12, QImage::Format_ARGB32_Premultiplied);
+			img.fill(0);
+
+			QPainter painter(&img);
+			painter.setCompositionMode(QPainter::CompositionMode_Source);
+			painter.setPen(QPen(Qt::black, 1));
+			painter.drawRect(0, 0, img.width()-1, img.height()-1);
+			painter.fillRect(1, 1, img.width()-2, img.height()-2, color);
+			painter.end();
+
+			return QPixmap::fromImage(img);
+		}
+
+	    Color3PropertyItem::Color3PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("Color3");
+			val = make_shared<Type::Color3>();
+			setIcon(1, getColorAsIcon(QColor(0, 0, 0)));
+			setText(1, getTextValue());
+		}
+
+		shared_ptr<Type::VarWrapper> Color3PropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void Color3PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asColor3();
+			if(!this->val){
+				this->val = make_shared<Type::Color3>();
+			}
+			
+			int r = this->val->getR() * 255;
+			if(r > 1){r = 1;}
+			if(r < 0){r = 0;}
+			int g = this->val->getG() * 255;
+			if(g > 1){g = 1;}
+			if(g < 0){g = 0;}
+			int b = this->val->getB() * 255;
+			if(b > 1){b = 1;}
+			if(b < 0){b = 0;}
+			
+			setIcon(1, getColorAsIcon(QColor(r, g, b)));
+			setText(1, getTextValue());
+		}
+		
+		QString Color3PropertyItem::getTextValue(){
+			int r = this->val->getR() * 255;
+			if(r > 1){r = 1;}
+			if(r < 0){r = 0;}
+			int g = this->val->getG() * 255;
+			if(g > 1){g = 1;}
+			if(g < 0){g = 0;}
+			int b = this->val->getB() * 255;
+			if(b > 1){b = 1;}
+			if(b < 0){b = 0;}
+
+			return QString("[%1, %2, %3]").arg(r).arg(g).arg(b);
+		}
+
+		QWidget* Color3PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+		    QColorDialog* colorDialog = new QColorDialog(StudioWindow::static_win);
+			colorDialog->setModal(true);
+			
+		    return colorDialog;
+		}
+
+		void Color3PropertyItem::setEditorData(QWidget* editor){
+		    QColorDialog* colorDialog = dynamic_cast<QColorDialog*>(editor);
+			if(colorDialog){
+				int r = this->val->getR() * 255;
+				if(r > 1){r = 1;}
+				if(r < 0){r = 0;}
+				int g = this->val->getG() * 255;
+				if(g > 1){g = 1;}
+				if(g < 0){g = 0;}
+				int b = this->val->getB() * 255;
+				if(b > 1){b = 1;}
+				if(b < 0){b = 0;}
+				
+			    colorDialog->setCurrentColor(QColor(r, g, b));
+			}
+		}
+
+	    void Color3PropertyItem::setModelData(QWidget* editor){
+		    QColorDialog* colorDialog = dynamic_cast<QColorDialog*>(editor);
+
+			if(colorDialog){
+			    QColor col = colorDialog->selectedColor();
+				if(col.isValid()){
+					val = make_shared<Type::Color3>(col.redF(), col.greenF(), col.blueF());
+					setText(1, getTextValue());
+				
+					tree->setProp(propertyName, getValue());
+				}
 			}
 		}
 	}

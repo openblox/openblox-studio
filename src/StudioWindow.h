@@ -37,6 +37,7 @@ namespace OB{
 			StudioWindow();
 
 			static std::string pathToStudioExecutable;
+			static StudioWindow* static_win;
 
 			QTabWidget* tabWidget;
 			StudioGLWidget* glWidget;

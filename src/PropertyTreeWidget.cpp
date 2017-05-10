@@ -175,6 +175,16 @@ namespace OB{
 						updateValue(propName);
 						continue;
 					}
+					if(pInfo.type == "Color3"){
+					    Color3PropertyItem* pi = new Color3PropertyItem(this, QString(propName.c_str()));
+						if(pInfo.readOnly){
+							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
+						}
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
 				}
 		    }else{
 				for(auto i = curProps.begin(); i != curProps.end(); ++i){
