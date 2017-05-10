@@ -362,9 +362,8 @@ namespace OB{
 			viewToolbarsMenu->addAction(commandBar->toggleViewAction());
 
 			//START COMMAND BAR
-			//TODO: Implement saving history of commands
 			cmdBar = new QComboBox();
-			cmdBar->setMaxCount(10);
+			cmdBar->setMaxCount(50);
 			cmdBar->setEditable(true);
 
 			//Setup QLineEdit in QComboBox
@@ -426,7 +425,7 @@ namespace OB{
 			QLineEdit* cmdEdit = cmdBar->lineEdit();
 			QString text = cmdEdit->text();
 
-			output->append("> " + text + "<br/>");
+			output->append("> " + text.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
 
 		    OB::OBEngine* eng = OB::OBEngine::getInstance();
 			if(!eng){
