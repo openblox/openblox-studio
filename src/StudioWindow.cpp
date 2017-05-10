@@ -35,19 +35,21 @@ namespace OB{
 		std::string StudioWindow::pathToStudioExecutable = "";
 	    StudioWindow* StudioWindow::static_win = NULL;
 		
-		// Do I think the use of HTML here is horrible? Yes.
-		// Am I going to do something about it in the near future? Probably not.
-		void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud){
+	    void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud){
 		    StudioWindow* win = (StudioWindow*)ud;
+
+			//Temporary
+			QColor errorCol(255, 51, 0);
+			QColor warnCol(242, 97, 0);
 			
 			if(evec.size() == 2){
 				QString msg = evec.at(0)->asString().c_str();
 				shared_ptr<OB::Type::LuaEnumItem> msgType = dynamic_pointer_cast<OB::Type::LuaEnumItem>(evec.at(1)->asType());
 
 				if(msgType->getValue() == (int)OB::Enum::MessageType::MessageError){
-					win->output->append("<font color=\"#FF3300\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+				    win->sendOutput(msg, errorCol);
 				}else if(msgType->getValue() == (int)OB::Enum::MessageType::MessageWarning){
-					win->output->append("<font color=\"#F26100\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+					win->sendOutput(msg, warnCol);
 				}else{
 					win->output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
 				}
@@ -429,7 +431,7 @@ namespace OB{
 			QLineEdit* cmdEdit = cmdBar->lineEdit();
 			QString text = cmdEdit->text();
 
-			output->append("> " + text.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
+		    sendOutput("> " + text);
 
 		    OB::OBEngine* eng = OB::OBEngine::getInstance();
 			if(!eng){
@@ -493,6 +495,20 @@ namespace OB{
 			}
 
 		    cmdBar->lineEdit()->setDisabled(false);
+		}
+
+		// Do I think the use of HTML here is horrible? Yes.
+		// Am I going to do something about it in the near future? Probably not.
+		void StudioWindow::sendOutput(QString msg){
+			if(output){
+				output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
+			}
+		}
+
+		void StudioWindow::sendOutput(QString msg, QColor col){
+		    if(output){
+				output->append("<font color=\"" + col.name() + "\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+			}
 		}
 	}
 }

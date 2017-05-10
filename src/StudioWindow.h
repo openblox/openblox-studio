@@ -30,6 +30,8 @@
 #include "StudioGLWidget.h"
 #include "PropertyTreeWidget.h"
 
+#define OB_STUDIO_DEFAULT_PORT 4490
+
 namespace OB{
 	namespace Studio{
 	    class StudioWindow: public QMainWindow{
@@ -49,6 +51,9 @@ namespace OB{
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
 
 			void initGL();
+
+			void sendOutput(QString str);
+			void sendOutput(QString str, QColor col);
 
 		    public slots:
 				void about();
