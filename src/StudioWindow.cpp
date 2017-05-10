@@ -30,6 +30,11 @@
 #include <type/Event.h>
 #include <type/Enum.h>
 
+#ifdef _WIN32
+#include "windows.h"
+#include "shellapi.h"
+#endif
+
 namespace OB{
 	namespace Studio{
 		std::string StudioWindow::pathToStudioExecutable = "";
@@ -406,12 +411,29 @@ namespace OB{
 		void StudioWindow::newInstance(){
 			if(glWidget){
 				if(pathToStudioExecutable.length() > 0){
+					#ifdef _WIN32
+					//Windows has to be special
+
+					STARTUPINFO si;
+					
+					CreateProcess(NULL,
+								  pathToStudioExecutable.c_str(),
+								  NULL,
+								  NULL,
+								  FALSE,
+								  0,
+								  NULL,
+								  NULL,
+								  &si);
+					#else
+					//Sane systems
 					pid_t fr = fork();
 					if(fr == 0){
 						execlp(pathToStudioExecutable.c_str(), pathToStudioExecutable.c_str(),
 							   "--new",
 							   NULL);
 					}
+					#endif
 				}
 			}else{
 				glWidget = new StudioGLWidget();
