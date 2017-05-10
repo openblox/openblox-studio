@@ -57,7 +57,7 @@ int main(int argc, char** argv){
 
 	#define DARK_THEME_DEFAULT true
 	#ifndef WIN32
-	#undefine DARK_THEME_DEFAULT
+	#undef DARK_THEME_DEFAULT
 	#define DARK_THEME_DEFAULT false
 	#endif
 	bool useDarkTheme = settings.value("dark_theme", DARK_THEME_DEFAULT).toBool();
@@ -85,6 +85,7 @@ int main(int argc, char** argv){
 
 	OB::Studio::StudioWindow* win = new OB::Studio::StudioWindow();
 
+	#ifdef WIN32
 	settings.beginGroup("main_window");
 	{
 		if(settings.contains("geometry")){
@@ -95,6 +96,7 @@ int main(int argc, char** argv){
 		}
 	}
 	settings.endGroup();
+	#endif
 
 	win->show();
 
@@ -107,12 +109,14 @@ int main(int argc, char** argv){
 		QThread::msleep(10);
 	}
 
+	#ifdef WIN32
 	settings.beginGroup("main_window");
 	{
 		settings.setValue("geometry", win->saveGeometry());
 		settings.setValue("state", win->saveState());
 	}
 	settings.endGroup();
+	#endif
 
 	return 0;
 }
