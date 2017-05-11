@@ -412,32 +412,12 @@ namespace OB{
 				this->val = make_shared<Type::Color3>();
 			}
 			
-			int r = this->val->getR() * 255;
-			if(r > 1){r = 1;}
-			if(r < 0){r = 0;}
-			int g = this->val->getG() * 255;
-			if(g > 1){g = 1;}
-			if(g < 0){g = 0;}
-			int b = this->val->getB() * 255;
-			if(b > 1){b = 1;}
-			if(b < 0){b = 0;}
-			
-			setIcon(1, getColorAsIcon(QColor(r, g, b)));
+			setIcon(1, getColorAsIcon(QColor(this->val->getRi(), this->val->getGi(), this->val->getBi())));
 			setText(1, getTextValue());
 		}
 		
 		QString Color3PropertyItem::getTextValue(){
-			int r = this->val->getR() * 255;
-			if(r > 1){r = 1;}
-			if(r < 0){r = 0;}
-			int g = this->val->getG() * 255;
-			if(g > 1){g = 1;}
-			if(g < 0){g = 0;}
-			int b = this->val->getB() * 255;
-			if(b > 1){b = 1;}
-			if(b < 0){b = 0;}
-
-			return QString("[%1, %2, %3]").arg(r).arg(g).arg(b);
+			return QString("[%1, %2, %3]").arg(this->val->getRi()).arg(this->val->getGi()).arg(this->val->getBi());
 		}
 
 		QWidget* Color3PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
@@ -450,17 +430,7 @@ namespace OB{
 		void Color3PropertyItem::setEditorData(QWidget* editor){
 		    QColorDialog* colorDialog = dynamic_cast<QColorDialog*>(editor);
 			if(colorDialog){
-				int r = this->val->getR() * 255;
-				if(r > 1){r = 1;}
-				if(r < 0){r = 0;}
-				int g = this->val->getG() * 255;
-				if(g > 1){g = 1;}
-				if(g < 0){g = 0;}
-				int b = this->val->getB() * 255;
-				if(b > 1){b = 1;}
-				if(b < 0){b = 0;}
-				
-			    colorDialog->setCurrentColor(QColor(r, g, b));
+			    colorDialog->setCurrentColor(QColor(this->val->getRi(), this->val->getGi(), this->val->getBi()));
 			}
 		}
 
@@ -470,7 +440,7 @@ namespace OB{
 			if(colorDialog){
 			    QColor col = colorDialog->selectedColor();
 				if(col.isValid()){
-					val = make_shared<Type::Color3>(col.redF(), col.greenF(), col.blueF());
+					val = make_shared<Type::Color3>(col.red(), col.green(), col.blue());
 					setText(1, getTextValue());
 				
 					tree->setProp(propertyName, getValue());

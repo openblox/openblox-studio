@@ -45,7 +45,7 @@ namespace OB{
 			QStringList headerLabels;
 			headerLabels << "Property" << "Value";
 			setHeaderLabels(headerLabels);
-			setHeaderHidden(true);
+			//setHeaderHidden(true);
 
 			QHeaderView* hv = header();
 			hv->setStretchLastSection(true);
