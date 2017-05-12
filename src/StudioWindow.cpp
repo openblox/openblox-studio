@@ -83,8 +83,8 @@ namespace OB{
 			if(QFile(icop).exists()){
 				ico = QIcon(icop);
 			}else{
-				std::string parentClassStr = OB::ClassFactory::getParentClassName(className.toStdString());
-				ico = getClassIcon(QString(parentClassStr.c_str()));
+				std::string parentClassStr = ClassFactory::getParentClassName(className.toStdString());
+			    ico = getClassIcon(QString(parentClassStr.c_str()));
 			}
 			
 			classIconMap[className] = ico;
@@ -378,6 +378,10 @@ namespace OB{
 			dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
 
 			basicObjects = new QListWidget();
+			basicObjects->setSortingEnabled(true);
+			basicObjects->setDragEnabled(false);
+			basicObjects->setSelectionBehavior(QAbstractItemView::SelectItems);
+			basicObjects->setSelectionMode(QAbstractItemView::SingleSelection);
 
 			dock->setWidget(basicObjects);
 			addDockWidget(Qt::LeftDockWidgetArea, dock);
@@ -556,6 +560,17 @@ namespace OB{
 						ls->getMessageOut()->Connect(handle_log_event, NULL);
 					}
 					addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(dm), this);
+				}
+			}
+
+			std::vector<std::string> registeredInstances = ClassFactory::getRegisteredClasses();
+			for(int i = 0; i < registeredInstances.size(); i++){
+				std::string classstr = registeredInstances.at(i);
+				bool doShow = ClassFactory::canCreate(classstr);
+				if(doShow){
+					QString classQstr = QString(classstr.c_str());
+					QListWidgetItem* wi = new QListWidgetItem(getClassIcon(classQstr), classQstr);
+					basicObjects->addItem(wi);
 				}
 			}
 		}
