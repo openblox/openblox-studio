@@ -35,6 +35,9 @@ namespace OB{
 			setDragDropMode(QAbstractItemView::InternalMove);
 			header()->close();
 
+			setItemsExpandable(true);
+			setRootIsDecorated(true);
+
 			connect(this, &QTreeWidget::itemChanged, this, &InstanceTree::itemEdited);
 		}
 

@@ -42,6 +42,10 @@ namespace OB{
 			setDragEnabled(false);
 			setSortingEnabled(true);
 
+			setItemsExpandable(true);
+			setExpandsOnDoubleClick(true);
+			setRootIsDecorated(true);
+
 			QStringList headerLabels;
 			headerLabels << "Property" << "Value";
 			setHeaderLabels(headerLabels);
