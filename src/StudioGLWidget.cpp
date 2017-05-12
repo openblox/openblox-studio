@@ -32,6 +32,8 @@ namespace OB{
 		    setFocusPolicy(Qt::StrongFocus);
 
 			setAutoFillBackground(false);
+
+			setUpdatesEnabled(false);
 		}
 
 		StudioGLWidget::~StudioGLWidget(){}
@@ -67,7 +69,11 @@ namespace OB{
 		void StudioGLWidget::resizeEvent(QResizeEvent* evt){
 			QWidget::resizeEvent(evt);
 
-			//TODO: Inform OB of the resize
+			OB::OBEngine* eng = OB::OBEngine::getInstance();
+			if(eng){
+				QSize newSize = evt->size();
+				eng->resized(newSize.width(), newSize.height());
+			}
 		}
 
 		void StudioGLWidget::timerEvent(QTimerEvent* evt){
