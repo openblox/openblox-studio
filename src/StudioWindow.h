@@ -25,6 +25,7 @@
 #include <QTabWidget>
 #include <QTextEdit>
 #include <QComboBox>
+#include <QSettings>
 
 #include "InstanceTree.h"
 #include "StudioGLWidget.h"
@@ -47,6 +48,8 @@ namespace OB{
 		    InstanceTree* explorer;
 			PropertyTreeWidget* properties;
 			QComboBox* cmdBar;
+
+			QSettings* settingsInst;
 
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
 

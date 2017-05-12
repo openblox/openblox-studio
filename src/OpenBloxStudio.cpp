@@ -32,9 +32,15 @@
 #include <instance/NetworkServer.h>
 #include <instance/NetworkClient.h>
 
+#define DARK_THEME_DEFAULT true
+#ifndef _WIN32
+#undef DARK_THEME_DEFAULT
+#define DARK_THEME_DEFAULT false
+#endif
+
 void defaultValues(QSettings* settings){
 	settings->setValue("first_run", false);
-	settings->setValue("dark_theme", true);
+	settings->setValue("dark_theme", DARK_THEME_DEFAULT);
 }
 
 int main(int argc, char** argv){
@@ -48,23 +54,18 @@ int main(int argc, char** argv){
 	app.setOrganizationName("OpenBlox");
 
 	#ifdef _WIN32
-	QSettings settings("OpenBlox", "OpenBloxStudio");
+	QSettings* settings = new QSettings("OpenBlox", "OpenBloxStudio");
 	#elif defined(__linux)
-	QSettings settings("openblox-studio", "openblox-studio");
+	QSettings* settings = new QSettings("openblox-studio", "openblox-studio");
 	#else
-	QSettings settings;
+	QSettings* settings = new QSettings();
 	#endif
-	bool firstRun = settings.value("first_run", true).toBool();
+	bool firstRun = settings->value("first_run", true).toBool();
 	if(firstRun){
-		defaultValues(&settings);
+		defaultValues(settings);
 	}
 
-	#define DARK_THEME_DEFAULT true
-	#ifndef _WIN32
-	#undef DARK_THEME_DEFAULT
-	#define DARK_THEME_DEFAULT false
-	#endif
-	bool useDarkTheme = settings.value("dark_theme", DARK_THEME_DEFAULT).toBool();
+    bool useDarkTheme = settings->value("dark_theme", DARK_THEME_DEFAULT).toBool();
 
 	if(useDarkTheme){
 		QFile f(":qdarkstyle/style.qss");
@@ -96,35 +97,36 @@ int main(int argc, char** argv){
     OB::OBEngine* eng = new OB::OBEngine();
 
 	OB::Studio::StudioWindow* win = new OB::Studio::StudioWindow();
+	win->settingsInst = settings;
 
 	#ifdef WIN32
-	settings.beginGroup("main_window");
+	settings->beginGroup("main_window");
 	{
-		if(settings.contains("geometry")){
-			win->restoreGeometry(settings.value("geometry").toByteArray());
+		if(settings->contains("geometry")){
+			win->restoreGeometry(settings->value("geometry").toByteArray());
 		}
-		if(settings.contains("state")){
-			win->restoreState(settings.value("state").toByteArray());
+		if(settings->contains("state")){
+			win->restoreState(settings->value("state").toByteArray());
 		}
 	}
-	settings.endGroup();
+	settings->endGroup();
 	#endif
 
 	win->show();
 
 	QComboBox* cmdBar = win->cmdBar;
-	settings.beginGroup("command_history");
+	settings->beginGroup("command_history");
 	{
-		if(settings.contains("max_history")){
-			cmdBar->setMaxCount(settings.value("max_history").toInt());
+		if(settings->contains("max_history")){
+			cmdBar->setMaxCount(settings->value("max_history").toInt());
 		}
-		if(settings.contains("history")){
-			cmdBar->addItems(settings.value("history").toStringList());
+		if(settings->contains("history")){
+			cmdBar->addItems(settings->value("history").toStringList());
 			cmdBar->setCurrentIndex(cmdBar->count());
 			cmdBar->setCurrentText("");
 		}
 	}
-	settings.endGroup();
+	settings->endGroup();
 
 	if(parser.isSet(newOpt) || parser.isSet(serverOpt) || parser.isSet(clientOpt)){
 		win->newInstance();
@@ -179,19 +181,20 @@ int main(int argc, char** argv){
 	}
 
 	#ifdef WIN32
-	settings.beginGroup("main_window");
+	settings->beginGroup("main_window");
 	{
-		settings.setValue("geometry", win->saveGeometry());
-		settings.setValue("state", win->saveState());
+		settings->setValue("geometry", win->saveGeometry());
+		settings->setValue("state", win->saveState());
 	}
 	settings.endGroup();
 	#endif
 
-	settings.beginGroup("command_history");
+	settings->beginGroup("command_history");
 	{
-	    settings.setValue("history", ((QStringListModel*)(cmdBar->model()))->stringList());
+		settings->setValue("max_history", cmdBar->maxCount());
+	    settings->setValue("history", ((QStringListModel*)(cmdBar->model()))->stringList());
 	}
-	settings.endGroup();
+	settings->endGroup();
 
 	return 0;
 }

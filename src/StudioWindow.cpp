@@ -21,8 +21,11 @@
 
 #include <QtWidgets>
 
+//Studio Widgets
 #include "InstanceTreeItem.h"
+#include "ConfigDialog.h"
 
+// OpenBlox Engine
 #include <openblox.h>
 #include <instance/Instance.h>
 #include <instance/DataModel.h>
@@ -401,7 +404,9 @@ namespace OB{
 		}
 
 		void StudioWindow::showSettings(){
-			//TODO
+		    ConfigDialog* cfg_d = new ConfigDialog(this);
+			cfg_d->setModal(true);
+			cfg_d->show();
 		}
 
 		void StudioWindow::closeStudio(){
