@@ -49,6 +49,8 @@ namespace OB{
 			PropertyTreeWidget* properties;
 			QComboBox* cmdBar;
 
+			QMenu* explorerCtxMenu;
+
 			QSettings* settingsInst;
 
 			//Actions
@@ -68,6 +70,8 @@ namespace OB{
 				void closeStudio();
 				void commandBarReturn();
 				void selectionChanged();
+
+				void explorerContextMenu(const QPoint &pos);
 
 				//Action handlers
 				void deleteSelection();

@@ -225,6 +225,7 @@ namespace OB{
 
 			tabWidget = new QTabWidget();
 			tabWidget->setTabsClosable(true);
+			
 			setCentralWidget(tabWidget);
 
 			//Menus
@@ -258,7 +259,8 @@ namespace OB{
 			closeAction->setShortcut(QKeySequence::Quit);
 			connect(closeAction, &QAction::triggered, this, &StudioWindow::closeStudio);
 
-			QMenu* editMenu = menuBar()->addMenu("Edit");
+		    QMenu* editMenu = menuBar()->addMenu("Edit");
+		    explorerCtxMenu = new QMenu();
 			QAction* undoAction = editMenu->addAction("Undo");
 			undoAction->setIcon(QIcon::fromTheme("edit-undo"));
 			undoAction->setEnabled(false);
@@ -272,21 +274,25 @@ namespace OB{
 			editMenu->addSeparator();
 
 			QAction* cutAction = editMenu->addAction("Cut");
+			explorerCtxMenu->addAction(cutAction);
 			cutAction->setIcon(QIcon::fromTheme("edit-cut"));
 			cutAction->setEnabled(false);
 			cutAction->setShortcut(QKeySequence::Cut);
 			
 			QAction* copyAction = editMenu->addAction("Copy");
+			explorerCtxMenu->addAction(copyAction);
 			copyAction->setIcon(QIcon::fromTheme("edit-copy"));
 			copyAction->setEnabled(false);
 			copyAction->setShortcut(QKeySequence::Copy);
 
 			QAction* pasteAction = editMenu->addAction("Paste");
+			explorerCtxMenu->addAction(pasteAction);
 			pasteAction->setIcon(QIcon::fromTheme("edit-paste"));
 			pasteAction->setEnabled(false);
 			pasteAction->setShortcut(QKeySequence::Paste);
 
 		    deleteAction = editMenu->addAction("Delete");
+			explorerCtxMenu->addAction(deleteAction);
 		    deleteAction->setIcon(QIcon::fromTheme("edit-delete"));
 			deleteAction->setEnabled(false);
 			deleteAction->setShortcut(QKeySequence::Delete);
@@ -339,6 +345,7 @@ namespace OB{
 
 			explorer = new InstanceTree();
 		    explorer->setContextMenuPolicy(Qt::CustomContextMenu);
+			connect(explorer, &QWidget::customContextMenuRequested, this, &StudioWindow::explorerContextMenu);
 			connect(explorer, &QTreeWidget::itemSelectionChanged, this, &StudioWindow::selectionChanged);
 
 			dock->setWidget(explorer);
@@ -567,6 +574,12 @@ namespace OB{
 						}
 					}
 				}
+			}
+		}
+
+		void StudioWindow::explorerContextMenu(const QPoint &pos){
+			if(explorerCtxMenu){
+				explorerCtxMenu->popup(explorer->mapToGlobal(pos));
 			}
 		}
 	}
