@@ -21,13 +21,10 @@
 #define OB_STUDIO_STUDIOGLWIDGET_H_
 
 #include <QWidget>
-#include <QOpenGLWidget>
-//#include <QtOpenGL>
-#include <QOpenGLFunctions>
 
 namespace OB{
 	namespace Studio{
-		class StudioGLWidget: public QOpenGLWidget, protected QOpenGLFunctions{
+		class StudioGLWidget: public QWidget{
 		  public:
 			StudioGLWidget(QWidget* parent = 0);
 			virtual ~StudioGLWidget();
@@ -35,11 +32,13 @@ namespace OB{
 			QSize minimumSizeHint() const;
 			QSize sizeHint() const;
 
-		  signals:
-			void glInitialized();
+			void init();
+
+			virtual void paintEvent(QPaintEvent* evt);
+			virtual void resizeEvent(QResizeEvent* evt);
+			virtual void timerEvent(QTimerEvent* evt);
 
 		  protected:
-			void initializeGL();
 			void paintGL();
 			void resizeGL(int width, int height);
 			void mousePressEvent(QMouseEvent* event);

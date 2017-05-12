@@ -45,11 +45,14 @@ namespace OB{
 			QTabWidget* tabWidget;
 			StudioGLWidget* glWidget;
 			QTextEdit* output;
-		    InstanceTree* explorer;
+			InstanceTree* explorer;
 			PropertyTreeWidget* properties;
 			QComboBox* cmdBar;
 
 			QSettings* settingsInst;
+
+			//Actions
+			QAction* deleteAction;
 
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
 
@@ -65,6 +68,9 @@ namespace OB{
 				void closeStudio();
 				void commandBarReturn();
 				void selectionChanged();
+
+				//Action handlers
+				void deleteSelection();
 		};
 	}
 }

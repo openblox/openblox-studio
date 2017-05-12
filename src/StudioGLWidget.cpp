@@ -27,70 +27,51 @@
 
 namespace OB{
 	namespace Studio{
-		StudioGLWidget::StudioGLWidget(QWidget* parent) : QOpenGLWidget(parent){
-			setAutoFillBackground(false);
-			setAttribute(Qt::WA_NoSystemBackground);
-			setAttribute(Qt::WA_NoBackground);
+		StudioGLWidget::StudioGLWidget(QWidget* parent) : QWidget(parent){
+			setAttribute(Qt::WA_PaintOnScreen);
 			setAttribute(Qt::WA_OpaquePaintEvent);
+		    setFocusPolicy(Qt::StrongFocus);
 
-			QTimer* timer = new QTimer(this);
-			connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-			timer->start(10);
-			
-			setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);
-
-			QSurfaceFormat fmt = format();
-			fmt.setDepthBufferSize(24);
-			fmt.setSamples(2);
-			fmt.setSwapInterval(1);
-			fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-			fmt.setRenderableType(QSurfaceFormat::OpenGL);
-			setFormat(fmt);
+			setAutoFillBackground(false);
 		}
 
 		StudioGLWidget::~StudioGLWidget(){}
 
 		QSize StudioGLWidget::minimumSizeHint() const{
-			return QSize(640, 480);
+			return QSize(320, 240);
 		}
 
 		QSize StudioGLWidget::sizeHint() const{
-			return QSize(640, 480);
+			return QSize(320, 240);
 		}
 
-		void StudioGLWidget::initializeGL(){
+		void StudioGLWidget::init(){
 		    OB::OBEngine* eng = OB::OBEngine::getInstance();
 			if(!eng){
 				throw OB::OBException("game is NULL!");
 			}
 
 			eng->setWindowId((void*)winId());
-		    ((StudioWindow*)(window()))->initGL();
+
+			startTimer(0);
 		}
 
-		void StudioGLWidget::paintGL(){
-		    OB::OBEngine* eng = OB::OBEngine::getInstance();
-			if(!eng){
-				throw OB::OBException("game is NULL!");
-			}
-			if(eng->isRunning()){
-				eng->tick();
-				eng->render();
+		void StudioGLWidget::paintEvent(QPaintEvent* evt){
+			OB::OBEngine* eng = OB::OBEngine::getInstance();
+			if(eng){
+			    eng->render();
 			}
 		}
 
-		void StudioGLWidget::resizeGL(int width, int height){
-			Q_UNUSED(width);
-			Q_UNUSED(height);
+		void StudioGLWidget::resizeEvent(QResizeEvent* evt){
+			puts("resize");
+			QWidget::resizeEvent(evt);
+		}
 
-		    OB::OBEngine* eng = OB::OBEngine::getInstance();
-			if(!eng){
-				throw OB::OBException("game is NULL!");
-			}
-		    //eng->resized();
-			if(eng->isRunning()){
-				eng->render();
-			}
+		void StudioGLWidget::timerEvent(QTimerEvent* evt){
+			paintEvent(NULL);
+			
+			evt->accept();
 		}
 
 		void StudioGLWidget::mousePressEvent(QMouseEvent* event){}

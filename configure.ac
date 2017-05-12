@@ -41,7 +41,6 @@ PKG_CHECK_MODULES([LQT], [
 	Qt5Core
 	Qt5Gui
 	Qt5Widgets
-	Qt5OpenGL
 ])
 
 AC_CHECK_PROGS(RCC, [rcc rcc-qt5])
