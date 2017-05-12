@@ -44,11 +44,11 @@ namespace OB{
 	    StudioWindow* StudioWindow::static_win = NULL;
 		
 	    void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud){
-		    StudioWindow* win = (StudioWindow*)ud;
-
 			//Temporary
 			QColor errorCol(255, 51, 0);
 			QColor warnCol(242, 97, 0);
+
+			StudioWindow* win = StudioWindow::static_win;
 			
 			if(evec.size() == 2){
 				QString msg = evec.at(0)->asString().c_str();
@@ -59,7 +59,7 @@ namespace OB{
 				}else if(msgType->getValue() == (int)OB::Enum::MessageType::MessageWarning){
 					win->sendOutput(msg, warnCol);
 				}else{
-					win->output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
+				    win->sendOutput(msg);
 				}
 			}
 		}
@@ -339,7 +339,6 @@ namespace OB{
 
 			explorer = new InstanceTree();
 		    explorer->setContextMenuPolicy(Qt::CustomContextMenu);
-
 			connect(explorer, &QTreeWidget::itemSelectionChanged, this, &StudioWindow::selectionChanged);
 
 			dock->setWidget(explorer);
@@ -530,7 +529,7 @@ namespace OB{
 				if(dm){
 					shared_ptr<OB::Instance::LogService> ls = dm->getLogService();
 					if(ls){
-						ls->getMessageOut()->Connect(handle_log_event, this);
+						ls->getMessageOut()->Connect(handle_log_event, NULL);
 					}
 					addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(dm), this);
 				}

@@ -177,6 +177,9 @@ int main(int argc, char** argv){
 
 	while(win->isVisible()){
 		app.processEvents();
+		if(eng->isRunning()){
+			eng->tick();
+		}
 		QThread::msleep(10);
 	}
 
