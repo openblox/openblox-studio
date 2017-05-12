@@ -12,6 +12,7 @@
 /install-sh
 /libtool
 /ltmain.sh
+/m4/
 /Makefile
 /Makefile.in
 /missing
@@ -26,3 +27,4 @@
 /src/stamp-h1
 /src/openblox-studio
 /src/qrc_*.cpp
+/rc/class_icons/.directory
