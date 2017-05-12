@@ -632,5 +632,119 @@ namespace OB{
 
 			tree->setProp(propertyName, getValue());
 		}
+
+		// Vector2PropertyItem
+
+	    Vector2PropertyItem::Vector2PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("Vector2");
+			val = make_shared<Type::Vector2>();
+			setText(1, getTextValue());
+
+			xVal = new ChildDoublePropertyItem(tree, "X");
+			yVal = new ChildDoublePropertyItem(tree, "Y");
+
+			addChild(xVal);
+			addChild(yVal);
+		}
+
+		Vector2PropertyItem::~Vector2PropertyItem(){
+			delete xVal;
+			delete yVal;
+		}
+
+		shared_ptr<Type::VarWrapper> Vector2PropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void Vector2PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asVector2();
+			if(!this->val){
+				this->val = make_shared<Type::Vector2>();
+			}
+		    
+			setText(1, getTextValue());
+			
+			xVal->setDValue(this->val->getX());
+			yVal->setDValue(this->val->getY());
+		}
+		
+		QString Vector2PropertyItem::getTextValue(){
+			return QString("%1, %2").arg(this->val->getX()).arg(this->val->getY());
+		}
+
+		void Vector2PropertyItem::setTextValue(QString val){
+			QStringList valSplit = val.split(',');
+			if(valSplit.size() == 2){
+				QString xStr = valSplit[0].trimmed();
+				QString yStr = valSplit[1].trimmed();
+
+			    double nX = this->val->getX();
+				double nY = this->val->getY();
+
+				bool validDouble = true;
+
+				if(xStr.length() > 0){
+					nX = xStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				if(yStr.length() > 0){
+					nY = yStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				this->val = make_shared<Type::Vector2>(nX, nY);
+
+				setText(1, getTextValue());
+				
+				xVal->setDValue(nX);
+				yVal->setDValue(nY);
+			}
+		}
+
+		QWidget* Vector2PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+			if(flags() & Qt::ItemIsEnabled){
+				QLineEdit* lineEdit = new QLineEdit(parent);
+				lineEdit->setGeometry(option.rect);
+				lineEdit->setFrame(false);
+			
+				return lineEdit;
+			}else{
+				return NULL;
+			}
+		}
+
+		void Vector2PropertyItem::setEditorData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+			if(lineEdit){
+				lineEdit->setText(getTextValue());
+			}
+		}
+
+	    void Vector2PropertyItem::setModelData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+
+			if(lineEdit){
+				setTextValue(lineEdit->text());
+
+				tree->setProp(propertyName, getValue());
+			}
+		}
+
+		void Vector2PropertyItem::childPropertyUpdated(){
+			double xval = xVal->getDValue();
+			double yval = yVal->getDValue();
+
+			val = make_shared<Type::Vector2>(xval, yval);
+			setText(1, getTextValue());
+
+			tree->setProp(propertyName, getValue());
+		}
 	}
 }

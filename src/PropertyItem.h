@@ -25,6 +25,7 @@
 
 #include <type/Color3.h>
 #include <type/Vector3.h>
+#include <type/Vector2.h>
 
 namespace OB{
 	namespace Studio{
@@ -193,6 +194,29 @@ namespace OB{
 			ChildDoublePropertyItem* xVal;
 			ChildDoublePropertyItem* yVal;
 			ChildDoublePropertyItem* zVal;
+		};
+
+		class Vector2PropertyItem: public PropertyItem{
+		  public:
+		    Vector2PropertyItem(PropertyTreeWidget* tree, QString name);
+			~Vector2PropertyItem();
+
+			virtual shared_ptr<Type::VarWrapper> getValue();
+			virtual void setValue(shared_ptr<Type::VarWrapper> val);
+		    virtual QString getTextValue();
+			virtual void setTextValue(QString val);
+
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual void setEditorData(QWidget* editor);
+			virtual void setModelData(QWidget* editor);
+
+			virtual void childPropertyUpdated();
+
+		  private:
+			shared_ptr<Type::Vector2> val;
+
+			ChildDoublePropertyItem* xVal;
+			ChildDoublePropertyItem* yVal;
 		};
 	}
 }
