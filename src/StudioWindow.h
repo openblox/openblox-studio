@@ -72,6 +72,7 @@ namespace OB{
 				void closeStudio();
 				void commandBarReturn();
 				void selectionChanged();
+				void insertInstance();
 
 				void explorerContextMenu(const QPoint &pos);
 

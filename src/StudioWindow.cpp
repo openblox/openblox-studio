@@ -29,6 +29,7 @@
 #include <openblox.h>
 #include <instance/Instance.h>
 #include <instance/DataModel.h>
+#include <instance/Workspace.h>
 #include <instance/LogService.h>
 #include <type/Event.h>
 #include <type/Enum.h>
@@ -382,6 +383,7 @@ namespace OB{
 			basicObjects->setDragEnabled(false);
 			basicObjects->setSelectionBehavior(QAbstractItemView::SelectItems);
 			basicObjects->setSelectionMode(QAbstractItemView::SingleSelection);
+			connect(basicObjects, &QListWidget::itemActivated, this, &StudioWindow::insertInstance);
 
 			dock->setWidget(basicObjects);
 			addDockWidget(Qt::LeftDockWidgetArea, dock);
@@ -540,10 +542,18 @@ namespace OB{
 			
 			properties->updateSelection(selectedInstances);
 
-			if(selectedInstances.size() > 0){
+			const int numSelected = selectedInstances.size();
+			if(numSelected > 0){
 				deleteAction->setEnabled(true);
+
+				if(numSelected > 1){
+					basicObjects->setEnabled(false);
+				}else{
+					basicObjects->setEnabled(true);
+				}
 			}else{
 				deleteAction->setEnabled(false);
+				basicObjects->setEnabled(true);
 			}
 		}
 
@@ -612,6 +622,31 @@ namespace OB{
 		void StudioWindow::explorerContextMenu(const QPoint &pos){
 			if(explorerCtxMenu){
 				explorerCtxMenu->popup(explorer->mapToGlobal(pos));
+			}
+		}
+
+		void StudioWindow::insertInstance(){
+			OBEngine* eng = OBEngine::getInstance();
+			if(eng){
+			    shared_ptr<Instance::DataModel> dm = eng->getDataModel();
+				if(dm){
+					shared_ptr<Instance::Instance> parentInstance = dm->getWorkspace();
+					
+					if(selectedInstances.size() == 1){
+						parentInstance = selectedInstances.at(0);
+					}
+
+				    QList<QListWidgetItem*> selectedInstanceTypes = basicObjects->selectedItems();
+					if(selectedInstanceTypes.size() == 1){
+						std::string instanceType = selectedInstanceTypes[0]->text().toStdString();
+
+						shared_ptr<Instance::Instance> newInst = ClassFactory::create(instanceType);
+
+						if(newInst){
+							newInst->setParent(parentInstance, true);
+						}
+					}
+				}
 			}
 		}
 	}
