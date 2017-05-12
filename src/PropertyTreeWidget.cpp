@@ -196,7 +196,6 @@ namespace OB{
 						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
-						expandItem(pi);
 						updateValue(propName);
 						continue;
 					}
@@ -207,13 +206,12 @@ namespace OB{
 						}
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
-						expandItem(pi);
 						updateValue(propName);
 						continue;
 					}
 				}
 		    }else{
-				for(auto i = curProps.begin(); i != curProps.end(); ++i){
+				for(auto i = curProps.begin(); i != curProps.end();){
 				   invisibleRootItem()->removeChild(i->second);
 				   delete i->second;
 				   i = curProps.erase(i);
