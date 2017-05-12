@@ -42,6 +42,7 @@ namespace OB{
 
 			setText(0, name);
 			setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+			setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
 		}
 
 	    PropertyItem::~PropertyItem(){}
@@ -81,6 +82,8 @@ namespace OB{
 		bool PropertyItem::editorEvent(QEvent* evt){
 			return false;
 		}
+
+		void PropertyItem::childPropertyUpdated(){}
 
 		// StringPropertyItem
 
@@ -446,6 +449,188 @@ namespace OB{
 					tree->setProp(propertyName, getValue());
 				}
 			}
+		}
+
+		// ChildDoublePropertyItem
+
+	    ChildDoublePropertyItem::ChildDoublePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("double");
+			val = 0;
+			setText(1, getTextValue());
+		}
+
+	    double ChildDoublePropertyItem::getDValue(){
+			return val;
+		}
+
+		void ChildDoublePropertyItem::setDValue(double val){
+			this->val = val;
+			setText(1, getTextValue());
+		}
+		
+		QString ChildDoublePropertyItem::getTextValue(){
+			return QString::number(val);
+		}
+
+		QWidget* ChildDoublePropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+		    QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+		    spinBox->setGeometry(option.rect);
+		    spinBox->setFrame(false);
+			spinBox->setMinimum(-DBL_MAX);
+			spinBox->setMaximum(DBL_MAX);
+			
+		    return spinBox;
+		}
+
+		void ChildDoublePropertyItem::setEditorData(QWidget* editor){
+		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+			if(spinBox){
+			    spinBox->setValue(val);
+			}
+		}
+
+	    void ChildDoublePropertyItem::setModelData(QWidget* editor){
+		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+
+			if(spinBox){
+			    val = spinBox->value();
+				setText(1, getTextValue());
+
+			    QTreeWidgetItem* par = parent();
+				if(par){
+					((PropertyItem*)par)->childPropertyUpdated();
+				}
+			}
+		}
+
+		// Vector3PropertyItem
+
+	    Vector3PropertyItem::Vector3PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("Vector3");
+			val = make_shared<Type::Vector3>();
+			setText(1, getTextValue());
+
+			xVal = new ChildDoublePropertyItem(tree, "X");
+			yVal = new ChildDoublePropertyItem(tree, "Y");
+			zVal = new ChildDoublePropertyItem(tree, "Z");
+
+			addChild(xVal);
+			addChild(yVal);
+			addChild(zVal);
+		}
+
+		Vector3PropertyItem::~Vector3PropertyItem(){
+			delete xVal;
+			delete yVal;
+			delete zVal;
+		}
+
+		shared_ptr<Type::VarWrapper> Vector3PropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void Vector3PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asVector3();
+			if(!this->val){
+				this->val = make_shared<Type::Vector3>();
+			}
+		    
+			setText(1, getTextValue());
+			
+			xVal->setDValue(this->val->getX());
+			yVal->setDValue(this->val->getY());
+			zVal->setDValue(this->val->getZ());
+		}
+		
+		QString Vector3PropertyItem::getTextValue(){
+			return QString("%1, %2, %3").arg(this->val->getX()).arg(this->val->getY()).arg(this->val->getZ());
+		}
+
+		void Vector3PropertyItem::setTextValue(QString val){
+			QStringList valSplit = val.split(',');
+			if(valSplit.size() == 3){
+				QString xStr = valSplit[0].trimmed();
+				QString yStr = valSplit[1].trimmed();
+				QString zStr = valSplit[2].trimmed();
+
+			    double nX = this->val->getX();
+				double nY = this->val->getY();
+				double nZ = this->val->getZ();
+
+				bool validDouble = true;
+
+				if(xStr.length() > 0){
+					nX = xStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				if(yStr.length() > 0){
+					nY = yStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				if(zStr.length() > 0){
+					nZ = zStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				this->val = make_shared<Type::Vector3>(nX, nY, nZ);
+
+				setText(1, getTextValue());
+				
+				xVal->setDValue(nX);
+				yVal->setDValue(nY);
+				zVal->setDValue(nZ);
+			}
+		}
+
+		QWidget* Vector3PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+			if(flags() & Qt::ItemIsEnabled){
+				QLineEdit* lineEdit = new QLineEdit(parent);
+				lineEdit->setGeometry(option.rect);
+				lineEdit->setFrame(false);
+			
+				return lineEdit;
+			}else{
+				return NULL;
+			}
+		}
+
+		void Vector3PropertyItem::setEditorData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+			if(lineEdit){
+				lineEdit->setText(getTextValue());
+			}
+		}
+
+	    void Vector3PropertyItem::setModelData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+
+			if(lineEdit){
+				setTextValue(lineEdit->text());
+
+				tree->setProp(propertyName, getValue());
+			}
+		}
+
+		void Vector3PropertyItem::childPropertyUpdated(){
+			double xval = xVal->getDValue();
+			double yval = yVal->getDValue();
+			double zval = zVal->getDValue();
+
+			val = make_shared<Type::Vector3>(xval, yval, zval);
+			setText(1, getTextValue());
+
+			tree->setProp(propertyName, getValue());
 		}
 	}
 }

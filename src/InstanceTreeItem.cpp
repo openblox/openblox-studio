@@ -26,6 +26,8 @@ namespace OB{
 
 			this->setText(0, QString(inst->getName().c_str()));
 
+			setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+
 			updateFlags();
 		}
 

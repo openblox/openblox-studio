@@ -24,6 +24,7 @@
 #include <QStyledItemDelegate>
 
 #include <type/Color3.h>
+#include <type/Vector3.h>
 
 namespace OB{
 	namespace Studio{
@@ -45,6 +46,8 @@ namespace OB{
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 			virtual bool editorEvent(QEvent* evt);
+
+			virtual void childPropertyUpdated();
 			
 			PropertyTreeWidget* tree;
 			
@@ -149,6 +152,47 @@ namespace OB{
 
 		  private:
 		    shared_ptr<Type::Color3> val;
+		};
+
+		class ChildDoublePropertyItem: public PropertyItem{
+		  public:
+		    ChildDoublePropertyItem(PropertyTreeWidget* tree, QString name);
+
+			double getDValue();
+			void setDValue(double val);
+			
+		    virtual QString getTextValue();
+
+		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual void setEditorData(QWidget* editor);
+			virtual void setModelData(QWidget* editor);
+
+		  private:
+		    double val;
+		};
+
+		class Vector3PropertyItem: public PropertyItem{
+		  public:
+		    Vector3PropertyItem(PropertyTreeWidget* tree, QString name);
+			~Vector3PropertyItem();
+
+			virtual shared_ptr<Type::VarWrapper> getValue();
+			virtual void setValue(shared_ptr<Type::VarWrapper> val);
+		    virtual QString getTextValue();
+			virtual void setTextValue(QString val);
+
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual void setEditorData(QWidget* editor);
+			virtual void setModelData(QWidget* editor);
+
+			virtual void childPropertyUpdated();
+
+		  private:
+			shared_ptr<Type::Vector3> val;
+
+			ChildDoublePropertyItem* xVal;
+			ChildDoublePropertyItem* yVal;
+			ChildDoublePropertyItem* zVal;
 		};
 	}
 }
