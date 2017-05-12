@@ -363,6 +363,7 @@ namespace OB{
 			dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
 
 			properties = new PropertyTreeWidget();
+			properties->setMinimumSize(100, 100);
 
 			dock->setWidget(properties);
 			addDockWidget(Qt::RightDockWidgetArea, dock);
