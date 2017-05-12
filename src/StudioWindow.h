@@ -48,6 +48,9 @@ namespace OB{
 			PropertyTreeWidget* properties;
 			QComboBox* cmdBar;
 
+			//Actions
+			QAction* deleteAction;
+
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
 
 			void initGL();
@@ -62,6 +65,9 @@ namespace OB{
 				void closeStudio();
 				void commandBarReturn();
 				void selectionChanged();
+
+				//Action handlers
+				void deleteSelection();
 		};
 	}
 }

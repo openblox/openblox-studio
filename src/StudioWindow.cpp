@@ -283,10 +283,11 @@ namespace OB{
 			pasteAction->setEnabled(false);
 			pasteAction->setShortcut(QKeySequence::Paste);
 
-			QAction* deleteAction = editMenu->addAction("Delete");
+		    deleteAction = editMenu->addAction("Delete");
 		    deleteAction->setIcon(QIcon::fromTheme("edit-delete"));
 			deleteAction->setEnabled(false);
 			deleteAction->setShortcut(QKeySequence::Delete);
+			connect(deleteAction, &QAction::triggered, this, &StudioWindow::deleteSelection);
 
 			editMenu->addSeparator();
 
@@ -334,6 +335,7 @@ namespace OB{
 			dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
 
 			explorer = new InstanceTree();
+		    explorer->setContextMenuPolicy(Qt::CustomContextMenu);
 
 			connect(explorer, &QTreeWidget::itemSelectionChanged, this, &StudioWindow::selectionChanged);
 
@@ -438,7 +440,8 @@ namespace OB{
 				}
 			}else{
 				glWidget = new StudioGLWidget();
-				int tabIdx = tabWidget->addTab(glWidget, "Game");
+				
+			    int tabIdx = tabWidget->addTab(glWidget, "Game");
 			    QTabBar* tabBar = tabWidget->tabBar();
 				if(tabBar){
 					QWidget* tabBtn = tabBar->tabButton(tabIdx, QTabBar::RightSide);
@@ -447,6 +450,11 @@ namespace OB{
 						tabBtn->setVisible(false);
 					}
 				}
+
+				glWidget->init();
+				initGL();
+				
+				cmdBar->lineEdit()->setDisabled(false);
 			}
 		}
 
@@ -499,6 +507,12 @@ namespace OB{
 			}
 			
 			properties->updateSelection(selectedInstances);
+
+			if(selectedInstances.size() > 0){
+				deleteAction->setEnabled(true);
+			}else{
+				deleteAction->setEnabled(false);
+			}
 		}
 
 		void StudioWindow::initGL(){
@@ -516,8 +530,6 @@ namespace OB{
 					addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(dm), this);
 				}
 			}
-
-		    cmdBar->lineEdit()->setDisabled(false);
 		}
 
 		// Do I think the use of HTML here is horrible? Yes.
@@ -531,6 +543,26 @@ namespace OB{
 		void StudioWindow::sendOutput(QString msg, QColor col){
 		    if(output){
 				output->append("<font color=\"" + col.name() + "\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+			}
+		}
+
+		void StudioWindow::deleteSelection(){
+			if(selectedInstances.size() > 0){
+				for(int i = 0; i < selectedInstances.size(); i++){
+					shared_ptr<Instance::Instance> inst = selectedInstances.at(i);
+					if(inst){
+						//Let's make a few classes safe..
+						std::string className = inst->getClassName();
+						if(className != "Workspace" &&
+						   className != "Lighting" &&
+						   className != "ContentProvider" &&
+						   className != "LogService" &&
+						   className != "RunService" &&
+						   className != "ReplicatedFirst"){
+							inst->Destroy();
+						}
+					}
+				}
 			}
 		}
 	}
