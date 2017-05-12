@@ -26,6 +26,7 @@
 #include <QTextEdit>
 #include <QComboBox>
 #include <QSettings>
+#include <QListWidget>
 
 #include "InstanceTree.h"
 #include "StudioGLWidget.h"
@@ -48,6 +49,7 @@ namespace OB{
 			InstanceTree* explorer;
 			PropertyTreeWidget* properties;
 			QComboBox* cmdBar;
+			QListWidget* basicObjects;
 
 			QMenu* explorerCtxMenu;
 

@@ -370,6 +370,20 @@ namespace OB{
 
 			viewMenu->addAction(dock->toggleViewAction());
 
+			//Basic Objects
+			dock = new QDockWidget(tr("Basic Objects"), this);
+			dock->setObjectName("studio_basic_objects");
+			dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
+
+			dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+
+			basicObjects = new QListWidget();
+
+			dock->setWidget(basicObjects);
+			addDockWidget(Qt::LeftDockWidgetArea, dock);
+
+			viewMenu->addAction(dock->toggleViewAction());
+
 			//Last View Menu things
 			viewMenu->addSeparator();
 
