@@ -4,6 +4,8 @@ AC_PREREQ(2.61)
 AC_INIT([openblox-studio], [0.1.1], [johnmh@openblox.org])
 AC_CONFIG_HEADERS([src/config.h])
 AC_PROG_CXX
+PKG_PROG_PKG_CONFIG
+PKG_INSTALLDIR
 
 AC_CANONICAL_SYSTEM
 
@@ -36,6 +38,8 @@ AS_IF([test "x$have_irrlicht" = "xyes"],
 
 
 AC_SUBST(LIRRLICHT_LIBS)
+
+AX_PKG_CHECK_MODULES([LBULLET], [bullet], [], [AC_DEFINE_UNQUOTED(HAVE_BULLET, 1, [Define to 1 if you have the `bullet' library (-lbullet).])])
 
 PKG_CHECK_MODULES([LQT], [
 	Qt5Core
