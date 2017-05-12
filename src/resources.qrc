@@ -19,6 +19,21 @@
 		<file>../rc/class_icons/Sound.png</file>
 		<file>../rc/class_icons/StarterGui.png</file>
 		<file>../rc/class_icons/Workspace.png</file>
+		<file>../rc/class_icons/BasePart.png</file>
+		<file>../rc/class_icons/Model.png</file>
+		<file>../rc/class_icons/Color3Value.png</file>
+		<file>../rc/class_icons/Humanoid.png</file>
+		<file>../rc/class_icons/BindableFunction.png</file>
+		<file>../rc/class_icons/BindableEvent.png</file>
+		<file>../rc/class_icons/RemoteFunction.png</file>
+		<file>../rc/class_icons/RemoteEvent.png</file>
+		<file>../rc/class_icons/BoolValue.png</file>
+		<file>../rc/class_icons/DoubleConstrainedValue.png</file>
+		<file>../rc/class_icons/IntConstrainedValue.png</file>
+		<file>../rc/class_icons/IntValue.png</file>
+		<file>../rc/class_icons/NumberValue.png</file>
+		<file>../rc/class_icons/ReplicatedFirst.png</file>
+		<file>../rc/class_icons/ReplicatedStorage.png</file>
 	</qresource>
 	<qresource prefix="qss_icons">
     <file>../rc/up_arrow_disabled.png</file>
