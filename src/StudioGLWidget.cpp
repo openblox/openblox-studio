@@ -28,7 +28,6 @@
 namespace OB{
 	namespace Studio{
 		StudioGLWidget::StudioGLWidget(QWidget* parent) : QWidget(parent){
-			setAttribute(Qt::WA_PaintOnScreen);
 			setAttribute(Qt::WA_OpaquePaintEvent);
 		    setFocusPolicy(Qt::StrongFocus);
 
@@ -59,13 +58,16 @@ namespace OB{
 		void StudioGLWidget::paintEvent(QPaintEvent* evt){
 			OB::OBEngine* eng = OB::OBEngine::getInstance();
 			if(eng){
-			    eng->render();
+				if(eng->isRunning()){
+					eng->render();
+				}
 			}
 		}
 
 		void StudioGLWidget::resizeEvent(QResizeEvent* evt){
-			puts("resize");
 			QWidget::resizeEvent(evt);
+
+			//TODO: Inform OB of the resize
 		}
 
 		void StudioGLWidget::timerEvent(QTimerEvent* evt){
