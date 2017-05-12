@@ -27,9 +27,9 @@
 #include <QMouseEvent>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
-#include <QColorDialog>
 
 #include "StudioWindow.h"
+#include "ColorDialog.h"
 
 #include <cfloat>
 
@@ -421,21 +421,21 @@ namespace OB{
 		}
 
 		QWidget* Color3PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-		    QColorDialog* colorDialog = new QColorDialog(StudioWindow::static_win);
+		    ColorDialog* colorDialog = new ColorDialog(StudioWindow::static_win);
 			colorDialog->setModal(true);
 			
 		    return colorDialog;
 		}
 
 		void Color3PropertyItem::setEditorData(QWidget* editor){
-		    QColorDialog* colorDialog = dynamic_cast<QColorDialog*>(editor);
+		    ColorDialog* colorDialog = dynamic_cast<ColorDialog*>(editor);
 			if(colorDialog){
 			    colorDialog->setCurrentColor(QColor(this->val->getRi(), this->val->getGi(), this->val->getBi()));
 			}
 		}
 
 	    void Color3PropertyItem::setModelData(QWidget* editor){
-		    QColorDialog* colorDialog = dynamic_cast<QColorDialog*>(editor);
+		    ColorDialog* colorDialog = dynamic_cast<ColorDialog*>(editor);
 
 			if(colorDialog){
 			    QColor col = colorDialog->selectedColor();

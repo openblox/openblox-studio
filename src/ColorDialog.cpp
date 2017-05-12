@@ -17,42 +17,24 @@
  * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OB_STUDIO_CONFIGDIALOG_H_
-#define OB_STUDIO_CONFIGDIALOG_H_
-
-#include <QDialog>
-#include <QListWidget>
-#include <QListWidgetItem>
-#include <QStackedWidget>
+#include "ColorDialog.h"
 
 namespace OB{
 	namespace Studio{
-		class ConfigDialog: public QDialog{
-		  public:
-			ConfigDialog(QWidget* parent);
+		ColorDialog::ColorDialog(QWidget* parent) : QColorDialog(parent){}
 
-			void optionChanged();
+		void ColorDialog::showEvent(QShowEvent* evt){
+			QWidget::showEvent(evt);
 
-			void saveButtonAct();
-			void applyButtonAct();
+			QWidget* par = parentWidget();
+			if(par){
+				QRect parGeom = par->geometry();
+				QPoint parCenter = parGeom.center();
 
-			virtual void showEvent(QShowEvent* evt);
-
-		  public slots:
-			void changePage(QListWidgetItem* current, QListWidgetItem* previous);
-
-		  private:
-			void createIcons();
-
-			QPushButton* applyButton;
-			QPushButton* saveButton;
-			
-			bool opt_changed;
-
-			QListWidget* contentsWidget;
-			QStackedWidget* pagesWidget;
-		};
+				QRect myGeom = geometry();
+				myGeom.moveCenter(parCenter);
+				setGeometry(myGeom);
+			}
+		}
 	}
 }
-
-#endif

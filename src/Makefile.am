@@ -11,6 +11,7 @@ openblox_studio_SOURCES = OpenBloxStudio.cpp \
 	PropertyTreeWidget.cpp \
 	ConfigDialog.cpp \
 	ConfigPage.cpp \
+	ColorDialog.cpp \
 	qrc_resources.cpp
 # Linker options
 openblox_studio_LDADD = $(LOPENBLOX_LIBS) $(LIRRLICHT_LIBS) $(LQT_LIBS)

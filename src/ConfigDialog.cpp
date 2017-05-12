@@ -121,5 +121,19 @@ namespace OB{
 
 			pagesWidget->setCurrentIndex(contentsWidget->row(current));
 		}
+
+		void ConfigDialog::showEvent(QShowEvent* evt){
+			QWidget::showEvent(evt);
+
+			QWidget* par = parentWidget();
+			if(par){
+				QRect parGeom = par->geometry();
+				QPoint parCenter = parGeom.center();
+
+				QRect myGeom = geometry();
+				myGeom.moveCenter(parCenter);
+				setGeometry(myGeom);
+			}
+		}
 	}
 }
