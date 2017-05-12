@@ -224,6 +224,7 @@ namespace OB{
 			glWidget = NULL;
 
 			tabWidget = new QTabWidget();
+			tabWidget->setMinimumSize(320, 240);
 			tabWidget->setTabsClosable(true);
 			
 			setCentralWidget(tabWidget);
@@ -344,6 +345,7 @@ namespace OB{
 			dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
 
 			explorer = new InstanceTree();
+			explorer->setMinimumSize(100, 100);
 		    explorer->setContextMenuPolicy(Qt::CustomContextMenu);
 			connect(explorer, &QWidget::customContextMenuRequested, this, &StudioWindow::explorerContextMenu);
 			connect(explorer, &QTreeWidget::itemSelectionChanged, this, &StudioWindow::selectionChanged);
