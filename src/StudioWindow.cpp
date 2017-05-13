@@ -144,10 +144,12 @@ namespace OB{
 				if(treeItemMap.contains(newGuy)){
 				    InstanceTreeItem* ngti = treeItemMap.value(newGuy);
 				    QTreeWidgetItem* twi = ngti->parent();
-					if(twi){
-						twi->removeChild(ngti);
+					if(twi != kidItem){
+						if(twi){
+							twi->removeChild(ngti);
+						}
+						kidItem->addChild(ngti);
 					}
-					kidItem->addChild(ngti);
 				}else{
 					addChildOfInstance(kidItem, newGuy);
 				}
@@ -807,6 +809,7 @@ namespace OB{
 					selectedInstances.clear();
 					selectedInstances.push_back(newModel);
 					updateSelectionFromLua();
+					update_toolbar_usability();
 				}
 			}
 		}
@@ -839,6 +842,7 @@ namespace OB{
 
 				selectedInstances = allKids;
 				updateSelectionFromLua();
+				update_toolbar_usability();
 			}
 		}
 	}
