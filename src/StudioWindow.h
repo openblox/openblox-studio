@@ -57,8 +57,13 @@ namespace OB{
 
 			//Actions
 			QAction* deleteAction;
+			
+			QAction* ungroupAct;
+			QAction* groupAct;
 
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
+			
+			void updateSelectionFromLua();
 
 			void initGL();
 
@@ -78,6 +83,8 @@ namespace OB{
 
 				//Action handlers
 				void deleteSelection();
+				void groupSelection();
+				void ungroupSelection();
 		};
 	}
 }

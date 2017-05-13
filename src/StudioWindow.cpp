@@ -425,6 +425,25 @@ namespace OB{
 
 			addToolBar(Qt::BottomToolBarArea, commandBar);
 			//END COMMAND BAR
+
+			//Begin Model toolbar
+			QToolBar* modelToolbar = new QToolBar("Model");
+			modelToolbar->setObjectName("studio_model_toolbar");
+			modelToolbar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
+			viewToolbarsMenu->addAction(modelToolbar->toggleViewAction());
+			
+		    groupAct = modelToolbar->addAction("Group");
+			groupAct->setIcon(QIcon::fromTheme("object-group", QIcon(":studio_icon/icon_group.png")));
+			groupAct->setEnabled(false);
+			connect(groupAct, &QAction::triggered, this, &StudioWindow::groupSelection);
+
+			ungroupAct = modelToolbar->addAction("Ungroup");
+			ungroupAct->setIcon(QIcon::fromTheme("object-ungroup", QIcon(":studio_icon/icon_ungroup.png")));
+			ungroupAct->setEnabled(false);
+			connect(ungroupAct, &QAction::triggered, this, &StudioWindow::ungroupSelection);
+
+			addToolBar(Qt::TopToolBarArea, modelToolbar);
+			//End Model toolbar
 		}
 
 		void StudioWindow::about(){
@@ -548,12 +567,68 @@ namespace OB{
 
 				if(numSelected > 1){
 					basicObjects->setEnabled(false);
+
+				    bool anyParentLocked = false;
+					shared_ptr<Instance::Instance> sharedParent = NULL;
+					for(int i = 0; i < numSelected; i++){
+						shared_ptr<Instance::Instance> selected_inst = selectedInstances.at(i);
+						if(selected_inst){
+							if(selected_inst->ParentLocked){
+								anyParentLocked = true;
+								break;
+							}
+							if(!sharedParent){
+								sharedParent = selected_inst->getParent();
+							}
+							if(selected_inst->getParent() != sharedParent){
+								sharedParent = NULL;
+								break;
+							}
+						}
+					}
+					
+				    ungroupAct->setEnabled(false);
+
+					if(anyParentLocked || !sharedParent){
+						groupAct->setEnabled(false);
+					}else{
+						groupAct->setEnabled(true);
+					}
 				}else{
 					basicObjects->setEnabled(true);
+					groupAct->setEnabled(false);
+					ungroupAct->setEnabled(false);
+
+				    shared_ptr<Instance::Instance> selected_inst = selectedInstances.at(0);
+					if(selected_inst){
+					    shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selected_inst);
+						if(selected_model){
+							if(selected_model->GetChildren().size() > 0){
+								ungroupAct->setEnabled(true);
+							}
+						}
+					}
 				}
 			}else{
 				deleteAction->setEnabled(false);
 				basicObjects->setEnabled(true);
+			}
+		}
+
+		void StudioWindow::updateSelectionFromLua(){
+			const QSignalBlocker sigBlock(explorer);
+
+			explorer->clearSelection();
+			for(int i = 0; i < selectedInstances.size(); i++){
+				shared_ptr<Instance::Instance> inst = selectedInstances.at(i);
+				if(inst){
+					InstanceTreeItem* ti = treeItemMap[inst];
+					if(ti){
+						ti->setSelected(true);
+					}else{
+						puts("No ti");
+					}
+				}
 			}
 		}
 
@@ -647,6 +722,36 @@ namespace OB{
 						}
 					}
 				}
+			}
+		}
+
+		void StudioWindow::groupSelection(){
+			
+		}
+		
+		void StudioWindow::ungroupSelection(){
+			shared_ptr<Instance::Instance> newPar = NULL;
+			
+			shared_ptr<Instance::Instance> selectedInst = selectedInstances.at(0);
+			if(selectedInst){
+				shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selectedInst);
+				if(selected_model){
+					newPar = selected_model->getParent();
+				}
+			}
+
+			if(newPar){
+				std::vector<shared_ptr<Instance::Instance>> allKids = selectedInst->GetChildren();
+				for(int i = 0; i < allKids.size(); i++){
+					shared_ptr<Instance::Instance> kI = allKids.at(i);
+					if(kI){
+						kI->setParent(newPar, true);
+					}
+				}
+				selectedInst->Destroy();
+
+				selectedInstances = allKids;
+				updateSelectionFromLua();
 			}
 		}
 	}
