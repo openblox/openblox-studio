@@ -134,9 +134,14 @@ namespace OB{
 		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			
 		    if(evec.size() == 1){
-			    shared_ptr<Instance::Instance> newGuy = dynamic_pointer_cast<Instance::Instance>(evec[0]->asInstance());
+			    shared_ptr<Instance::Instance> newGuy = evec[0]->asInstance();
 				if(treeItemMap.contains(newGuy)){
-					kidItem->addChild(treeItemMap[newGuy]);
+				    InstanceTreeItem* ngti = treeItemMap.at(newGuy);
+				    QTreeWidgetItem* twi = ngti->parent();
+					if(twi){
+						twi->removeChild(ngti);
+					}
+					kidItem->addChild(ngti);
 				}else{
 					addChildOfInstance(kidItem, newGuy);
 				}
@@ -147,9 +152,11 @@ namespace OB{
 			InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			
 		    if(evec.size() == 1){
+				puts("removedEvt");
 			    shared_ptr<Instance::Instance> newGuy = dynamic_pointer_cast<Instance::Instance>(evec[0]->asInstance());
 				if(treeItemMap.contains(newGuy)){
-					kidItem->removeChild(treeItemMap[newGuy]);
+					puts("newGuy!!");
+					kidItem->removeChild(treeItemMap.at(newGuy));
 				}
 			}
 		}
@@ -642,7 +649,7 @@ namespace OB{
 				if(dm){
 					shared_ptr<OB::Instance::LogService> ls = dm->getLogService();
 					if(ls){
-						ls->getMessageOut()->Connect(handle_log_event, NULL);
+						ls->getMessageOut()->Connect(handle_log_event, this);
 					}
 					addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(dm), this);
 				}
@@ -726,7 +733,41 @@ namespace OB{
 		}
 
 		void StudioWindow::groupSelection(){
+			const QSignalBlocker sigBlock(explorer);
 			
+		    shared_ptr<Instance::Instance> selectedInst = selectedInstances.at(0);
+			if(selectedInst){
+				shared_ptr<Instance::Instance> newPar = selectedInst->getParent();
+				
+				shared_ptr<Instance::Instance> newModel = ClassFactory::create("Model");
+				if(newModel){
+					newModel->setParent(newPar, true);
+
+					std::vector<shared_ptr<Instance::Instance>> toGroup = selectedInstances;
+					for(int i = 0; i < toGroup.size(); i++){
+						shared_ptr<Instance::Instance> kI = toGroup.at(i);
+						if(kI){
+							kI->setParent(NULL, false);
+						}
+					}
+
+					OBEngine* eng = OBEngine::getInstance();
+					//eng->tick();
+
+					for(int i = 0; i < toGroup.size(); i++){
+						shared_ptr<Instance::Instance> kI = toGroup.at(i);
+						if(kI){
+							kI->setParent(newModel, false);
+						}
+					}
+
+					//eng->tick();
+
+					selectedInstances.clear();
+					selectedInstances.push_back(newModel);
+					updateSelectionFromLua();
+				}
+			}
 		}
 		
 		void StudioWindow::ungroupSelection(){
