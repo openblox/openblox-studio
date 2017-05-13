@@ -134,9 +134,15 @@ namespace OB{
 		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			
 		    if(evec.size() == 1){
+			    if(kidItem->isSelected()){
+					StudioWindow* win = StudioWindow::static_win;
+					if(win){
+						win->update_toolbar_usability();
+					}
+				}
 			    shared_ptr<Instance::Instance> newGuy = evec[0]->asInstance();
 				if(treeItemMap.contains(newGuy)){
-				    InstanceTreeItem* ngti = treeItemMap.at(newGuy);
+				    InstanceTreeItem* ngti = treeItemMap.value(newGuy);
 				    QTreeWidgetItem* twi = ngti->parent();
 					if(twi){
 						twi->removeChild(ngti);
@@ -152,11 +158,18 @@ namespace OB{
 			InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			
 		    if(evec.size() == 1){
-				puts("removedEvt");
+				if(kidItem->isSelected()){
+					StudioWindow* win = StudioWindow::static_win;
+					if(win){
+						win->update_toolbar_usability();
+					}
+				}
 			    shared_ptr<Instance::Instance> newGuy = dynamic_pointer_cast<Instance::Instance>(evec[0]->asInstance());
-				if(treeItemMap.contains(newGuy)){
-					puts("newGuy!!");
-					kidItem->removeChild(treeItemMap.at(newGuy));
+				InstanceTreeItem* kTi = treeItemMap.value(newGuy);
+				if(kTi){
+					if(kTi->parent() == kidItem){
+						kidItem->removeChild(kTi);
+					}
 				}
 			}
 		}
@@ -551,23 +564,7 @@ namespace OB{
 			}
 		}
 
-		void StudioWindow::selectionChanged(){
-			QList<QTreeWidgetItem*> selectedItems = explorer->selectedItems();
-
-			selectedInstances.clear();
-
-			for(int i = 0; i < selectedItems.size(); i++){
-				InstanceTreeItem* srcItem = dynamic_cast<InstanceTreeItem*>(selectedItems[i]);
-				if(srcItem){
-					shared_ptr<Instance::Instance> instPtr = srcItem->GetInstance();
-					if(instPtr){
-					    selectedInstances.push_back(instPtr);
-					}
-				}
-			}
-			
-			properties->updateSelection(selectedInstances);
-
+		void StudioWindow::update_toolbar_usability(){
 			const int numSelected = selectedInstances.size();
 			if(numSelected > 0){
 				deleteAction->setEnabled(true);
@@ -622,18 +619,64 @@ namespace OB{
 			}
 		}
 
+		void StudioWindow::selectionChanged(){
+			QList<QTreeWidgetItem*> selectedItems = explorer->selectedItems();
+
+			selectedInstances.clear();
+
+			for(int i = 0; i < selectedItems.size(); i++){
+				InstanceTreeItem* srcItem = dynamic_cast<InstanceTreeItem*>(selectedItems[i]);
+				if(srcItem){
+					shared_ptr<Instance::Instance> instPtr = srcItem->GetInstance();
+					if(instPtr){
+					    selectedInstances.push_back(instPtr);
+					}
+				}
+			}
+			
+			properties->updateSelection(selectedInstances);
+			update_toolbar_usability();
+		}
+
 		void StudioWindow::updateSelectionFromLua(){
 			const QSignalBlocker sigBlock(explorer);
 
+			std::vector<shared_ptr<Instance::Instance>> newSelection = selectedInstances;
+
 			explorer->clearSelection();
-			for(int i = 0; i < selectedInstances.size(); i++){
+			for(int i = 0; i < newSelection.size(); i++){
 				shared_ptr<Instance::Instance> inst = selectedInstances.at(i);
 				if(inst){
-					InstanceTreeItem* ti = treeItemMap[inst];
+					shared_ptr<Instance::Instance> parInst = inst->getParent();
+					
+				    InstanceTreeItem* ti = treeItemMap.value(inst);
 					if(ti){
+					    InstanceTreeItem* pTi = (InstanceTreeItem*)ti->parent();
+						if(pTi){
+							if(pTi->GetInstance() != parInst){
+								std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(inst)});
+								instance_child_removed_evt(argVector, pTi);
+							    if(parInst){
+								    InstanceTreeItem* tiParent = treeItemMap.value(parInst);
+									if(tiParent){
+										instance_child_added_evt(argVector, tiParent);
+									}
+								}
+							}
+						}
 						ti->setSelected(true);
 					}else{
-						puts("No ti");
+						if(parInst){
+							InstanceTreeItem* tiParent = treeItemMap.value(parInst);
+							if(tiParent){
+								std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(inst)});
+								instance_child_added_evt(argVector, tiParent);
+								ti = treeItemMap.value(inst);
+								if(ti){
+									ti->setSelected(true);
+								}
+							}
+						}
 					}
 				}
 			}
@@ -747,21 +790,19 @@ namespace OB{
 					for(int i = 0; i < toGroup.size(); i++){
 						shared_ptr<Instance::Instance> kI = toGroup.at(i);
 						if(kI){
-							kI->setParent(NULL, false);
-						}
-					}
+							std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(kI)});
+							
+						    shared_ptr<Instance::Instance> oPar = kI->getParent();
+							if(oPar){
+								InstanceTreeItem* pTi = treeItemMap.value(oPar);
+								if(pTi){
+									instance_child_removed_evt(argVector, pTi);
+								}
+							}
 
-					OBEngine* eng = OBEngine::getInstance();
-					//eng->tick();
-
-					for(int i = 0; i < toGroup.size(); i++){
-						shared_ptr<Instance::Instance> kI = toGroup.at(i);
-						if(kI){
 							kI->setParent(newModel, false);
 						}
 					}
-
-					//eng->tick();
 
 					selectedInstances.clear();
 					selectedInstances.push_back(newModel);
@@ -790,6 +831,11 @@ namespace OB{
 					}
 				}
 				selectedInst->Destroy();
+			    InstanceTreeItem* pti = treeItemMap.value(newPar);
+				if(pti){
+					std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(selectedInst)});
+					instance_child_removed_evt(argVector, pti);
+				}
 
 				selectedInstances = allKids;
 				updateSelectionFromLua();

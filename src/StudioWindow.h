@@ -64,6 +64,7 @@ namespace OB{
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
 			
 			void updateSelectionFromLua();
+			void update_toolbar_usability();
 
 			void initGL();
 
