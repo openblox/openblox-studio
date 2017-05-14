@@ -189,7 +189,7 @@ int main(int argc, char** argv){
 		settings->setValue("geometry", win->saveGeometry());
 		settings->setValue("state", win->saveState());
 	}
-	settings.endGroup();
+	settings->endGroup();
 	#endif
 
 	settings->beginGroup("command_history");
