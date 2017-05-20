@@ -39,6 +39,10 @@ namespace OB{
 
 	    Selection::~Selection(){}
 
+		shared_ptr<Type::Event> Selection::getSelectionChanged(){
+			return SelectionChanged;
+		}
+
 		shared_ptr<Instance> Selection::cloneImpl(){
 			return NULL;
 		}
@@ -47,9 +51,44 @@ namespace OB{
 			Studio::StudioWindow* win = Studio::StudioWindow::static_win;
 
 			if(win){
-				
+				return win->selectedInstances;
 			}
 			return std::vector<shared_ptr<Instance>>();
+		}
+
+		int Selection::lua_Get(lua_State* L){
+			shared_ptr<Instance> inst = checkInstance(L, 1, false);
+
+			if(inst){
+				shared_ptr<Selection> instS = dynamic_pointer_cast<Selection>(inst);
+				if(instS){
+					lua_newtable(L);
+					int lIndex = 1;
+
+					std::vector<shared_ptr<Instance>> curSelection = instS->Get();
+					for(int i = 0; i < curSelection.size(); i++){
+						shared_ptr<Instance> kid = curSelection.at(i);
+						if(kid){
+							kid->wrap_lua(L);
+							lua_rawseti(L, -2, lIndex++);
+						}
+					}
+					
+					return 1;
+				}
+			}
+
+			return luaL_error(L, COLONERR, "Get");
+		}
+
+		void Selection::register_lua_methods(lua_State* L){
+			Instance::register_lua_methods(L);
+			
+			luaL_Reg methods[] = {
+				{"Get", lua_Get},
+				{NULL, NULL}
+			};
+			luaL_setfuncs(L, methods, 0);
 		}
 
 		void Selection::register_lua_events(lua_State* L){

@@ -29,8 +29,13 @@ namespace OB{
 			    Selection();
 				virtual ~Selection();
 
+				shared_ptr<Type::Event> getSelectionChanged();
+
 				std::vector<shared_ptr<Instance>> Get();
 
+				DECLARE_LUA_METHOD(Get);
+
+				static void register_lua_methods(lua_State* L);
 				static void register_lua_events(lua_State* L);
 				
 				DECLARE_CLASS(Selection);

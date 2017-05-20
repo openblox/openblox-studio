@@ -32,6 +32,8 @@
 #include <instance/NetworkServer.h>
 #include <instance/NetworkClient.h>
 
+#include "Selection.h"
+
 #define DARK_THEME_DEFAULT true
 #ifndef _WIN32
 #undef DARK_THEME_DEFAULT
@@ -95,6 +97,8 @@ int main(int argc, char** argv){
 	parser.process(app);
 
     OB::OBEngine* eng = new OB::OBEngine();
+
+	OB::Instance::Selection::registerClass();
 
 	OB::Studio::StudioWindow* win = new OB::Studio::StudioWindow();
 	win->settingsInst = settings;
