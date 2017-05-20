@@ -42,6 +42,7 @@ namespace OB{
 
 			static std::string pathToStudioExecutable;
 			static StudioWindow* static_win;
+			std::string openedFile;
 
 			QTabWidget* tabWidget;
 			StudioGLWidget* glWidget;
@@ -56,6 +57,9 @@ namespace OB{
 			QSettings* settingsInst;
 
 			//Actions
+			QAction* saveAction;
+			QAction* saveAsAction;
+
 			QAction* deleteAction;
 			
 			QAction* ungroupAct;
@@ -86,6 +90,9 @@ namespace OB{
 				void deleteSelection();
 				void groupSelection();
 				void ungroupSelection();
+
+				void saveAct();
+				void saveAsAct();
 		};
 	}
 }

@@ -25,12 +25,18 @@
 #include "InstanceTreeItem.h"
 #include "ConfigDialog.h"
 
+//Studio services
+#include "Selection.h"
+
 // OpenBlox Engine
 #include <openblox.h>
+#include <OBSerializer.h>
+
 #include <instance/Instance.h>
 #include <instance/DataModel.h>
 #include <instance/Workspace.h>
 #include <instance/LogService.h>
+
 #include <type/Event.h>
 #include <type/Enum.h>
 
@@ -131,7 +137,9 @@ namespace OB{
 		}
 
 		void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
+			if(!ud){puts("addNULL");return;}
+			
+			QTreeWidgetItem* kidItem = static_cast<QTreeWidgetItem*>(ud);
 			
 		    if(evec.size() == 1){
 			    if(kidItem->isSelected()){
@@ -157,7 +165,11 @@ namespace OB{
 		}
 
 		void instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
+			if(!ud){puts("remNULL");return;}else{
+				puts("!NULL");
+			}
+			
+		    QTreeWidgetItem* kidItem = static_cast<QTreeWidgetItem*>(ud);
 			
 		    if(evec.size() == 1){
 				if(kidItem->isSelected()){
@@ -166,7 +178,7 @@ namespace OB{
 						win->update_toolbar_usability();
 					}
 				}
-			    shared_ptr<Instance::Instance> newGuy = dynamic_pointer_cast<Instance::Instance>(evec[0]->asInstance());
+				shared_ptr<Instance::Instance> newGuy = evec[0]->asInstance();
 				InstanceTreeItem* kTi = treeItemMap.value(newGuy);
 				if(kTi){
 					if(kTi->parent() == kidItem){
@@ -229,6 +241,7 @@ namespace OB{
 			if(!parentItem || !inst){
 				return;
 			}
+			
 			std::vector<shared_ptr<Instance::Instance>> kids = inst->GetChildren();
 			for(std::vector<shared_ptr<Instance::Instance>>::size_type i = 0; i < kids.size(); i++){
 				shared_ptr<Instance::Instance> kid = kids[i];
@@ -245,6 +258,7 @@ namespace OB{
 		StudioWindow::StudioWindow(){
 			static_win = this;
 			glWidget = NULL;
+			openedFile = "";
 
 			tabWidget = new QTabWidget();
 			tabWidget->setMinimumSize(320, 240);
@@ -266,15 +280,17 @@ namespace OB{
 
 			fileMenu->addSeparator();
 
-			QAction* saveAction = fileMenu->addAction("Save");
+		    saveAction = fileMenu->addAction("Save");
 			saveAction->setEnabled(false);
 			saveAction->setIcon(QIcon::fromTheme("document-save"));
 			saveAction->setShortcut(QKeySequence::Save);
+			connect(saveAction, &QAction::triggered, this, &StudioWindow::saveAct);
 			
-			QAction* saveAsAction = fileMenu->addAction("Save As");
+		    saveAsAction = fileMenu->addAction("Save As");
 			saveAsAction->setEnabled(false);
 			saveAsAction->setIcon(QIcon::fromTheme("document-save-as"));
 			saveAsAction->setShortcut(QKeySequence::SaveAs);
+			connect(saveAsAction, &QAction::triggered, this, &StudioWindow::saveAsAct);
 			
 			fileMenu->addSeparator();
 			
@@ -638,6 +654,17 @@ namespace OB{
 			
 			properties->updateSelection(selectedInstances);
 			update_toolbar_usability();
+
+			OBEngine* eng = OBEngine::getInstance();
+			if(eng){
+				shared_ptr<Instance::DataModel> dm = eng->getDataModel();
+				if(dm){
+					shared_ptr<Instance::Selection> selectionService = dynamic_pointer_cast<Instance::Selection>(dm->FindService("Selection"));
+					if(selectionService){
+						selectionService->getSelectionChanged()->Fire();
+					}
+				}
+			}
 		}
 
 		void StudioWindow::updateSelectionFromLua(){
@@ -710,6 +737,9 @@ namespace OB{
 					basicObjects->addItem(wi);
 				}
 			}
+
+			saveAction->setEnabled(true);
+			saveAsAction->setEnabled(true);
 		}
 
 		// Do I think the use of HTML here is horrible? Yes.
@@ -808,7 +838,7 @@ namespace OB{
 
 					selectedInstances.clear();
 					selectedInstances.push_back(newModel);
-					updateSelectionFromLua();
+
 					update_toolbar_usability();
 				}
 			}
@@ -843,6 +873,63 @@ namespace OB{
 				selectedInstances = allKids;
 				updateSelectionFromLua();
 				update_toolbar_usability();
+			}
+		}
+
+		void StudioWindow::saveAct(){
+			if(openedFile.length() > 0){
+				OBEngine* eng = OBEngine::getInstance();
+				// We use this instead of Save(file) to allow saving
+				// to remote locations such as network drives/webdav
+				shared_ptr<OBSerializer> serializer = eng->getSerializer();
+				if(!serializer){
+					// This should never happen
+					statusBar()->showMessage("No serialization support.");
+					// This error message is, of course, totally bogus.
+					QMessageBox::critical(this, "Error", "Serialization failed due to lack of binary executable data.");
+					return;
+				}
+				
+				std::string strToWrite = serializer->SaveInMemory();
+				if(strToWrite.length() == 0){
+					QString errMsg = "Failed to serialize game.";
+					statusBar()->showMessage(errMsg);
+					QMessageBox::critical(this, "Error", errMsg);
+				}else{
+					QFile file(QString(openedFile.c_str()));
+					std::cout << "Saving to " << openedFile << std::endl;
+					if(file.open(QIODevice::WriteOnly)){
+						QTextStream stream(&file);
+						stream << QString(strToWrite.c_str()) << endl;
+						statusBar()->showMessage("Saved.");
+					}else{
+						QString errMsg = "Failed to open file";
+						statusBar()->showMessage(errMsg);
+						QMessageBox::critical(this, "Error", errMsg);
+					}
+				}
+			}else{
+				// No file open
+				saveAsAct();
+			}
+		}
+
+		void StudioWindow::saveAsAct(){
+			QFileDialog* fileDia = new QFileDialog(this);
+			fileDia->setAcceptMode(QFileDialog::AcceptSave);
+			fileDia->setDefaultSuffix("obgx");
+			fileDia->setFileMode(QFileDialog::AnyFile);
+			fileDia->setFilter(QDir::Files | QDir::Writable);
+			fileDia->setNameFilter("OpenBlox Game (*.obgx)");
+
+			if(fileDia->exec()){
+				QList<QUrl> selected = fileDia->selectedUrls();
+				if(selected.size() > 0){
+					openedFile = selected[0].toLocalFile().toStdString();
+					saveAct();
+				}else{
+					statusBar()->showMessage("Operation canceled.");
+				}
 			}
 		}
 	}
