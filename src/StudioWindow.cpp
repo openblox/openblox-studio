@@ -900,7 +900,7 @@ namespace OB{
 					std::cout << "Saving to " << openedFile << std::endl;
 					if(file.open(QIODevice::WriteOnly)){
 						QTextStream stream(&file);
-						stream << QString(strToWrite.c_str()) << endl;
+						stream << QString(strToWrite.c_str()) << flush;
 						statusBar()->showMessage("Saved.");
 					}else{
 						QString errMsg = "Failed to open file";
