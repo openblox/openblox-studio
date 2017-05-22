@@ -90,7 +90,7 @@ namespace OB{
 	    StringPropertyItem::StringPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("string");
 			val = "";
-			setText(1, QString(val.c_str()));
+			setText(1, "");
 		}
 
 		shared_ptr<Type::VarWrapper> StringPropertyItem::getValue(){
@@ -140,6 +140,34 @@ namespace OB{
 			}
 		}
 
+		// InstancePropertyItem
+
+	    InstancePropertyItem::InstancePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("Instance");
+			val = NULL;
+			setText(1, "");
+			
+			setFlags(flags() & ~Qt::ItemIsEnabled);
+		}
+
+		shared_ptr<Type::VarWrapper> InstancePropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void InstancePropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asInstance();
+			
+			setText(1, getTextValue());
+		}
+		
+		QString InstancePropertyItem::getTextValue(){
+			if(val){
+				return QString(val->getName().c_str());
+			}else{
+				return "";
+			}
+		}
+		
 		// BoolPropertyItem
 
 	    QIcon getCheckBox(int val, bool disabled){

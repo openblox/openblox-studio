@@ -96,14 +96,12 @@ int main(int argc, char** argv){
 	
 	parser.process(app);
 
-    OB::OBEngine* eng = new OB::OBEngine();
-
+	OB::ClassFactory::registerCoreClasses();
 	OB::Instance::Selection::registerClass();
 
 	OB::Studio::StudioWindow* win = new OB::Studio::StudioWindow();
 	win->settingsInst = settings;
 
-	#ifdef WIN32
 	settings->beginGroup("main_window");
 	{
 		if(settings->contains("geometry")){
@@ -114,7 +112,6 @@ int main(int argc, char** argv){
 		}
 	}
 	settings->endGroup();
-	#endif
 
 	win->show();
 
@@ -132,6 +129,7 @@ int main(int argc, char** argv){
 	}
 	settings->endGroup();
 
+	/*
 	if(parser.isSet(newOpt) || parser.isSet(serverOpt) || parser.isSet(clientOpt)){
 		win->newInstance();
 
@@ -178,23 +176,20 @@ int main(int argc, char** argv){
 			}
 		}
 	}
+	*/
 
 	while(win->isVisible()){
 		app.processEvents();
-		if(eng->isRunning()){
-			eng->tick();
-		}
+		win->tickEngines();
 		QThread::msleep(10);
 	}
 
-	#ifdef WIN32
 	settings->beginGroup("main_window");
 	{
 		settings->setValue("geometry", win->saveGeometry());
 		settings->setValue("state", win->saveState());
 	}
 	settings->endGroup();
-	#endif
 
 	settings->beginGroup("command_history");
 	{

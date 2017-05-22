@@ -20,13 +20,15 @@
 #ifndef OB_STUDIO_STUDIOGLWIDGET_H_
 #define OB_STUDIO_STUDIOGLWIDGET_H_
 
-#include <QWidget>
+#include "StudioTabWidget.h"
+
+#include "StudioWindow.h"
 
 namespace OB{
 	namespace Studio{
-		class StudioGLWidget: public QWidget{
+		class StudioGLWidget: public StudioTabWidget{
 		  public:
-			StudioGLWidget(QWidget* parent = 0);
+			StudioGLWidget(OBEngine* eng);
 			virtual ~StudioGLWidget();
 
 			QSize minimumSizeHint() const;
@@ -38,11 +40,41 @@ namespace OB{
 			virtual void resizeEvent(QResizeEvent* evt);
 			virtual void timerEvent(QTimerEvent* evt);
 
+			void setLogHistory(QString hist);
+			QString getLogHistory();
+
+			void populateTree(InstanceTree* explorer);
+
+			void saveAct();
+			void saveAsAct();
+
+			QString fileOpened;
+
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
+
+			// Explorer handling
+			void sendOutput(QString msg, QColor col);
+			void sendOutput(QString msg);
+
+			void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud);
+			void instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
+			void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
+			void instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
+			void addChildOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> kid);
+			void addChildrenOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst);
+			void dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
+			void addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst, StudioWindow* sw);
+			
 		  protected:
 			void paintGL();
 			void resizeGL(int width, int height);
 			void mousePressEvent(QMouseEvent* event);
 			void mouseMoveEvent(QMouseEvent* event);
+
+			QMap<shared_ptr<Instance::Instance>, InstanceTreeItem*> treeItemMap;
+			
+		  private:
+			QString logHist;
 		};
 	}
 }

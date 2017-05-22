@@ -49,32 +49,10 @@ namespace OB{
 	namespace Studio{
 		std::string StudioWindow::pathToStudioExecutable = "";
 	    StudioWindow* StudioWindow::static_win = NULL;
-		
-	    void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud){
-			//Temporary
-			QColor errorCol(255, 51, 0);
-			QColor warnCol(242, 97, 0);
-
-			StudioWindow* win = StudioWindow::static_win;
-			
-			if(evec.size() == 2){
-				QString msg = evec.at(0)->asString().c_str();
-				shared_ptr<OB::Type::LuaEnumItem> msgType = dynamic_pointer_cast<OB::Type::LuaEnumItem>(evec.at(1)->asType());
-
-				if(msgType->getValue() == (int)OB::Enum::MessageType::MessageError){
-				    win->sendOutput(msg, errorCol);
-				}else if(msgType->getValue() == (int)OB::Enum::MessageType::MessageWarning){
-					win->sendOutput(msg, warnCol);
-				}else{
-				    win->sendOutput(msg);
-				}
-			}
-		}
-		
-		QMap<shared_ptr<Instance::Instance>, InstanceTreeItem*> treeItemMap;
+	    
 		QMap<QString, QIcon> classIconMap;
 
-		QIcon getClassIcon(QString className){
+		QIcon StudioWindow::getClassIcon(QString className){
 		    if(classIconMap.contains(className)){
 				return classIconMap[className];
 			}
@@ -98,167 +76,8 @@ namespace OB{
 			return ico;
 		}
 
-		void addChildrenOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst);
-		void addChildOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> kid);
-		
-		void instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			if(!ud){
-				return;
-			}
-			
-		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
-			shared_ptr<Instance::Instance> kid = kidItem->GetInstance();
-			if(!kid){
-				return;
-			}
-
-			std::string prop = evec.at(0)->asString();
-
-			if(StudioWindow::static_win){
-				std::vector<shared_ptr<Instance::Instance>> selection = StudioWindow::static_win->selectedInstances;
-
-				if(!selection.empty()){
-					if(std::find(selection.begin(), selection.end(), kid) != selection.end()){
-						StudioWindow::static_win->properties->updateValue(prop);
-					}
-				}
-				
-			}
-
-			if(prop == "Name"){
-			    const QSignalBlocker sigBlock(kidItem->treeWidget());
-				kidItem->setText(0, QString(kid->getName().c_str()));
-				return;
-			}
-			if(prop == "Parent" || prop == "ParentLocked"){
-				kidItem->updateFlags();
-				return;
-			}
-		}
-
-		void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			if(!ud){puts("addNULL");return;}
-			
-			QTreeWidgetItem* kidItem = static_cast<QTreeWidgetItem*>(ud);
-			
-		    if(evec.size() == 1){
-			    if(kidItem->isSelected()){
-					StudioWindow* win = StudioWindow::static_win;
-					if(win){
-						win->update_toolbar_usability();
-					}
-				}
-			    shared_ptr<Instance::Instance> newGuy = evec[0]->asInstance();
-				if(treeItemMap.contains(newGuy)){
-				    InstanceTreeItem* ngti = treeItemMap.value(newGuy);
-				    QTreeWidgetItem* twi = ngti->parent();
-					if(twi != kidItem){
-						if(twi){
-							twi->removeChild(ngti);
-						}
-						kidItem->addChild(ngti);
-					}
-				}else{
-					addChildOfInstance(kidItem, newGuy);
-				}
-			}
-		}
-
-		void instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			if(!ud){puts("remNULL");return;}else{
-				puts("!NULL");
-			}
-			
-		    QTreeWidgetItem* kidItem = static_cast<QTreeWidgetItem*>(ud);
-			
-		    if(evec.size() == 1){
-				if(kidItem->isSelected()){
-					StudioWindow* win = StudioWindow::static_win;
-					if(win){
-						win->update_toolbar_usability();
-					}
-				}
-				shared_ptr<Instance::Instance> newGuy = evec[0]->asInstance();
-				InstanceTreeItem* kTi = treeItemMap.value(newGuy);
-				if(kTi){
-					if(kTi->parent() == kidItem){
-						kidItem->removeChild(kTi);
-					}
-				}
-			}
-		}
-
-		void addChildOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> kid){
-			if(!parentItem || !kid){
-				return;
-			}
-
-			InstanceTreeItem* kidItem = new InstanceTreeItem(kid);
-			treeItemMap[kid] = kidItem;
-			kidItem->setIcon(0, getClassIcon(QString(kid->getClassName().c_str())));
-
-		    kid->Changed->Connect(instance_changed_evt, kidItem);
-			kid->ChildAdded->Connect(instance_child_added_evt, kidItem);
-			kid->ChildRemoved->Connect(instance_child_removed_evt, kidItem);
-
-			addChildrenOfInstance(kidItem, kid);
-
-			parentItem->addChild(kidItem);
-		}
-
-		void addChildrenOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst){
-			if(!parentItem || !inst){
-				return;
-			}
-			std::vector<shared_ptr<Instance::Instance>> kids = inst->GetChildren();
-			for(std::vector<shared_ptr<Instance::Instance>>::size_type i = 0; i < kids.size(); i++){
-			    shared_ptr<Instance::Instance> kid = kids[i];
-				if(kid){
-					addChildOfInstance(parentItem, kid);
-				}
-			}
-		}
-		
-		void dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			StudioWindow* sw = (StudioWindow*)ud;
-			if(!sw){
-				return;
-			}
-			
-		    OBEngine* eng = OBEngine::getInstance();
-			if(eng){
-			    shared_ptr<Instance::DataModel> dm = eng->getDataModel();
-				if(dm){
-					if(sw->tabWidget && sw->glWidget){
-						int studioWidgetIdx = sw->tabWidget->indexOf(sw->glWidget);
-						sw->tabWidget->setTabText(studioWidgetIdx, QString(dm->getName().c_str()));
-					}
-				}
-			}
-		}
-
-		void addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst, StudioWindow* sw){			
-			if(!parentItem || !inst){
-				return;
-			}
-			
-			std::vector<shared_ptr<Instance::Instance>> kids = inst->GetChildren();
-			for(std::vector<shared_ptr<Instance::Instance>>::size_type i = 0; i < kids.size(); i++){
-				shared_ptr<Instance::Instance> kid = kids[i];
-				if(kid){
-					addChildOfInstance(parentItem, kid);
-				}
-			}
-
-			inst->ChildAdded->Connect(instance_child_added_evt, parentItem);
-			inst->ChildRemoved->Connect(instance_child_removed_evt, parentItem);
-			inst->Changed->Connect(dm_changed_evt, sw);
-		}
-
 		StudioWindow::StudioWindow(){
 			static_win = this;
-			glWidget = NULL;
-			openedFile = "";
 
 			tabWidget = new QTabWidget();
 			tabWidget->setMinimumSize(320, 240);
@@ -502,7 +321,7 @@ namespace OB{
 		}
 
 		void StudioWindow::newInstance(){
-			if(glWidget){
+			/*if(glWidget){
 				if(pathToStudioExecutable.length() > 0){
 					#ifdef _WIN32
 					//Windows has to be special
@@ -529,24 +348,24 @@ namespace OB{
 					}
 					#endif
 				}
-			}else{
-				glWidget = new StudioGLWidget();
-				
-			    int tabIdx = tabWidget->addTab(glWidget, "Game");
-			    QTabBar* tabBar = tabWidget->tabBar();
-				if(tabBar){
-					QWidget* tabBtn = tabBar->tabButton(tabIdx, QTabBar::RightSide);
-					if(tabBtn){
-						tabBtn->resize(0, 0);
-						tabBtn->setVisible(false);
-					}
-				}
+			}else{*/
+			OBEngine* eng = new OBEngine();
+			StudioGLWidget* glWidget = new StudioGLWidget(eng);
 
-				glWidget->init();
-				initGL();
-				
-				cmdBar->lineEdit()->setDisabled(false);
+			int tabIdx = tabWidget->addTab(glWidget, "Game");
+			QTabBar* tabBar = tabWidget->tabBar();
+			if(tabBar){
+				QWidget* tabBtn = tabBar->tabButton(tabIdx, QTabBar::RightSide);
+				if(tabBtn){
+					tabBtn->resize(0, 0);
+					tabBtn->setVisible(false);
+				}
 			}
+
+			glWidget->init();
+
+			cmdBar->lineEdit()->setDisabled(false);
+			//}
 		}
 
 		void StudioWindow::commandBarReturn(){
@@ -555,7 +374,12 @@ namespace OB{
 
 		    sendOutput("> " + text);
 
-		    OB::OBEngine* eng = OB::OBEngine::getInstance();
+			StudioTabWidget* tW = tabWidget->currentWidget();
+			if(!tW){
+				return;
+			}
+
+		    OB::OBEngine* eng = tW->getEngine();
 			if(!eng){
 				return;
 			}
@@ -583,6 +407,8 @@ namespace OB{
 		}
 
 		void StudioWindow::update_toolbar_usability(){
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = getSelectedInstances();
+			
 			const int numSelected = selectedInstances.size();
 			if(numSelected > 0){
 				deleteAction->setEnabled(true);
@@ -639,6 +465,8 @@ namespace OB{
 
 		void StudioWindow::selectionChanged(){
 			QList<QTreeWidgetItem*> selectedItems = explorer->selectedItems();
+
+			StudioGLWidget* sW = 
 
 			selectedInstances.clear();
 

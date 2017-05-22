@@ -73,6 +73,18 @@ namespace OB{
 			std::string val;
 		};
 
+		class InstancePropertyItem: public PropertyItem{
+		  public:
+			InstancePropertyItem(PropertyTreeWidget* tree, QString name);
+
+			virtual shared_ptr<Type::VarWrapper> getValue();
+			virtual void setValue(shared_ptr<Type::VarWrapper> val);
+		    virtual QString getTextValue();
+
+		  private:
+		    shared_ptr<Instance::Instance> val;
+		};
+
 		class BoolPropertyItem: public PropertyItem{
 		  public:
 		    BoolPropertyItem(PropertyTreeWidget* tree, QString name);

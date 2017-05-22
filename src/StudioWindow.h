@@ -42,10 +42,10 @@ namespace OB{
 
 			static std::string pathToStudioExecutable;
 			static StudioWindow* static_win;
-			std::string openedFile;
+
+			static QIcon getClassIcon(QString className);
 
 			QTabWidget* tabWidget;
-			StudioGLWidget* glWidget;
 			QTextEdit* output;
 			InstanceTree* explorer;
 			PropertyTreeWidget* properties;
@@ -65,11 +65,12 @@ namespace OB{
 			QAction* ungroupAct;
 			QAction* groupAct;
 
-			std::vector<shared_ptr<Instance::Instance>> selectedInstances;
+			std::vector<shared_ptr<Instance::Instance>> getSelectedInstances();
 			
 			void updateSelectionFromLua();
 			void update_toolbar_usability();
 
+			StudioGLWidget* getCurrentGLWidget();
 			void initGL();
 
 			void sendOutput(QString str);

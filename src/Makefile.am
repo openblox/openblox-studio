@@ -2,6 +2,7 @@ bin_PROGRAMS = openblox-studio
 
 # Sources for openblox
 openblox_studio_SOURCES = OpenBloxStudio.cpp \
+	StudioTabWidget.cpp \
 	StudioGLWidget.cpp \
 	StudioWindow.cpp \
 	InstanceTree.cpp \

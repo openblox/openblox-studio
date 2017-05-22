@@ -209,6 +209,13 @@ namespace OB{
 						updateValue(propName);
 						continue;
 					}
+					if(pInfo.type == "Instance"){
+					    InstancePropertyItem* pi = new InstancePropertyItem(this, QString(propName.c_str()));
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
 				}
 		    }else{
 				for(auto i = curProps.begin(); i != curProps.end();){
