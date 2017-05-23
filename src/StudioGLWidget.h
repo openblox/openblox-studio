@@ -38,6 +38,9 @@ namespace OB{
 			QSize sizeHint() const;
 
 			void do_init();
+			
+			virtual void remove_focus();
+			virtual void gain_focus();
 
 			virtual void resizeEvent(QResizeEvent* evt);
 			
@@ -74,6 +77,8 @@ namespace OB{
 			void resizeGL(int width, int height);
 			void mousePressEvent(QMouseEvent* event);
 			void mouseMoveEvent(QMouseEvent* event);
+
+			bool has_focus;
 			
 		  private:
 			QString logHist;

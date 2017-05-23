@@ -38,6 +38,9 @@ namespace OB{
 			setAutoFillBackground(false);
 
 			setUpdatesEnabled(false);
+
+			has_focus = false;
+			logHist = "";
 		}
 
 		StudioGLWidget::~StudioGLWidget(){}
@@ -60,6 +63,8 @@ namespace OB{
 			eng->setWindowId((void*)winId());
 			eng->init();
 
+			StudioWindow* win = StudioWindow::static_win;
+
 			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
 			if(dm){
 				shared_ptr<OB::Instance::LogService> ls = dm->getLogService();
@@ -67,7 +72,28 @@ namespace OB{
 				    std::function<void(std::vector<shared_ptr<Type::VarWrapper>>)> lsb = std::bind(&StudioGLWidget::handle_log_event, this, _1);
 					ls->getMessageOut()->Connect(lsb);
 				}
+		    }
+		}
+
+		void StudioGLWidget::remove_focus(){
+			has_focus = false;
+
+			StudioWindow::static_win->explorer->invisibleRootItem()->takeChildren();
+		}
+		
+		void StudioGLWidget::gain_focus(){
+			using namespace std::placeholders;
+			
+			has_focus = true;
+
+			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
+			if(dm){
 				addDM(StudioWindow::static_win->explorer->invisibleRootItem(), dynamic_pointer_cast<Instance::Instance>(dm));
+			}
+
+			StudioWindow* win = StudioWindow::static_win;
+			if(win->output){
+				win->output->setHtml(logHist);
 			}
 		}
 
@@ -85,18 +111,28 @@ namespace OB{
 
 		// Explorer/log handling
 		void StudioGLWidget::sendOutput(QString msg){
-			StudioWindow* win = StudioWindow::static_win;
+			QString emsg = msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>";
+			logHist = logHist + emsg;
 			
-			if(win->output){
-				win->output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
+			if(has_focus){
+				StudioWindow* win = StudioWindow::static_win;
+			
+				if(win->output){
+					win->output->append(emsg);
+				}
 			}
 		}
 
 		void StudioGLWidget::sendOutput(QString msg, QColor col){
-			StudioWindow* win = StudioWindow::static_win;
+			QString emsg = "<font color=\"" + col.name() + "\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>";
+			logHist = logHist + emsg;
+
+			if(has_focus){
+				StudioWindow* win = StudioWindow::static_win;
 			
-			if(win->output){
-				win->output->append("<font color=\"" + col.name() + "\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+				if(win->output){
+					win->output->append(emsg);
+				}
 			}
 		}
 		

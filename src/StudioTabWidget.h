@@ -32,6 +32,9 @@ namespace OB{
 			virtual ~StudioTabWidget();
 
 			OBEngine* getEngine();
+
+			virtual void remove_focus();
+			virtual void gain_focus();
 			
 		  protected:
 			OBEngine* eng;

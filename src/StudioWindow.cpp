@@ -82,6 +82,10 @@ namespace OB{
 			tabWidget = new QTabWidget();
 			tabWidget->setMinimumSize(320, 240);
 			tabWidget->setTabsClosable(true);
+			tabWidget->setMovable(true);
+			connect(tabWidget, &QTabWidget::currentChanged, this, &StudioWindow::tabChanged);
+
+			curTab = NULL;
 			
 			setCentralWidget(tabWidget);
 
@@ -363,6 +367,8 @@ namespace OB{
 			}
 
 			glWidget->do_init();
+			
+			tabChanged();
 
 			cmdBar->lineEdit()->setDisabled(false);
 			//}
@@ -463,9 +469,8 @@ namespace OB{
 		}
 
 		OBEngine* StudioWindow::getCurrentEngine(){
-			StudioTabWidget* tW = (StudioTabWidget*)tabWidget->currentWidget();
-			if(tW){
-				return tW->getEngine();
+			if(curTab){
+				return curTab->getEngine();
 			}
 			return NULL;
 		}
@@ -477,11 +482,10 @@ namespace OB{
 			}
 
 			// If there's a current, that's *probably* the one we're looking for
-		    StudioTabWidget* tW = (StudioTabWidget*)tabWidget->currentWidget();
-			if(tW){
-				if(tW->getEngine() == eng){
+			if(curTab){
+				if(curTab->getEngine() == eng){
 					StudioGLWidget* gW = NULL;
-					if((gW = dynamic_cast<StudioGLWidget*>(tW))){
+					if((gW = dynamic_cast<StudioGLWidget*>(curTab))){
 						return gW;
 					}
 				}
@@ -491,7 +495,7 @@ namespace OB{
 			int numTabs = tabWidget->count();
 			for(int i = 0; i < numTabs; i++){
 			    StudioTabWidget* tw = (StudioTabWidget*)tabWidget->widget(i);
-				if(tw && tw != tW){
+				if(tw && tw != curTab){
 					StudioGLWidget* gW = NULL;
 					if((gW = dynamic_cast<StudioGLWidget*>(tw))){
 						if(gW->getEngine() == eng){
@@ -516,10 +520,9 @@ namespace OB{
 				}
 			}
 
-			StudioTabWidget* tW = (StudioTabWidget*)tabWidget->currentWidget();
-			if(tW){
+			if(curTab){
 				StudioGLWidget* gW = NULL;
-				if((gW = dynamic_cast<StudioGLWidget*>(tW))){
+				if((gW = dynamic_cast<StudioGLWidget*>(curTab))){
 				    OBEngine* eng = gW->getEngine();
 					if(eng){
 						eng->render();
@@ -703,6 +706,16 @@ namespace OB{
 						}
 					}
 				}
+			}
+		}
+
+		void StudioWindow::tabChanged(){
+			if(curTab){
+				curTab->remove_focus();
+			}
+			curTab = (StudioTabWidget*)tabWidget->currentWidget();
+			if(curTab){
+				curTab->gain_focus();
 			}
 		}
 

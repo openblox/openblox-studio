@@ -46,6 +46,8 @@ namespace OB{
 			static QIcon getClassIcon(QString className);
 
 			QTabWidget* tabWidget;
+			StudioTabWidget* curTab;
+			
 			QTextEdit* output;
 			InstanceTree* explorer;
 			PropertyTreeWidget* properties;
@@ -84,6 +86,8 @@ namespace OB{
 				void commandBarReturn();
 				void selectionChanged();
 				void insertInstance();
+				
+				void tabChanged();
 
 				void explorerContextMenu(const QPoint &pos);
 

@@ -19,6 +19,9 @@
 
 #include "StudioTabWidget.h"
 
+#include "StudioWindow.h"
+#include "StudioGLWidget.h"
+
 namespace OB{
 	namespace Studio{
 		StudioTabWidget::StudioTabWidget(OBEngine* eng) : QWidget(NULL){
@@ -29,6 +32,26 @@ namespace OB{
 
 		OBEngine* StudioTabWidget::getEngine(){
 			return eng;
+		}
+
+	    void StudioTabWidget::remove_focus(){
+			StudioWindow* win = StudioWindow::static_win;
+			if(win){
+				StudioGLWidget* gW = win->getCurrentGLWidget(eng);
+				if(gW){
+					gW->remove_focus();
+				}
+			}
+		}
+		
+		void StudioTabWidget::gain_focus(){
+			StudioWindow* win = StudioWindow::static_win;
+			if(win){
+				StudioGLWidget* gW = win->getCurrentGLWidget(eng);
+				if(gW){
+					gW->gain_focus();
+				}
+			}
 		}
 	}
 }
