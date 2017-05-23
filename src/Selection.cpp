@@ -23,14 +23,15 @@
 #include <instance/DataModel.h>
 
 #include "StudioWindow.h"
+#include "StudioGLWidget.h"
 
 namespace OB{
 	namespace Instance{
 		DEFINE_CLASS(Selection, false, isDataModel, Instance){
-			registerLuaClass(LuaClassName, register_lua_metamethods, register_lua_methods, register_lua_property_getters, register_lua_property_setters, register_lua_events);
+			registerLuaClass(eng, LuaClassName, register_lua_metamethods, register_lua_methods, register_lua_property_getters, register_lua_property_setters, register_lua_events);
 		}
 
-	    Selection::Selection(){
+	    Selection::Selection(OBEngine* eng) : Instance(eng){
 			Name = ClassName;
 			netId = OB_NETID_NOT_REPLICATED;
 
@@ -51,7 +52,10 @@ namespace OB{
 			Studio::StudioWindow* win = Studio::StudioWindow::static_win;
 
 			if(win){
-				return win->selectedInstances;
+				Studio::StudioGLWidget* gW = win->getCurrentGLWidget(eng);
+				if(gW){
+					return gW->selectedInstances;
+				}
 			}
 			return std::vector<shared_ptr<Instance>>();
 		}

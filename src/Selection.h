@@ -26,7 +26,7 @@ namespace OB{
 	namespace Instance{
 		class Selection: public Instance{
 			public:
-			    Selection();
+			    Selection(OBEngine* eng);
 				virtual ~Selection();
 
 				shared_ptr<Type::Event> getSelectionChanged();
