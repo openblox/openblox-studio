@@ -515,6 +515,17 @@ namespace OB{
 					}
 				}
 			}
+
+			StudioTabWidget* tW = (StudioTabWidget*)tabWidget->currentWidget();
+			if(tW){
+				StudioGLWidget* gW = NULL;
+				if((gW = dynamic_cast<StudioGLWidget*>(tW))){
+				    OBEngine* eng = gW->getEngine();
+					if(eng){
+						eng->render();
+					}
+				}
+			}
 		}
 
 		void StudioWindow::selectionChanged(){

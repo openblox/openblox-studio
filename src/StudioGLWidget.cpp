@@ -69,14 +69,6 @@ namespace OB{
 				}
 				addDM(StudioWindow::static_win->explorer->invisibleRootItem(), dynamic_pointer_cast<Instance::Instance>(dm));
 			}
-
-			startTimer(0);
-		}
-
-		void StudioGLWidget::paintEvent(QPaintEvent* evt){
-		    if(eng){
-				eng->render();
-			}
 		}
 
 		void StudioGLWidget::resizeEvent(QResizeEvent* evt){
@@ -86,12 +78,6 @@ namespace OB{
 				QSize newSize = evt->size();
 				eng->resized(newSize.width(), newSize.height());
 			}
-		}
-
-		void StudioGLWidget::timerEvent(QTimerEvent* evt){
-			paintEvent(NULL);
-			
-			evt->accept();
 		}
 
 		void StudioGLWidget::mousePressEvent(QMouseEvent* event){}

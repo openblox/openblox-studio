@@ -39,10 +39,8 @@ namespace OB{
 
 			void do_init();
 
-			virtual void paintEvent(QPaintEvent* evt);
 			virtual void resizeEvent(QResizeEvent* evt);
-			virtual void timerEvent(QTimerEvent* evt);
-
+			
 			void setLogHistory(QString hist);
 			QString getLogHistory();
 
