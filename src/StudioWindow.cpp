@@ -362,7 +362,7 @@ namespace OB{
 				}
 			}
 
-			glWidget->init();
+			glWidget->do_init();
 
 			cmdBar->lineEdit()->setDisabled(false);
 			//}
@@ -374,12 +374,7 @@ namespace OB{
 
 		    sendOutput("> " + text);
 
-			StudioTabWidget* tW = tabWidget->currentWidget();
-			if(!tW){
-				return;
-			}
-
-		    OB::OBEngine* eng = tW->getEngine();
+		    OB::OBEngine* eng = getCurrentEngine();
 			if(!eng){
 				return;
 			}
@@ -407,7 +402,11 @@ namespace OB{
 		}
 
 		void StudioWindow::update_toolbar_usability(){
-			std::vector<shared_ptr<Instance::Instance>> selectedInstances = getSelectedInstances();
+			StudioGLWidget* gW = getCurrentGLWidget(getCurrentEngine());
+			if(!gW){
+				return;
+			}
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = gW->selectedInstances;
 			
 			const int numSelected = selectedInstances.size();
 			if(numSelected > 0){
@@ -463,60 +462,121 @@ namespace OB{
 			}
 		}
 
+		OBEngine* StudioWindow::getCurrentEngine(){
+			StudioTabWidget* tW = (StudioTabWidget*)tabWidget->currentWidget();
+			if(tW){
+				return tW->getEngine();
+			}
+			return NULL;
+		}
+
+		StudioGLWidget* StudioWindow::getCurrentGLWidget(OBEngine* eng){
+			// No GLWidget should be associated with NULL
+			if(!eng){
+				return NULL;
+			}
+
+			// If there's a current, that's *probably* the one we're looking for
+		    StudioTabWidget* tW = (StudioTabWidget*)tabWidget->currentWidget();
+			if(tW){
+				if(tW->getEngine() == eng){
+					StudioGLWidget* gW = NULL;
+					if((gW = dynamic_cast<StudioGLWidget*>(tW))){
+						return gW;
+					}
+				}
+			}
+
+			// Otherwise, iterate through
+			int numTabs = tabWidget->count();
+			for(int i = 0; i < numTabs; i++){
+			    StudioTabWidget* tw = (StudioTabWidget*)tabWidget->widget(i);
+				if(tw && tw != tW){
+					StudioGLWidget* gW = NULL;
+					if((gW = dynamic_cast<StudioGLWidget*>(tw))){
+						if(gW->getEngine() == eng){
+							return gW;
+						}
+					}
+				}
+			}
+			return NULL;
+		}
+
+		void StudioWindow::tickEngines(){
+			int numTabs = tabWidget->count();
+			for(int i = 0; i < numTabs; i++){
+			    StudioTabWidget* tw = (StudioGLWidget*)tabWidget->widget(i);
+				StudioGLWidget* gW = NULL;
+				if((gW = dynamic_cast<StudioGLWidget*>(tw))){
+				    OBEngine* eng = gW->getEngine();
+					if(eng){
+						eng->tick();
+					}
+				}
+			}
+		}
+
 		void StudioWindow::selectionChanged(){
 			QList<QTreeWidgetItem*> selectedItems = explorer->selectedItems();
 
-			StudioGLWidget* sW = 
-
-			selectedInstances.clear();
+			OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* sW = getCurrentGLWidget(eng);
+			if(!sW){
+				return;
+			}
+			
+			sW->selectedInstances.clear();
 
 			for(int i = 0; i < selectedItems.size(); i++){
 				InstanceTreeItem* srcItem = dynamic_cast<InstanceTreeItem*>(selectedItems[i]);
 				if(srcItem){
 					shared_ptr<Instance::Instance> instPtr = srcItem->GetInstance();
 					if(instPtr){
-					    selectedInstances.push_back(instPtr);
+					    sW->selectedInstances.push_back(instPtr);
 					}
 				}
 			}
 			
-			properties->updateSelection(selectedInstances);
+			properties->updateSelection(sW->selectedInstances);
 			update_toolbar_usability();
 
-			OBEngine* eng = OBEngine::getInstance();
-			if(eng){
-				shared_ptr<Instance::DataModel> dm = eng->getDataModel();
-				if(dm){
-					shared_ptr<Instance::Selection> selectionService = dynamic_pointer_cast<Instance::Selection>(dm->FindService("Selection"));
-					if(selectionService){
-						selectionService->getSelectionChanged()->Fire();
-					}
+			shared_ptr<Instance::DataModel> dm = eng->getDataModel();
+			if(dm){
+				shared_ptr<Instance::Selection> selectionService = dynamic_pointer_cast<Instance::Selection>(dm->FindService("Selection"));
+				if(selectionService){
+					selectionService->getSelectionChanged()->Fire(eng);
 				}
 			}
 		}
 
-		void StudioWindow::updateSelectionFromLua(){
+		void StudioWindow::updateSelectionFromLua(OBEngine* eng){
 			const QSignalBlocker sigBlock(explorer);
 
-			std::vector<shared_ptr<Instance::Instance>> newSelection = selectedInstances;
+			StudioGLWidget* gW = getCurrentGLWidget(eng);
+			if(!gW){
+				return;
+			}
+
+			std::vector<shared_ptr<Instance::Instance>> newSelection = gW->selectedInstances;
 
 			explorer->clearSelection();
 			for(int i = 0; i < newSelection.size(); i++){
-				shared_ptr<Instance::Instance> inst = selectedInstances.at(i);
+				shared_ptr<Instance::Instance> inst = gW->selectedInstances.at(i);
 				if(inst){
 					shared_ptr<Instance::Instance> parInst = inst->getParent();
 					
-				    InstanceTreeItem* ti = treeItemMap.value(inst);
+				    InstanceTreeItem* ti = gW->treeItemMap.value(inst);
 					if(ti){
 					    InstanceTreeItem* pTi = (InstanceTreeItem*)ti->parent();
 						if(pTi){
 							if(pTi->GetInstance() != parInst){
 								std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(inst)});
-								instance_child_removed_evt(argVector, pTi);
+								gW->instance_child_removed_evt(argVector, pTi);
 							    if(parInst){
-								    InstanceTreeItem* tiParent = treeItemMap.value(parInst);
+								    InstanceTreeItem* tiParent = gW->treeItemMap.value(parInst);
 									if(tiParent){
-										instance_child_added_evt(argVector, tiParent);
+										gW->instance_child_added_evt(argVector, tiParent);
 									}
 								}
 							}
@@ -524,11 +584,11 @@ namespace OB{
 						ti->setSelected(true);
 					}else{
 						if(parInst){
-							InstanceTreeItem* tiParent = treeItemMap.value(parInst);
+							InstanceTreeItem* tiParent = gW->treeItemMap.value(parInst);
 							if(tiParent){
 								std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(inst)});
-								instance_child_added_evt(argVector, tiParent);
-								ti = treeItemMap.value(inst);
+								gW->instance_child_added_evt(argVector, tiParent);
+								ti = gW->treeItemMap.value(inst);
 								if(ti){
 									ti->setSelected(true);
 								}
@@ -539,20 +599,9 @@ namespace OB{
 			}
 		}
 
-		void StudioWindow::initGL(){
-			QTreeWidgetItem* rootItem = explorer->invisibleRootItem();
-
-		    OB::OBEngine* eng = OB::OBEngine::getInstance();
-			if(eng){
-				eng->init();
-				shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
-				if(dm){
-					shared_ptr<OB::Instance::LogService> ls = dm->getLogService();
-					if(ls){
-						ls->getMessageOut()->Connect(handle_log_event, this);
-					}
-					addDM(rootItem, dynamic_pointer_cast<Instance::Instance>(dm), this);
-				}
+		void StudioWindow::populateBasicObjects(){
+		    if(basicObjects->count() > 0){
+				return;
 			}
 
 			std::vector<std::string> registeredInstances = ClassFactory::getRegisteredClasses();
@@ -565,26 +614,32 @@ namespace OB{
 					basicObjects->addItem(wi);
 				}
 			}
-
-			saveAction->setEnabled(true);
-			saveAsAction->setEnabled(true);
 		}
 
 		// Do I think the use of HTML here is horrible? Yes.
 		// Am I going to do something about it in the near future? Probably not.
 		void StudioWindow::sendOutput(QString msg){
-			if(output){
-				output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
+			StudioGLWidget* gW = getCurrentGLWidget(getCurrentEngine());
+			if(gW){
+				gW->sendOutput(msg);
 			}
 		}
 
 		void StudioWindow::sendOutput(QString msg, QColor col){
-		    if(output){
-				output->append("<font color=\"" + col.name() + "\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
-			}
+		   StudioGLWidget* gW = getCurrentGLWidget(getCurrentEngine());
+			if(gW){
+				gW->sendOutput(msg, col);
+			} 
 		}
 
 		void StudioWindow::deleteSelection(){
+			StudioGLWidget* sW = getCurrentGLWidget(getCurrentEngine());
+			if(!sW){
+				return;
+			}
+			
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
+
 			if(selectedInstances.size() > 0){
 				for(int i = 0; i < selectedInstances.size(); i++){
 					shared_ptr<Instance::Instance> inst = selectedInstances.at(i);
@@ -611,21 +666,26 @@ namespace OB{
 		}
 
 		void StudioWindow::insertInstance(){
-			OBEngine* eng = OBEngine::getInstance();
+			OBEngine* eng = getCurrentEngine();
 			if(eng){
+				StudioGLWidget* gW = getCurrentGLWidget(eng);
+				if(!gW){
+					return;
+				}
+				
 			    shared_ptr<Instance::DataModel> dm = eng->getDataModel();
 				if(dm){
 					shared_ptr<Instance::Instance> parentInstance = dm->getWorkspace();
 					
-					if(selectedInstances.size() == 1){
-						parentInstance = selectedInstances.at(0);
+					if(gW->selectedInstances.size() == 1){
+						parentInstance = gW->selectedInstances.at(0);
 					}
 
 				    QList<QListWidgetItem*> selectedInstanceTypes = basicObjects->selectedItems();
 					if(selectedInstanceTypes.size() == 1){
 						std::string instanceType = selectedInstanceTypes[0]->text().toStdString();
 
-						shared_ptr<Instance::Instance> newInst = ClassFactory::create(instanceType);
+						shared_ptr<Instance::Instance> newInst = ClassFactory::create(instanceType, eng);
 
 						if(newInst){
 							newInst->setParent(parentInstance, true);
@@ -637,12 +697,20 @@ namespace OB{
 
 		void StudioWindow::groupSelection(){
 			const QSignalBlocker sigBlock(explorer);
+
+			OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* sW = getCurrentGLWidget(eng);
+			if(!sW){
+				return;
+			}
+			
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
 			
 		    shared_ptr<Instance::Instance> selectedInst = selectedInstances.at(0);
 			if(selectedInst){
 				shared_ptr<Instance::Instance> newPar = selectedInst->getParent();
 				
-				shared_ptr<Instance::Instance> newModel = ClassFactory::create("Model");
+				shared_ptr<Instance::Instance> newModel = ClassFactory::create("Model", eng);
 				if(newModel){
 					newModel->setParent(newPar, true);
 
@@ -654,9 +722,9 @@ namespace OB{
 							
 						    shared_ptr<Instance::Instance> oPar = kI->getParent();
 							if(oPar){
-								InstanceTreeItem* pTi = treeItemMap.value(oPar);
+								InstanceTreeItem* pTi = sW->treeItemMap.value(oPar);
 								if(pTi){
-									instance_child_removed_evt(argVector, pTi);
+									sW->instance_child_removed_evt(argVector, pTi);
 								}
 							}
 
@@ -664,8 +732,8 @@ namespace OB{
 						}
 					}
 
-					selectedInstances.clear();
-					selectedInstances.push_back(newModel);
+					sW->selectedInstances.clear();
+					sW->selectedInstances.push_back(newModel);
 
 					update_toolbar_usability();
 				}
@@ -674,8 +742,14 @@ namespace OB{
 		
 		void StudioWindow::ungroupSelection(){
 			shared_ptr<Instance::Instance> newPar = NULL;
+
+			OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* gW = getCurrentGLWidget(eng);
+			if(!gW){
+				return;
+			}
 			
-			shared_ptr<Instance::Instance> selectedInst = selectedInstances.at(0);
+			shared_ptr<Instance::Instance> selectedInst = gW->selectedInstances.at(0);
 			if(selectedInst){
 				shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selectedInst);
 				if(selected_model){
@@ -692,22 +766,27 @@ namespace OB{
 					}
 				}
 				selectedInst->Destroy();
-			    InstanceTreeItem* pti = treeItemMap.value(newPar);
+			    InstanceTreeItem* pti = gW->treeItemMap.value(newPar);
 				if(pti){
 					std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(selectedInst)});
-					instance_child_removed_evt(argVector, pti);
+					gW->instance_child_removed_evt(argVector, pti);
 				}
 
-				selectedInstances = allKids;
-				updateSelectionFromLua();
+				gW->selectedInstances = allKids;
+				updateSelectionFromLua(eng);
 				update_toolbar_usability();
 			}
 		}
 
 		void StudioWindow::saveAct(){
-			if(openedFile.length() > 0){
-				OBEngine* eng = OBEngine::getInstance();
-				// We use this instead of Save(file) to allow saving
+			OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* gW = getCurrentGLWidget(eng);
+			if(!gW){
+				return;
+			}
+			
+			if(gW->fileOpened.length() > 0){
+			    // We use this instead of Save(file) to allow saving
 				// to remote locations such as network drives/webdav
 				shared_ptr<OBSerializer> serializer = eng->getSerializer();
 				if(!serializer){
@@ -724,8 +803,8 @@ namespace OB{
 					statusBar()->showMessage(errMsg);
 					QMessageBox::critical(this, "Error", errMsg);
 				}else{
-					QFile file(QString(openedFile.c_str()));
-					std::cout << "Saving to " << openedFile << std::endl;
+					QFile file(gW->fileOpened);
+					std::cout << "Saving to " << gW->fileOpened.toStdString() << std::endl;
 					if(file.open(QIODevice::WriteOnly)){
 						QTextStream stream(&file);
 						stream << QString(strToWrite.c_str()) << flush;
@@ -743,6 +822,12 @@ namespace OB{
 		}
 
 		void StudioWindow::saveAsAct(){
+			OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* gW = getCurrentGLWidget(eng);
+			if(!gW){
+				return;
+			}
+			
 			QFileDialog* fileDia = new QFileDialog(this);
 			fileDia->setAcceptMode(QFileDialog::AcceptSave);
 			fileDia->setDefaultSuffix("obgx");
@@ -753,7 +838,7 @@ namespace OB{
 			if(fileDia->exec()){
 				QList<QUrl> selected = fileDia->selectedUrls();
 				if(selected.size() > 0){
-					openedFile = selected[0].toLocalFile().toStdString();
+				    gW->fileOpened = selected[0].toLocalFile();
 					saveAct();
 				}else{
 					statusBar()->showMessage("Operation canceled.");

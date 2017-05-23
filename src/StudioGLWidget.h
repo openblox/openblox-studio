@@ -22,10 +22,13 @@
 
 #include "StudioTabWidget.h"
 
-#include "StudioWindow.h"
+#include "InstanceTreeItem.h"
 
 namespace OB{
 	namespace Studio{
+		class StudioWindow;
+		class InstanceTree;
+		
 		class StudioGLWidget: public StudioTabWidget{
 		  public:
 			StudioGLWidget(OBEngine* eng);
@@ -34,7 +37,7 @@ namespace OB{
 			QSize minimumSizeHint() const;
 			QSize sizeHint() const;
 
-			void init();
+			void do_init();
 
 			virtual void paintEvent(QPaintEvent* evt);
 			virtual void resizeEvent(QResizeEvent* evt);
@@ -56,22 +59,23 @@ namespace OB{
 			void sendOutput(QString msg, QColor col);
 			void sendOutput(QString msg);
 
-			void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud);
-			void instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
-			void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
-			void instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
+			void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec);
+
+			QMap<shared_ptr<Instance::Instance>, InstanceTreeItem*> treeItemMap;
+			
+			void instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, InstanceTreeItem* kidItem);
+			void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem);
+			void instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem);
 			void addChildOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> kid);
 			void addChildrenOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst);
-			void dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud);
-			void addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst, StudioWindow* sw);
+			void dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec);
+			void addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst);
 			
 		  protected:
 			void paintGL();
 			void resizeGL(int width, int height);
 			void mousePressEvent(QMouseEvent* event);
 			void mouseMoveEvent(QMouseEvent* event);
-
-			QMap<shared_ptr<Instance::Instance>, InstanceTreeItem*> treeItemMap;
 			
 		  private:
 			QString logHist;

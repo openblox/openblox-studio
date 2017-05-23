@@ -33,7 +33,7 @@ namespace OB{
 
 			OBEngine* getEngine();
 			
-		  private:
+		  protected:
 			OBEngine* eng;
 		};
 	}

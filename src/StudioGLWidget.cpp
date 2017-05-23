@@ -20,8 +20,12 @@
 #include "StudioGLWidget.h"
 
 #include "StudioWindow.h"
+#include "InstanceTree.h"
 
-#include "openblox.h"
+#include <openblox.h>
+#include <instance/LogService.h>
+
+#include <functional>
 
 #include <QtGui>
 
@@ -46,31 +50,39 @@ namespace OB{
 			return QSize(320, 240);
 		}
 
-		void StudioGLWidget::init(){
-		    OB::OBEngine* eng = OB::OBEngine::getInstance();
+		void StudioGLWidget::do_init(){
+			using namespace std::placeholders;
+			
 			if(!eng){
 				throw OB::OBException("game is NULL!");
 			}
 
 			eng->setWindowId((void*)winId());
+			eng->init();
+
+			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
+			if(dm){
+				shared_ptr<OB::Instance::LogService> ls = dm->getLogService();
+				if(ls){
+				    std::function<void(std::vector<shared_ptr<Type::VarWrapper>>)> lsb = std::bind(&StudioGLWidget::handle_log_event, this, _1);
+					ls->getMessageOut()->Connect(lsb);
+				}
+				addDM(StudioWindow::static_win->explorer->invisibleRootItem(), dynamic_pointer_cast<Instance::Instance>(dm));
+			}
 
 			startTimer(0);
 		}
 
 		void StudioGLWidget::paintEvent(QPaintEvent* evt){
-			OB::OBEngine* eng = OB::OBEngine::getInstance();
-			if(eng){
-				if(eng->isRunning()){
-					eng->render();
-				}
+		    if(eng){
+				eng->render();
 			}
 		}
 
 		void StudioGLWidget::resizeEvent(QResizeEvent* evt){
 			QWidget::resizeEvent(evt);
 
-			OB::OBEngine* eng = OB::OBEngine::getInstance();
-			if(eng){
+		    if(eng){
 				QSize newSize = evt->size();
 				eng->resized(newSize.width(), newSize.height());
 			}
@@ -86,7 +98,23 @@ namespace OB{
 		void StudioGLWidget::mouseMoveEvent(QMouseEvent* event){}
 
 		// Explorer/log handling
-		void StudioGLWidget::handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec, void* ud){
+		void StudioGLWidget::sendOutput(QString msg){
+			StudioWindow* win = StudioWindow::static_win;
+			
+			if(win->output){
+				win->output->append(msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>");
+			}
+		}
+
+		void StudioGLWidget::sendOutput(QString msg, QColor col){
+			StudioWindow* win = StudioWindow::static_win;
+			
+			if(win->output){
+				win->output->append("<font color=\"" + col.name() + "\">" + msg.toHtmlEscaped().replace('\n', "<br/>") + "</font><br/>");
+			}
+		}
+		
+		void StudioGLWidget::handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec){
 			//Temporary
 			QColor errorCol(255, 51, 0);
 			QColor warnCol(242, 97, 0);
@@ -106,12 +134,11 @@ namespace OB{
 			}
 		}
 
-		void StudioGLWidget::instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			if(!ud){
+		void StudioGLWidget::instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, InstanceTreeItem* kidItem){
+			if(!kidItem){
 				return;
 			}
 			
-		    InstanceTreeItem* kidItem = (InstanceTreeItem*)ud;
 			shared_ptr<Instance::Instance> kid = kidItem->GetInstance();
 			if(!kid){
 				return;
@@ -127,7 +154,6 @@ namespace OB{
 						StudioWindow::static_win->properties->updateValue(prop);
 					}
 				}
-				
 			}
 
 			if(prop == "Name"){
@@ -141,11 +167,11 @@ namespace OB{
 			}
 		}
 
-		void StudioGLWidget::instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			if(!ud){puts("addNULL");return;}
-			
-			QTreeWidgetItem* kidItem = static_cast<QTreeWidgetItem*>(ud);
-			
+		void StudioGLWidget::instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem){
+			if(!kidItem){
+				return;
+			}
+
 		    if(evec.size() == 1){
 			    if(kidItem->isSelected()){
 					StudioWindow* win = StudioWindow::static_win;
@@ -169,12 +195,10 @@ namespace OB{
 			}
 		}
 
-		void StudioGLWidget::instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			if(!ud){puts("remNULL");return;}else{
-				puts("!NULL");
+		void StudioGLWidget::instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem){
+			if(!kidItem){
+				return;
 			}
-			
-		    QTreeWidgetItem* kidItem = static_cast<QTreeWidgetItem*>(ud);
 			
 		    if(evec.size() == 1){
 				if(kidItem->isSelected()){
@@ -194,6 +218,8 @@ namespace OB{
 		}
 
 		void StudioGLWidget::addChildOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> kid){
+			using namespace std::placeholders;
+
 			if(!parentItem || !kid){
 				return;
 			}
@@ -202,9 +228,9 @@ namespace OB{
 			treeItemMap[kid] = kidItem;
 			kidItem->setIcon(0, StudioWindow::getClassIcon(QString(kid->getClassName().c_str())));
 
-		    kid->Changed->Connect(std::bind(&StudioGLWidget::instance_changed_evt, this), kidItem);
-			kid->ChildAdded->Connect(std::bind(&StudioGLWidget::instance_child_added_evt, this), kidItem);
-			kid->ChildRemoved->Connect(std::bind(&StudioGLWidget::instance_child_removed_evt, this), kidItem);
+		    kid->Changed->Connect(std::bind(&StudioGLWidget::instance_changed_evt, this, _1, kidItem));
+			kid->ChildAdded->Connect(std::bind(&StudioGLWidget::instance_child_added_evt, this, _1, kidItem));
+			kid->ChildRemoved->Connect(std::bind(&StudioGLWidget::instance_child_removed_evt, this, _1, kidItem));
 
 			addChildrenOfInstance(kidItem, kid);
 
@@ -215,6 +241,7 @@ namespace OB{
 			if(!parentItem || !inst){
 				return;
 			}
+			
 			std::vector<shared_ptr<Instance::Instance>> kids = inst->GetChildren();
 			for(std::vector<shared_ptr<Instance::Instance>>::size_type i = 0; i < kids.size(); i++){
 			    shared_ptr<Instance::Instance> kid = kids[i];
@@ -224,25 +251,24 @@ namespace OB{
 			}
 		}
 		
-		void StudioGLWidget::dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, void* ud){
-			StudioWindow* sw = (StudioWindow*)ud;
+		void StudioGLWidget::dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec){
+			StudioWindow* sw = StudioWindow::static_win;
 			if(!sw){
 				return;
 			}
-			
-		    OBEngine* eng = OBEngine::getInstance();
-			if(eng){
-			    shared_ptr<Instance::DataModel> dm = eng->getDataModel();
-				if(dm){
-					if(sw->tabWidget && sw->glWidget){
-						int studioWidgetIdx = sw->tabWidget->indexOf(sw->glWidget);
-						sw->tabWidget->setTabText(studioWidgetIdx, QString(dm->getName().c_str()));
-					}
+
+			shared_ptr<Instance::DataModel> dm = eng->getDataModel();
+			if(dm){
+				if(sw->tabWidget){
+					int studioWidgetIdx = sw->tabWidget->indexOf(this);
+					sw->tabWidget->setTabText(studioWidgetIdx, QString(dm->getName().c_str()));
 				}
 			}
 		}
 
-		void StudioGLWidget::addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst, StudioWindow* sw){
+		void StudioGLWidget::addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst){
+		    using namespace std::placeholders;
+			
 			if(!parentItem || !inst){
 				return;
 			}
@@ -255,9 +281,9 @@ namespace OB{
 				}
 			}
 
-			inst->ChildAdded->Connect(std::bind(&StudioGLWidget::instance_child_added_evt, this), parentItem);
-			inst->ChildRemoved->Connect(std::bind(&StudioGLWidget::instance_child_removed_evt, this), parentItem);
-			inst->Changed->Connect(std::bind(&StudioGLWidget::dm_changed_evt, this), sw);
+			inst->ChildAdded->Connect(std::bind(&StudioGLWidget::instance_child_added_evt, this, _1, parentItem));
+			inst->ChildRemoved->Connect(std::bind(&StudioGLWidget::instance_child_removed_evt, this, _1, parentItem));
+			inst->Changed->Connect(std::bind(&StudioGLWidget::dm_changed_evt, this, _1));
 		}
 	}
 }

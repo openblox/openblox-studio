@@ -65,13 +65,13 @@ namespace OB{
 			QAction* ungroupAct;
 			QAction* groupAct;
 
-			std::vector<shared_ptr<Instance::Instance>> getSelectedInstances();
-			
-			void updateSelectionFromLua();
+			void updateSelectionFromLua(OBEngine* eng);
 			void update_toolbar_usability();
-
-			StudioGLWidget* getCurrentGLWidget();
-			void initGL();
+			void populateBasicObjects();
+			
+			OBEngine* getCurrentEngine();
+			StudioGLWidget* getCurrentGLWidget(OBEngine* eng);
+			void tickEngines();
 
 			void sendOutput(QString str);
 			void sendOutput(QString str, QColor col);
