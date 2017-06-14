@@ -872,9 +872,13 @@ namespace OB{
 
 			if(toOpen.size() > 0){
 				newInstance();
-				gW->fileOpened = toOpen;
 
 				OBEngine* eng = getCurrentEngine();
+				StudioGLWidget* gW = getCurrentGLWidget(eng);
+				if(!gW){
+					return;
+				}
+				gW->fileOpened = toOpen;
 				shared_ptr<OBSerializer> serializer = eng->getSerializer();
 				if(!serializer){
 					// This should never happen
