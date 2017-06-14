@@ -98,6 +98,7 @@ namespace OB{
 
 				void saveAct();
 				void saveAsAct();
+				void openGame();
 		};
 	}
 }

@@ -97,9 +97,10 @@ namespace OB{
 			newAction->setShortcut(QKeySequence::New);
 			connect(newAction, &QAction::triggered, this, &StudioWindow::newInstance);
 			
-			QAction* openAction = fileMenu->addAction("Open");
+		    QAction* openAction = fileMenu->addAction("Open");
 			openAction->setIcon(QIcon::fromTheme("document-open"));
 			openAction->setShortcut(QKeySequence::Open);
+			connect(openAction, &QAction::triggered, this, &StudioWindow::openGame);
 
 			fileMenu->addSeparator();
 
@@ -325,34 +326,6 @@ namespace OB{
 		}
 
 		void StudioWindow::newInstance(){
-			/*if(glWidget){
-				if(pathToStudioExecutable.length() > 0){
-					#ifdef _WIN32
-					//Windows has to be special
-
-					STARTUPINFO si;
-					
-					CreateProcess(NULL,
-								  (LPSTR)pathToStudioExecutable.c_str(),
-								  NULL,
-								  NULL,
-								  FALSE,
-								  0,
-								  NULL,
-								  NULL,
-								  &si,
-								  NULL);
-					#else
-					//Sane systems
-					pid_t fr = fork();
-					if(fr == 0){
-						execlp(pathToStudioExecutable.c_str(), pathToStudioExecutable.c_str(),
-							   "--new",
-							   NULL);
-					}
-					#endif
-				}
-			}else{*/
 			OBEngine* eng = new OBEngine();
 			StudioGLWidget* glWidget = new StudioGLWidget(eng);
 
@@ -367,11 +340,12 @@ namespace OB{
 			}
 
 			glWidget->do_init();
+
+			populateBasicObjects();
 			
 			tabChanged();
 
 			cmdBar->lineEdit()->setDisabled(false);
-			//}
 		}
 
 		void StudioWindow::commandBarReturn(){
@@ -717,6 +691,12 @@ namespace OB{
 			if(curTab){
 				curTab->gain_focus();
 			}
+
+		    OBEngine* eng = getCurrentEngine();
+			if(eng){
+				saveAction->setEnabled(true);
+				saveAsAction->setEnabled(true);
+			}
 		}
 
 		void StudioWindow::groupSelection(){
@@ -867,6 +847,44 @@ namespace OB{
 				}else{
 					statusBar()->showMessage("Operation canceled.");
 				}
+			}
+		}
+
+		void StudioWindow::openGame(){
+			QString toOpen = "";
+			
+			QFileDialog* fileDia = new QFileDialog(this);
+			fileDia->setAcceptMode(QFileDialog::AcceptOpen);
+			fileDia->setDefaultSuffix("obgx");
+			fileDia->setFileMode(QFileDialog::AnyFile);
+			fileDia->setFilter(QDir::Files | QDir::Writable);
+			fileDia->setNameFilter("OpenBlox Game (*.obgx)");
+
+			if(fileDia->exec()){
+				QList<QUrl> selected = fileDia->selectedUrls();
+				if(selected.size() > 0){
+				    toOpen = selected[0].toLocalFile();
+				}else{
+					statusBar()->showMessage("Operation canceled.");
+					return;
+				}
+			}
+
+			if(toOpen.size() > 0){
+				newInstance();
+				gW->fileOpened = toOpen;
+
+				OBEngine* eng = getCurrentEngine();
+				shared_ptr<OBSerializer> serializer = eng->getSerializer();
+				if(!serializer){
+					// This should never happen
+					statusBar()->showMessage("No serialization support.");
+					// This error message is, of course, totally bogus.
+					QMessageBox::critical(this, "Error", "Serialization failed due to lack of binary executable data.");
+					return;
+				}
+
+				serializer->Load(toOpen.toStdString());
 			}
 		}
 	}
