@@ -700,9 +700,7 @@ namespace OB{
 		}
 
 		void StudioWindow::groupSelection(){
-			const QSignalBlocker sigBlock(explorer);
-
-			OBEngine* eng = getCurrentEngine();
+		    OBEngine* eng = getCurrentEngine();
 			StudioGLWidget* sW = getCurrentGLWidget(eng);
 			if(!sW){
 				return;
@@ -736,8 +734,9 @@ namespace OB{
 						}
 					}
 
-					sW->selectedInstances.clear();
+				    sW->selectedInstances.clear();
 					sW->selectedInstances.push_back(newModel);
+					updateSelectionFromLua(eng);
 
 					update_toolbar_usability();
 				}
