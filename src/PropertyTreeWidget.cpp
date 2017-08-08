@@ -209,6 +209,26 @@ namespace OB{
 						updateValue(propName);
 						continue;
 					}
+					if(pInfo.type == "UDim"){
+					    UDimPropertyItem* pi = new UDimPropertyItem(this, QString(propName.c_str()));
+						if(pInfo.readOnly){
+							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
+						}
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
+					if(pInfo.type == "UDim2"){
+					    UDim2PropertyItem* pi = new UDim2PropertyItem(this, QString(propName.c_str()));
+						if(pInfo.readOnly){
+							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
+						}
+						curProps[propName] = pi;
+						addTopLevelItem(pi);
+						updateValue(propName);
+						continue;
+					}
 					if(pInfo.type == "Instance"){
 					    InstancePropertyItem* pi = new InstancePropertyItem(this, QString(propName.c_str()));
 						curProps[propName] = pi;

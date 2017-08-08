@@ -774,5 +774,273 @@ namespace OB{
 
 			tree->setProp(propertyName, getValue());
 		}
+
+		// UDimPropertyItem
+
+	    UDimPropertyItem::UDimPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("UDim");
+			val = make_shared<Type::UDim>();
+			setText(1, getTextValue());
+
+			scale = new ChildDoublePropertyItem(tree, "Scale");
+		    offset = new ChildDoublePropertyItem(tree, "Offset");
+
+			addChild(scale);
+			addChild(offset);
+		}
+
+	    UDimPropertyItem::~UDimPropertyItem(){
+			delete scale;
+			delete offset;
+		}
+
+		shared_ptr<Type::VarWrapper> UDimPropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void UDimPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asUDim();
+			if(!this->val){
+				this->val = make_shared<Type::UDim>();
+			}
+		    
+			setText(1, getTextValue());
+			
+			scale->setDValue(this->val->getScale());
+		    offset->setDValue(this->val->getOffset());
+		}
+		
+		QString UDimPropertyItem::getTextValue(){
+			return QString("%1, %2").arg(this->val->getScale()).arg(this->val->getOffset());
+		}
+
+		void UDimPropertyItem::setTextValue(QString val){
+			QStringList valSplit = val.split(',');
+			if(valSplit.size() == 2){
+				QString scaleStr = valSplit[0].trimmed();
+				QString offsetStr = valSplit[1].trimmed();
+
+			    double nScale = this->val->getScale();
+				double nOffset = this->val->getOffset();
+
+				bool validDouble = true;
+
+				if(scaleStr.length() > 0){
+				    nScale = scaleStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				if(offsetStr.length() > 0){
+					nOffset = offsetStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				this->val = make_shared<Type::UDim>(nScale, nOffset);
+
+				setText(1, getTextValue());
+				
+			    scale->setDValue(nScale);
+			    offset->setDValue(nOffset);
+			}
+		}
+
+		QWidget* UDimPropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+			if(flags() & Qt::ItemIsEnabled){
+				QLineEdit* lineEdit = new QLineEdit(parent);
+				lineEdit->setGeometry(option.rect);
+				lineEdit->setFrame(false);
+			
+				return lineEdit;
+			}else{
+				return NULL;
+			}
+		}
+
+		void UDimPropertyItem::setEditorData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+			if(lineEdit){
+				lineEdit->setText(getTextValue());
+			}
+		}
+
+	    void UDimPropertyItem::setModelData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+
+			if(lineEdit){
+				setTextValue(lineEdit->text());
+
+				tree->setProp(propertyName, getValue());
+			}
+		}
+
+		void UDimPropertyItem::childPropertyUpdated(){
+			double scaleval = scale->getDValue();
+			double offsetval = offset->getDValue();
+
+			val = make_shared<Type::UDim>(scaleval, offsetval);
+			setText(1, getTextValue());
+
+			tree->setProp(propertyName, getValue());
+		}
+
+		// UDim2PropertyItem
+
+	    UDim2PropertyItem::UDim2PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+			setPropertyType("UDim2");
+			val = make_shared<Type::UDim2>();
+			setText(1, getTextValue());
+
+			xscale = new ChildDoublePropertyItem(tree, "X Scale");
+		    xoffset = new ChildDoublePropertyItem(tree, "X Offset");
+			yscale = new ChildDoublePropertyItem(tree, "Y Scale");
+		    yoffset = new ChildDoublePropertyItem(tree, "Y Offset");
+
+			addChild(xscale);
+			addChild(xoffset);
+			addChild(yscale);
+			addChild(yoffset);
+		}
+
+	    UDim2PropertyItem::~UDim2PropertyItem(){
+			delete xscale;
+			delete xoffset;
+			delete yscale;
+			delete yoffset;
+		}
+
+		shared_ptr<Type::VarWrapper> UDim2PropertyItem::getValue(){
+			return make_shared<Type::VarWrapper>(val);
+		}
+		
+		void UDim2PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
+			this->val = val->asUDim2();
+			if(!this->val){
+				this->val = make_shared<Type::UDim2>();
+			}
+		    
+			setText(1, getTextValue());
+
+			shared_ptr<Type::UDim> uX = this->val->getX();
+			shared_ptr<Type::UDim> uY = this->val->getY();
+			
+			xscale->setDValue(uX->getScale());
+		    xoffset->setDValue(uX->getOffset());
+			yscale->setDValue(uY->getScale());
+		    yoffset->setDValue(uY->getOffset());
+		}
+		
+		QString UDim2PropertyItem::getTextValue(){
+			shared_ptr<Type::UDim> uX = this->val->getX();
+			shared_ptr<Type::UDim> uY = this->val->getY();
+			return QString("%1, %2, %3, %4").arg(uX->getScale()).arg(uX->getOffset()).arg(uY->getScale()).arg(uY->getOffset());
+		}
+
+		void UDim2PropertyItem::setTextValue(QString val){
+			QStringList valSplit = val.split(',');
+			if(valSplit.size() == 4){
+				QString xscaleStr = valSplit[0].trimmed();
+				QString xoffsetStr = valSplit[1].trimmed();
+				QString yscaleStr = valSplit[2].trimmed();
+				QString yoffsetStr = valSplit[3].trimmed();
+
+				shared_ptr<Type::UDim> uX = this->val->getX();
+				shared_ptr<Type::UDim> uY = this->val->getY();
+				
+			    double nxScale = uX->getScale();
+				double nxOffset = uX->getOffset();
+				double nyScale = uY->getScale();
+				double nyOffset = uY->getOffset();
+
+				bool validDouble = true;
+
+				if(xscaleStr.length() > 0){
+					nxScale = xscaleStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				if(xoffsetStr.length() > 0){
+					nxOffset = xoffsetStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				if(yscaleStr.length() > 0){
+					nyScale = yscaleStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				if(yoffsetStr.length() > 0){
+					nyOffset = yoffsetStr.toDouble(&validDouble);
+				}
+
+				if(!validDouble){
+					return;
+				}
+
+				this->val = make_shared<Type::UDim2>(nxScale, nxOffset, nyScale, nyOffset);
+
+				setText(1, getTextValue());
+				
+			    xscale->setDValue(nxScale);
+			    xoffset->setDValue(nxOffset);
+				yscale->setDValue(nyScale);
+			    yoffset->setDValue(nyOffset);
+			}
+		}
+
+		QWidget* UDim2PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
+			if(flags() & Qt::ItemIsEnabled){
+				QLineEdit* lineEdit = new QLineEdit(parent);
+				lineEdit->setGeometry(option.rect);
+				lineEdit->setFrame(false);
+			
+				return lineEdit;
+			}else{
+				return NULL;
+			}
+		}
+
+		void UDim2PropertyItem::setEditorData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+			if(lineEdit){
+				lineEdit->setText(getTextValue());
+			}
+		}
+
+	    void UDim2PropertyItem::setModelData(QWidget* editor){
+			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
+
+			if(lineEdit){
+				setTextValue(lineEdit->text());
+
+				tree->setProp(propertyName, getValue());
+			}
+		}
+
+		void UDim2PropertyItem::childPropertyUpdated(){
+			double xscaleval = xscale->getDValue();
+			double xoffsetval = xoffset->getDValue();
+			double yscaleval = yscale->getDValue();
+			double yoffsetval = yoffset->getDValue();
+
+			val = make_shared<Type::UDim2>(xscaleval, xoffsetval, yscaleval, yoffsetval);
+			setText(1, getTextValue());
+
+			tree->setProp(propertyName, getValue());
+		}
 	}
 }
