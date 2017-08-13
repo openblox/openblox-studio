@@ -48,15 +48,15 @@
 namespace OB{
 	namespace Studio{
 		std::string StudioWindow::pathToStudioExecutable = "";
-	    StudioWindow* StudioWindow::static_win = NULL;
-	    
+		StudioWindow* StudioWindow::static_win = NULL;
+
 		QMap<QString, QIcon> classIconMap;
 
 		QIcon StudioWindow::getClassIcon(QString className){
-		    if(classIconMap.contains(className)){
+			if(classIconMap.contains(className)){
 				return classIconMap[className];
 			}
-		    
+
 			QIcon ico;
 
 			if(className.isEmpty()){
@@ -64,14 +64,14 @@ namespace OB{
 			}
 
 			QString icop = ":rc/class_icons/" + className + ".png";
-			
+
 			if(QFile(icop).exists()){
 				ico = QIcon(icop);
 			}else{
 				std::string parentClassStr = ClassFactory::getParentClassName(className.toStdString());
-			    ico = getClassIcon(QString(parentClassStr.c_str()));
+				ico = getClassIcon(QString(parentClassStr.c_str()));
 			}
-			
+
 			classIconMap[className] = ico;
 			return ico;
 		}
@@ -86,50 +86,50 @@ namespace OB{
 			connect(tabWidget, &QTabWidget::currentChanged, this, &StudioWindow::tabChanged);
 
 			curTab = NULL;
-			
+
 			setCentralWidget(tabWidget);
 
 			//Menus
 			QMenu* fileMenu = menuBar()->addMenu("File");
-			
+
 			QAction* newAction = fileMenu->addAction("New");
 			newAction->setIcon(QIcon::fromTheme("document-new"));
 			newAction->setShortcut(QKeySequence::New);
 			connect(newAction, &QAction::triggered, this, &StudioWindow::newInstance);
-			
-		    QAction* openAction = fileMenu->addAction("Open");
+
+			QAction* openAction = fileMenu->addAction("Open");
 			openAction->setIcon(QIcon::fromTheme("document-open"));
 			openAction->setShortcut(QKeySequence::Open);
 			connect(openAction, &QAction::triggered, this, &StudioWindow::openGame);
 
 			fileMenu->addSeparator();
 
-		    saveAction = fileMenu->addAction("Save");
+			saveAction = fileMenu->addAction("Save");
 			saveAction->setEnabled(false);
 			saveAction->setIcon(QIcon::fromTheme("document-save"));
 			saveAction->setShortcut(QKeySequence::Save);
 			connect(saveAction, &QAction::triggered, this, &StudioWindow::saveAct);
-			
-		    saveAsAction = fileMenu->addAction("Save As");
+
+			saveAsAction = fileMenu->addAction("Save As");
 			saveAsAction->setEnabled(false);
 			saveAsAction->setIcon(QIcon::fromTheme("document-save-as"));
 			saveAsAction->setShortcut(QKeySequence::SaveAs);
 			connect(saveAsAction, &QAction::triggered, this, &StudioWindow::saveAsAct);
-			
+
 			fileMenu->addSeparator();
-			
+
 			QAction* closeAction = fileMenu->addAction("Close");
 			closeAction->setIcon(QIcon::fromTheme("window-close"));
 			closeAction->setShortcut(QKeySequence::Quit);
 			connect(closeAction, &QAction::triggered, this, &StudioWindow::closeStudio);
 
-		    QMenu* editMenu = menuBar()->addMenu("Edit");
-		    explorerCtxMenu = new QMenu();
+			QMenu* editMenu = menuBar()->addMenu("Edit");
+			explorerCtxMenu = new QMenu();
 			QAction* undoAction = editMenu->addAction("Undo");
 			undoAction->setIcon(QIcon::fromTheme("edit-undo"));
 			undoAction->setEnabled(false);
 			undoAction->setShortcut(QKeySequence::Undo);
-			
+
 			QAction* redoAction = editMenu->addAction("Redo");
 			redoAction->setIcon(QIcon::fromTheme("edit-redo"));
 			redoAction->setEnabled(false);
@@ -142,7 +142,7 @@ namespace OB{
 			cutAction->setIcon(QIcon::fromTheme("edit-cut"));
 			cutAction->setEnabled(false);
 			cutAction->setShortcut(QKeySequence::Cut);
-			
+
 			QAction* copyAction = editMenu->addAction("Copy");
 			explorerCtxMenu->addAction(copyAction);
 			copyAction->setIcon(QIcon::fromTheme("edit-copy"));
@@ -155,9 +155,9 @@ namespace OB{
 			pasteAction->setEnabled(false);
 			pasteAction->setShortcut(QKeySequence::Paste);
 
-		    deleteAction = editMenu->addAction("Delete");
+			deleteAction = editMenu->addAction("Delete");
 			explorerCtxMenu->addAction(deleteAction);
-		    deleteAction->setIcon(QIcon::fromTheme("edit-delete"));
+			deleteAction->setIcon(QIcon::fromTheme("edit-delete"));
 			deleteAction->setEnabled(false);
 			deleteAction->setShortcut(QKeySequence::Delete);
 			connect(deleteAction, &QAction::triggered, this, &StudioWindow::deleteSelection);
@@ -194,6 +194,8 @@ namespace OB{
 
 			output = new QTextEdit();
 			output->setReadOnly(true);
+			output->setContextMenuPolicy(Qt::CustomContextMenu);
+			connect(output, &QWidget::customContextMenuRequested, this, &StudioWindow::outputContextMenu);
 
 			dock->setWidget(output);
 			addDockWidget(Qt::BottomDockWidgetArea, dock);
@@ -209,7 +211,7 @@ namespace OB{
 
 			explorer = new InstanceTree();
 			explorer->setMinimumSize(100, 100);
-		    explorer->setContextMenuPolicy(Qt::CustomContextMenu);
+			explorer->setContextMenuPolicy(Qt::CustomContextMenu);
 			connect(explorer, &QWidget::customContextMenuRequested, this, &StudioWindow::explorerContextMenu);
 			connect(explorer, &QTreeWidget::itemSelectionChanged, this, &StudioWindow::selectionChanged);
 
@@ -293,8 +295,8 @@ namespace OB{
 			modelToolbar->setObjectName("studio_model_toolbar");
 			modelToolbar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
 			viewToolbarsMenu->addAction(modelToolbar->toggleViewAction());
-			
-		    groupAct = modelToolbar->addAction("Group");
+
+			groupAct = modelToolbar->addAction("Group");
 			groupAct->setIcon(QIcon::fromTheme("object-group", QIcon(":studio_icon/icon_group.png")));
 			groupAct->setEnabled(false);
 			connect(groupAct, &QAction::triggered, this, &StudioWindow::groupSelection);
@@ -316,13 +318,13 @@ namespace OB{
 		}
 
 		void StudioWindow::showSettings(){
-		    ConfigDialog* cfg_d = new ConfigDialog(this);
+			ConfigDialog* cfg_d = new ConfigDialog(this);
 			cfg_d->setModal(true);
 			cfg_d->show();
 		}
 
 		void StudioWindow::closeStudio(){
-		    close();
+			close();
 		}
 
 		void StudioWindow::newInstance(){
@@ -342,7 +344,7 @@ namespace OB{
 			glWidget->do_init();
 
 			populateBasicObjects();
-			
+
 			tabChanged();
 
 			cmdBar->lineEdit()->setDisabled(false);
@@ -352,9 +354,9 @@ namespace OB{
 			QLineEdit* cmdEdit = cmdBar->lineEdit();
 			QString text = cmdEdit->text();
 
-		    sendOutput("> " + text);
+			sendOutput("> " + text);
 
-		    OB::OBEngine* eng = getCurrentEngine();
+			OB::OBEngine* eng = getCurrentEngine();
 			if(!eng){
 				return;
 			}
@@ -364,7 +366,7 @@ namespace OB{
 				//Prevents segfaults when commands are run before initialization
 				return;
 			}
-			
+
 			lua_State* L = Lua::initThread(gL);
 
 			int s = luaL_loadstring(L, text.toStdString().c_str());
@@ -373,7 +375,7 @@ namespace OB{
 			}
 
 			if(s != 0 && s != LUA_YIELD){
-			    Lua::handle_errors(L);
+				Lua::handle_errors(L);
 				Lua::close_state(L);
 			}
 			if(s == LUA_OK){
@@ -387,7 +389,7 @@ namespace OB{
 				return;
 			}
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances = gW->selectedInstances;
-			
+
 			const int numSelected = selectedInstances.size();
 			if(numSelected > 0){
 				deleteAction->setEnabled(true);
@@ -395,7 +397,7 @@ namespace OB{
 				if(numSelected > 1){
 					basicObjects->setEnabled(false);
 
-				    bool anyParentLocked = false;
+					bool anyParentLocked = false;
 					shared_ptr<Instance::Instance> sharedParent = NULL;
 					for(int i = 0; i < numSelected; i++){
 						shared_ptr<Instance::Instance> selected_inst = selectedInstances.at(i);
@@ -413,8 +415,8 @@ namespace OB{
 							}
 						}
 					}
-					
-				    ungroupAct->setEnabled(false);
+
+					ungroupAct->setEnabled(false);
 
 					if(anyParentLocked || !sharedParent){
 						groupAct->setEnabled(false);
@@ -426,9 +428,9 @@ namespace OB{
 					groupAct->setEnabled(false);
 					ungroupAct->setEnabled(false);
 
-				    shared_ptr<Instance::Instance> selected_inst = selectedInstances.at(0);
+					shared_ptr<Instance::Instance> selected_inst = selectedInstances.at(0);
 					if(selected_inst){
-					    shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selected_inst);
+						shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selected_inst);
 						if(selected_model){
 							if(selected_model->GetChildren().size() > 0){
 								ungroupAct->setEnabled(true);
@@ -468,7 +470,7 @@ namespace OB{
 			// Otherwise, iterate through
 			int numTabs = tabWidget->count();
 			for(int i = 0; i < numTabs; i++){
-			    StudioTabWidget* tw = (StudioTabWidget*)tabWidget->widget(i);
+				StudioTabWidget* tw = (StudioTabWidget*)tabWidget->widget(i);
 				if(tw && tw != curTab){
 					StudioGLWidget* gW = NULL;
 					if((gW = dynamic_cast<StudioGLWidget*>(tw))){
@@ -484,10 +486,10 @@ namespace OB{
 		void StudioWindow::tickEngines(){
 			int numTabs = tabWidget->count();
 			for(int i = 0; i < numTabs; i++){
-			    StudioTabWidget* tw = (StudioGLWidget*)tabWidget->widget(i);
+				StudioTabWidget* tw = (StudioGLWidget*)tabWidget->widget(i);
 				StudioGLWidget* gW = NULL;
 				if((gW = dynamic_cast<StudioGLWidget*>(tw))){
-				    OBEngine* eng = gW->getEngine();
+					OBEngine* eng = gW->getEngine();
 					if(eng){
 						eng->tick();
 					}
@@ -497,7 +499,7 @@ namespace OB{
 			if(curTab){
 				StudioGLWidget* gW = NULL;
 				if((gW = dynamic_cast<StudioGLWidget*>(curTab))){
-				    OBEngine* eng = gW->getEngine();
+					OBEngine* eng = gW->getEngine();
 					if(eng){
 						eng->render();
 					}
@@ -513,7 +515,7 @@ namespace OB{
 			if(!sW){
 				return;
 			}
-			
+
 			sW->selectedInstances.clear();
 
 			for(int i = 0; i < selectedItems.size(); i++){
@@ -521,11 +523,11 @@ namespace OB{
 				if(srcItem){
 					shared_ptr<Instance::Instance> instPtr = srcItem->GetInstance();
 					if(instPtr){
-					    sW->selectedInstances.push_back(instPtr);
+						sW->selectedInstances.push_back(instPtr);
 					}
 				}
 			}
-			
+
 			properties->updateSelection(sW->selectedInstances);
 			update_toolbar_usability();
 
@@ -553,16 +555,16 @@ namespace OB{
 				shared_ptr<Instance::Instance> inst = gW->selectedInstances.at(i);
 				if(inst){
 					shared_ptr<Instance::Instance> parInst = inst->getParent();
-					
-				    InstanceTreeItem* ti = gW->treeItemMap.value(inst);
+
+					InstanceTreeItem* ti = gW->treeItemMap.value(inst);
 					if(ti){
-					    InstanceTreeItem* pTi = (InstanceTreeItem*)ti->parent();
+						InstanceTreeItem* pTi = (InstanceTreeItem*)ti->parent();
 						if(pTi){
 							if(pTi->GetInstance() != parInst){
 								std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(inst)});
 								gW->instance_child_removed_evt(argVector, pTi);
-							    if(parInst){
-								    InstanceTreeItem* tiParent = gW->treeItemMap.value(parInst);
+								if(parInst){
+									InstanceTreeItem* tiParent = gW->treeItemMap.value(parInst);
 									if(tiParent){
 										gW->instance_child_added_evt(argVector, tiParent);
 									}
@@ -588,7 +590,7 @@ namespace OB{
 		}
 
 		void StudioWindow::populateBasicObjects(){
-		    if(basicObjects->count() > 0){
+			if(basicObjects->count() > 0){
 				return;
 			}
 
@@ -617,7 +619,14 @@ namespace OB{
 		   StudioGLWidget* gW = getCurrentGLWidget(getCurrentEngine());
 			if(gW){
 				gW->sendOutput(msg, col);
-			} 
+			}
+		}
+
+		void StudioWindow::clearOutput(){
+			StudioGLWidget* gW = getCurrentGLWidget(getCurrentEngine());
+			if(gW){
+				gW->clearOutput();
+			}
 		}
 
 		void StudioWindow::deleteSelection(){
@@ -625,7 +634,7 @@ namespace OB{
 			if(!sW){
 				return;
 			}
-			
+
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
 
 			if(selectedInstances.size() > 0){
@@ -653,6 +662,17 @@ namespace OB{
 			}
 		}
 
+		void StudioWindow::outputContextMenu(const QPoint &pt) {
+			QMenu *menu = output->createStandardContextMenu();
+
+			QAction* clearAction = menu->addAction("Clear Output");
+			clearAction->setEnabled(true);
+			connect(clearAction, &QAction::triggered, this, &StudioWindow::clearOutput);
+
+			menu->exec(output->mapToGlobal(pt));
+			delete menu;
+		}
+
 		void StudioWindow::insertInstance(){
 			OBEngine* eng = getCurrentEngine();
 			if(eng){
@@ -660,16 +680,16 @@ namespace OB{
 				if(!gW){
 					return;
 				}
-				
-			    shared_ptr<Instance::DataModel> dm = eng->getDataModel();
+
+				shared_ptr<Instance::DataModel> dm = eng->getDataModel();
 				if(dm){
 					shared_ptr<Instance::Instance> parentInstance = dm->getWorkspace();
-					
+
 					if(gW->selectedInstances.size() == 1){
 						parentInstance = gW->selectedInstances.at(0);
 					}
 
-				    QList<QListWidgetItem*> selectedInstanceTypes = basicObjects->selectedItems();
+					QList<QListWidgetItem*> selectedInstanceTypes = basicObjects->selectedItems();
 					if(selectedInstanceTypes.size() == 1){
 						std::string instanceType = selectedInstanceTypes[0]->text().toStdString();
 
@@ -692,7 +712,7 @@ namespace OB{
 				curTab->gain_focus();
 			}
 
-		    OBEngine* eng = getCurrentEngine();
+			OBEngine* eng = getCurrentEngine();
 			if(eng){
 				saveAction->setEnabled(true);
 				saveAsAction->setEnabled(true);
@@ -700,18 +720,18 @@ namespace OB{
 		}
 
 		void StudioWindow::groupSelection(){
-		    OBEngine* eng = getCurrentEngine();
+			OBEngine* eng = getCurrentEngine();
 			StudioGLWidget* sW = getCurrentGLWidget(eng);
 			if(!sW){
 				return;
 			}
-			
+
 			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
-			
-		    shared_ptr<Instance::Instance> selectedInst = selectedInstances.at(0);
+
+			shared_ptr<Instance::Instance> selectedInst = selectedInstances.at(0);
 			if(selectedInst){
 				shared_ptr<Instance::Instance> newPar = selectedInst->getParent();
-				
+
 				shared_ptr<Instance::Instance> newModel = ClassFactory::create("Model", eng);
 				if(newModel){
 					newModel->setParent(newPar, true);
@@ -721,8 +741,8 @@ namespace OB{
 						shared_ptr<Instance::Instance> kI = toGroup.at(i);
 						if(kI){
 							std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(kI)});
-							
-						    shared_ptr<Instance::Instance> oPar = kI->getParent();
+
+							shared_ptr<Instance::Instance> oPar = kI->getParent();
 							if(oPar){
 								InstanceTreeItem* pTi = sW->treeItemMap.value(oPar);
 								if(pTi){
@@ -734,7 +754,7 @@ namespace OB{
 						}
 					}
 
-				    sW->selectedInstances.clear();
+					sW->selectedInstances.clear();
 					sW->selectedInstances.push_back(newModel);
 					updateSelectionFromLua(eng);
 
@@ -742,7 +762,7 @@ namespace OB{
 				}
 			}
 		}
-		
+
 		void StudioWindow::ungroupSelection(){
 			shared_ptr<Instance::Instance> newPar = NULL;
 
@@ -751,7 +771,7 @@ namespace OB{
 			if(!gW){
 				return;
 			}
-			
+
 			shared_ptr<Instance::Instance> selectedInst = gW->selectedInstances.at(0);
 			if(selectedInst){
 				shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selectedInst);
@@ -769,7 +789,7 @@ namespace OB{
 					}
 				}
 				selectedInst->Destroy();
-			    InstanceTreeItem* pti = gW->treeItemMap.value(newPar);
+				InstanceTreeItem* pti = gW->treeItemMap.value(newPar);
 				if(pti){
 					std::vector<shared_ptr<Type::VarWrapper>> argVector({make_shared<Type::VarWrapper>(selectedInst)});
 					gW->instance_child_removed_evt(argVector, pti);
@@ -787,9 +807,9 @@ namespace OB{
 			if(!gW){
 				return;
 			}
-			
+
 			if(gW->fileOpened.length() > 0){
-			    // We use this instead of Save(file) to allow saving
+				// We use this instead of Save(file) to allow saving
 				// to remote locations such as network drives/webdav
 				shared_ptr<OBSerializer> serializer = eng->getSerializer();
 				if(!serializer){
@@ -799,7 +819,7 @@ namespace OB{
 					QMessageBox::critical(this, "Error", "Serialization failed due to lack of binary executable data.");
 					return;
 				}
-				
+
 				std::string strToWrite = serializer->SaveInMemory();
 				if(strToWrite.length() == 0){
 					QString errMsg = "Failed to serialize game.";
@@ -830,7 +850,7 @@ namespace OB{
 			if(!gW){
 				return;
 			}
-			
+
 			QFileDialog* fileDia = new QFileDialog(this);
 			fileDia->setAcceptMode(QFileDialog::AcceptSave);
 			fileDia->setDefaultSuffix("obgx");
@@ -841,7 +861,7 @@ namespace OB{
 			if(fileDia->exec()){
 				QList<QUrl> selected = fileDia->selectedUrls();
 				if(selected.size() > 0){
-				    gW->fileOpened = selected[0].toLocalFile();
+					gW->fileOpened = selected[0].toLocalFile();
 					saveAct();
 				}else{
 					statusBar()->showMessage("Operation canceled.");
@@ -851,7 +871,7 @@ namespace OB{
 
 		void StudioWindow::openGame(){
 			QString toOpen = "";
-			
+
 			QFileDialog* fileDia = new QFileDialog(this);
 			fileDia->setAcceptMode(QFileDialog::AcceptOpen);
 			fileDia->setDefaultSuffix("obgx");
@@ -862,7 +882,7 @@ namespace OB{
 			if(fileDia->exec()){
 				QList<QUrl> selected = fileDia->selectedUrls();
 				if(selected.size() > 0){
-				    toOpen = selected[0].toLocalFile();
+					toOpen = selected[0].toLocalFile();
 				}else{
 					statusBar()->showMessage("Operation canceled.");
 					return;

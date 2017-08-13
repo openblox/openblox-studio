@@ -36,7 +36,7 @@
 
 namespace OB{
 	namespace Studio{
-	    class StudioWindow: public QMainWindow{
+		class StudioWindow: public QMainWindow{
 		  public:
 			StudioWindow();
 
@@ -47,7 +47,7 @@ namespace OB{
 
 			QTabWidget* tabWidget;
 			StudioTabWidget* curTab;
-			
+
 			QTextEdit* output;
 			InstanceTree* explorer;
 			PropertyTreeWidget* properties;
@@ -63,22 +63,23 @@ namespace OB{
 			QAction* saveAsAction;
 
 			QAction* deleteAction;
-			
+
 			QAction* ungroupAct;
 			QAction* groupAct;
 
 			void updateSelectionFromLua(OBEngine* eng);
 			void update_toolbar_usability();
 			void populateBasicObjects();
-			
+
 			OBEngine* getCurrentEngine();
 			StudioGLWidget* getCurrentGLWidget(OBEngine* eng);
 			void tickEngines();
 
 			void sendOutput(QString str);
 			void sendOutput(QString str, QColor col);
+			void clearOutput();
 
-		    public slots:
+			public slots:
 				void about();
 				void showSettings();
 				void newInstance();
@@ -86,10 +87,11 @@ namespace OB{
 				void commandBarReturn();
 				void selectionChanged();
 				void insertInstance();
-				
+
 				void tabChanged();
 
 				void explorerContextMenu(const QPoint &pos);
+				void outputContextMenu(const QPoint &pos);
 
 				//Action handlers
 				void deleteSelection();
