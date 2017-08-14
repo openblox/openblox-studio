@@ -16,7 +16,7 @@ openblox_studio_SOURCES = OpenBloxStudio.cpp \
 	Selection.cpp \
 	qrc_resources.cpp
 # Linker options
-openblox_studio_LDADD = $(LOPENBLOX_LIBS) $(LIRRLICHT_LIBS) $(LBULLET_LIBS) $(LQT_LIBS)
+openblox_studio_LDADD = $(LOPENBLOX_LIBS) $(LIRRLICHT_LIBS) $(LBULLET_LIBS) $(LQT_LIBS) $(LGL_LIB)
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
