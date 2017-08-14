@@ -7,6 +7,7 @@ AC_PROG_CXX
 PKG_PROG_PKG_CONFIG
 PKG_INSTALLDIR
 
+AC_CANONICAL_TARGET
 AC_CANONICAL_SYSTEM
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -48,6 +49,12 @@ PKG_CHECK_MODULES([LQT], [
 ])
 
 AC_CHECK_PROGS(RCC, [rcc rcc-qt5])
+
+AS_IF([test "x$target_os" == "xmingw32"],
+      [LGL_LIB="-lopengl32"],
+      [LGL_LIB="-lGL"])
+
+AS_SUBST(LGL_LIB)
 
 LT_INIT
 
