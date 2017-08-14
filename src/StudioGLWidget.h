@@ -28,7 +28,7 @@ namespace OB{
 	namespace Studio{
 		class StudioWindow;
 		class InstanceTree;
-		
+
 		class StudioGLWidget: public StudioTabWidget{
 		  public:
 			StudioGLWidget(OBEngine* eng);
@@ -38,12 +38,12 @@ namespace OB{
 			QSize sizeHint() const;
 
 			void do_init();
-			
+
 			virtual void remove_focus();
 			virtual void gain_focus();
 
 			virtual void resizeEvent(QResizeEvent* evt);
-			
+
 			void setLogHistory(QString hist);
 			QString getLogHistory();
 
@@ -59,11 +59,12 @@ namespace OB{
 			// Explorer handling
 			void sendOutput(QString msg, QColor col);
 			void sendOutput(QString msg);
+			void clearOutput();
 
 			void handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec);
 
 			QMap<shared_ptr<Instance::Instance>, InstanceTreeItem*> treeItemMap;
-			
+
 			void instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, InstanceTreeItem* kidItem);
 			void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem);
 			void instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem);
@@ -71,7 +72,7 @@ namespace OB{
 			void addChildrenOfInstance(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst);
 			void dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec);
 			void addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst);
-			
+
 		  protected:
 			void paintGL();
 			void resizeGL(int width, int height);
@@ -79,7 +80,7 @@ namespace OB{
 			void mouseMoveEvent(QMouseEvent* event);
 
 			bool has_focus;
-			
+
 		  private:
 			QString logHist;
 		};

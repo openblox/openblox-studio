@@ -33,7 +33,7 @@ namespace OB{
 	namespace Studio{
 		StudioGLWidget::StudioGLWidget(OBEngine* eng) : StudioTabWidget(eng){
 			setAttribute(Qt::WA_OpaquePaintEvent);
-		    setFocusPolicy(Qt::StrongFocus);
+			setFocusPolicy(Qt::StrongFocus);
 
 			setAutoFillBackground(false);
 
@@ -55,7 +55,7 @@ namespace OB{
 
 		void StudioGLWidget::do_init(){
 			using namespace std::placeholders;
-			
+
 			if(!eng){
 				throw OB::OBException("game is NULL!");
 			}
@@ -69,10 +69,10 @@ namespace OB{
 			if(dm){
 				shared_ptr<OB::Instance::LogService> ls = dm->getLogService();
 				if(ls){
-				    std::function<void(std::vector<shared_ptr<Type::VarWrapper>>)> lsb = std::bind(&StudioGLWidget::handle_log_event, this, _1);
+					std::function<void(std::vector<shared_ptr<Type::VarWrapper>>)> lsb = std::bind(&StudioGLWidget::handle_log_event, this, _1);
 					ls->getMessageOut()->Connect(lsb);
 				}
-		    }
+			}
 		}
 
 		void StudioGLWidget::remove_focus(){
@@ -80,10 +80,10 @@ namespace OB{
 
 			StudioWindow::static_win->explorer->invisibleRootItem()->takeChildren();
 		}
-		
+
 		void StudioGLWidget::gain_focus(){
 			using namespace std::placeholders;
-			
+
 			has_focus = true;
 
 			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
@@ -100,7 +100,7 @@ namespace OB{
 		void StudioGLWidget::resizeEvent(QResizeEvent* evt){
 			QWidget::resizeEvent(evt);
 
-		    if(eng){
+			if(eng){
 				QSize newSize = evt->size();
 				eng->resized(newSize.width(), newSize.height());
 			}
@@ -113,10 +113,10 @@ namespace OB{
 		void StudioGLWidget::sendOutput(QString msg){
 			QString emsg = msg.toHtmlEscaped().replace('\n', "<br/>") + "<br/>";
 			logHist = logHist + emsg;
-			
+
 			if(has_focus){
 				StudioWindow* win = StudioWindow::static_win;
-			
+
 				if(win->output){
 					win->output->append(emsg);
 				}
@@ -129,13 +129,21 @@ namespace OB{
 
 			if(has_focus){
 				StudioWindow* win = StudioWindow::static_win;
-			
+
 				if(win->output){
 					win->output->append(emsg);
 				}
 			}
 		}
-		
+
+		void StudioGLWidget::clearOutput(){
+			StudioWindow* win = StudioWindow::static_win;
+
+			if(win->output){
+				win->output->clear();
+			}
+		}
+
 		void StudioGLWidget::handle_log_event(std::vector<shared_ptr<OB::Type::VarWrapper>> evec){
 			//Temporary
 			QColor errorCol(255, 51, 0);
@@ -160,7 +168,7 @@ namespace OB{
 			if(!kidItem){
 				return;
 			}
-			
+
 			shared_ptr<Instance::Instance> kid = kidItem->GetInstance();
 			if(!kid){
 				return;
@@ -179,7 +187,7 @@ namespace OB{
 			}
 
 			if(prop == "Name"){
-			    const QSignalBlocker sigBlock(kidItem->treeWidget());
+				const QSignalBlocker sigBlock(kidItem->treeWidget());
 				kidItem->setText(0, QString(kid->getName().c_str()));
 				return;
 			}
@@ -194,17 +202,17 @@ namespace OB{
 				return;
 			}
 
-		    if(evec.size() == 1){
-			    if(kidItem->isSelected()){
+			if(evec.size() == 1){
+				if(kidItem->isSelected()){
 					StudioWindow* win = StudioWindow::static_win;
 					if(win){
 						win->update_toolbar_usability();
 					}
 				}
-			    shared_ptr<Instance::Instance> newGuy = evec[0]->asInstance();
+				shared_ptr<Instance::Instance> newGuy = evec[0]->asInstance();
 				if(treeItemMap.contains(newGuy)){
-				    InstanceTreeItem* ngti = treeItemMap.value(newGuy);
-				    QTreeWidgetItem* twi = ngti->parent();
+					InstanceTreeItem* ngti = treeItemMap.value(newGuy);
+					QTreeWidgetItem* twi = ngti->parent();
 					if(twi != kidItem){
 						if(twi){
 							twi->removeChild(ngti);
@@ -221,8 +229,8 @@ namespace OB{
 			if(!kidItem){
 				return;
 			}
-			
-		    if(evec.size() == 1){
+
+			if(evec.size() == 1){
 				if(kidItem->isSelected()){
 					StudioWindow* win = StudioWindow::static_win;
 					if(win){
@@ -250,7 +258,7 @@ namespace OB{
 			treeItemMap[kid] = kidItem;
 			kidItem->setIcon(0, StudioWindow::getClassIcon(QString(kid->getClassName().c_str())));
 
-		    kid->Changed->Connect(std::bind(&StudioGLWidget::instance_changed_evt, this, _1, kidItem));
+			kid->Changed->Connect(std::bind(&StudioGLWidget::instance_changed_evt, this, _1, kidItem));
 			kid->ChildAdded->Connect(std::bind(&StudioGLWidget::instance_child_added_evt, this, _1, kidItem));
 			kid->ChildRemoved->Connect(std::bind(&StudioGLWidget::instance_child_removed_evt, this, _1, kidItem));
 
@@ -263,16 +271,16 @@ namespace OB{
 			if(!parentItem || !inst){
 				return;
 			}
-			
+
 			std::vector<shared_ptr<Instance::Instance>> kids = inst->GetChildren();
 			for(std::vector<shared_ptr<Instance::Instance>>::size_type i = 0; i < kids.size(); i++){
-			    shared_ptr<Instance::Instance> kid = kids[i];
+				shared_ptr<Instance::Instance> kid = kids[i];
 				if(kid){
 					addChildOfInstance(parentItem, kid);
 				}
 			}
 		}
-		
+
 		void StudioGLWidget::dm_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec){
 			StudioWindow* sw = StudioWindow::static_win;
 			if(!sw){
@@ -289,8 +297,8 @@ namespace OB{
 		}
 
 		void StudioGLWidget::addDM(QTreeWidgetItem* parentItem, shared_ptr<Instance::Instance> inst){
-		    using namespace std::placeholders;
-			
+			using namespace std::placeholders;
+
 			if(!parentItem || !inst){
 				return;
 			}
