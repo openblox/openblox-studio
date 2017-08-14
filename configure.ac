@@ -54,7 +54,7 @@ AS_IF([test "x$target_os" == "xmingw32"],
       [LGL_LIB="-lopengl32"],
       [LGL_LIB="-lGL"])
 
-AS_SUBST(LGL_LIB)
+AC_SUBST(LGL_LIB)
 
 LT_INIT
 
