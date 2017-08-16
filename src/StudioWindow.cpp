@@ -849,6 +849,40 @@ namespace OB{
 			}
 		}
 
+		void StudioWindow::loadGame(QString toOpen){
+			if(toOpen.size() > 0){
+				newInstance();
+
+				OBEngine* eng = getCurrentEngine();
+				StudioGLWidget* gW = getCurrentGLWidget(eng);
+				if(!gW){
+					return;
+				}
+				gW->fileOpened = toOpen;
+				shared_ptr<OBSerializer> serializer = eng->getSerializer();
+				if(!serializer){
+					// This should never happen
+					statusBar()->showMessage("No serialization support.");
+					// This error message is, of course, totally bogus.
+					QMessageBox::critical(this, "Error", "Serialization failed due to lack of binary executable data.");
+					return;
+				}
+
+				QString buf;
+				QFile f(toOpen);
+				if(!f.open(QFile::ReadOnly | QFile::Text)){
+					statusBar()->showMessage("Could not open file.");
+					// This error message is, of course, totally bogus.
+					QMessageBox::critical(this, "Error", "Failed to open file (can't read?)");
+					return;
+				}
+				QTextStream in(&f);
+				buf = in.readAll();
+
+				serializer->LoadFromMemory((char*)buf.toStdString().c_str(), buf.size());
+			}
+		}
+
 		void StudioWindow::openGame(){
 			QString toOpen = "";
 			
@@ -869,26 +903,7 @@ namespace OB{
 				}
 			}
 
-			if(toOpen.size() > 0){
-				newInstance();
-
-				OBEngine* eng = getCurrentEngine();
-				StudioGLWidget* gW = getCurrentGLWidget(eng);
-				if(!gW){
-					return;
-				}
-				gW->fileOpened = toOpen;
-				shared_ptr<OBSerializer> serializer = eng->getSerializer();
-				if(!serializer){
-					// This should never happen
-					statusBar()->showMessage("No serialization support.");
-					// This error message is, of course, totally bogus.
-					QMessageBox::critical(this, "Error", "Serialization failed due to lack of binary executable data.");
-					return;
-				}
-
-				serializer->Load(toOpen.toStdString());
-			}
+			loadGame(toOpen);
 		}
 	}
 }

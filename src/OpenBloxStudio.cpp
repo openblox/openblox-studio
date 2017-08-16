@@ -28,6 +28,7 @@
 #include <QStringListModel>
 
 #include "StudioWindow.h"
+#include "StudioGLWidget.h"
 
 #include <instance/NetworkServer.h>
 #include <instance/NetworkClient.h>
@@ -93,6 +94,8 @@ int main(int argc, char** argv){
 	QCommandLineOption clientOpt("client", "Starts a NetworkClient on initialization.");
     clientOpt.setDefaultValue("localhost:4490");
 	parser.addOption(clientOpt);
+
+	parser.addPositionalArgument("file", "The file to open.");
 	
 	parser.process(app);
 
@@ -129,9 +132,9 @@ int main(int argc, char** argv){
 	}
 	settings->endGroup();
 
-	/*
 	if(parser.isSet(newOpt) || parser.isSet(serverOpt) || parser.isSet(clientOpt)){
 		win->newInstance();
+		OB::OBEngine* eng = win->getCurrentEngine();
 
 		if(parser.isSet(serverOpt)){
 			bool isInt;
@@ -176,7 +179,14 @@ int main(int argc, char** argv){
 			}
 		}
 	}
-	*/
+
+    QStringList posArgs = parser.positionalArguments();
+	if(!posArgs.isEmpty()){
+		for(int i = 0; i < posArgs.size(); i++){
+		    QString toOpen = posArgs.at(i);
+		    win->loadGame(toOpen);
+		}
+	}
 
 	while(win->isVisible()){
 		app.processEvents();

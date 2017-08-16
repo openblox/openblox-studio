@@ -78,6 +78,8 @@ namespace OB{
 			void sendOutput(QString str);
 			void sendOutput(QString str, QColor col);
 
+			void loadGame(QString toOpen);
+
 		    public slots:
 				void about();
 				void showSettings();
