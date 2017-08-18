@@ -366,6 +366,8 @@ namespace OB{
 			}
 			
 			lua_State* L = Lua::initThread(gL);
+			Lua::setGetsPaused(L, false);
+			Lua::setDMBound(L, false);
 
 			int s = luaL_loadstring(L, text.toStdString().c_str());
 			if(s == 0){
