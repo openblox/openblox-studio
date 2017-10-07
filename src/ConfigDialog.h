@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OB_STUDIO_CONFIGDIALOG_H_
@@ -28,7 +28,7 @@
 namespace OB{
 	namespace Studio{
 		class ConfigDialog: public QDialog{
-		  public:
+		public:
 			ConfigDialog(QWidget* parent);
 
 			void optionChanged();
@@ -38,15 +38,15 @@ namespace OB{
 
 			virtual void showEvent(QShowEvent* evt);
 
-		  public slots:
+		public slots:
 			void changePage(QListWidgetItem* current, QListWidgetItem* previous);
 
-		  private:
+		private:
 			void createIcons();
 
 			QPushButton* applyButton;
 			QPushButton* saveButton;
-			
+
 			bool opt_changed;
 
 			QListWidget* contentsWidget;
@@ -56,3 +56,7 @@ namespace OB{
 }
 
 #endif
+
+// Local Variables:
+// mode: c++
+// End:

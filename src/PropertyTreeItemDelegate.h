@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OB_STUDIO_PROPERTYTREEITEMDELEGATE_H_
@@ -26,8 +26,8 @@
 namespace OB{
 	namespace Studio{
 		class PropertyTreeItemDelegate: public QStyledItemDelegate{
-		  public:
-		    PropertyTreeItemDelegate(PropertyTreeWidget* treeWidget);
+		public:
+			PropertyTreeItemDelegate(PropertyTreeWidget* treeWidget);
 			virtual ~PropertyTreeItemDelegate();
 
 			virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
@@ -38,10 +38,14 @@ namespace OB{
 			virtual void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex &index) const;
 			virtual bool editorEvent(QEvent* evt, QAbstractItemModel* model, const QStyleOptionViewItem &option, const QModelIndex &index);
 
-		  private:
-		    PropertyTreeWidget* treeWidget;
+		private:
+			PropertyTreeWidget* treeWidget;
 		};
 	}
 }
 
 #endif
+
+// Local Variables:
+// mode: c++
+// End:

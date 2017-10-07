@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "PropertyTreeItemDelegate.h"
@@ -24,20 +24,20 @@
 namespace OB{
 	namespace Studio{
 		PropertyTreeItemDelegate::PropertyTreeItemDelegate(PropertyTreeWidget* treeWidget){
-		    this->treeWidget = treeWidget;
+			this->treeWidget = treeWidget;
 		}
 
-	    PropertyTreeItemDelegate::~PropertyTreeItemDelegate(){}
+		PropertyTreeItemDelegate::~PropertyTreeItemDelegate(){}
 
 		QSize PropertyTreeItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const{
 			return QStyledItemDelegate::sizeHint(option, index) + QSize(4, 4);
 		}
-		
-	    void PropertyTreeItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &index) const{
+
+		void PropertyTreeItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &index) const{
 			if(!editor){
 				return;
 			}
-			
+
 			editor->setGeometry(option.rect);
 		}
 
@@ -62,7 +62,7 @@ namespace OB{
 			}
 		}
 
-	    void PropertyTreeItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex &index) const{
+		void PropertyTreeItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex &index) const{
 			if(!editor){
 				return;
 			}

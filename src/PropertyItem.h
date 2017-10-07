@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OB_STUDIO_PROPERTYITEM_H_
@@ -32,168 +32,168 @@
 namespace OB{
 	namespace Studio{
 		class PropertyItem: public QTreeWidgetItem{
-		  public:
-		    PropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			PropertyItem(PropertyTreeWidget* tree, QString name);
 			virtual ~PropertyItem();
 
-		    std::string getPropertyName();
-		    std::string getPropertyType();
+			std::string getPropertyName();
+			std::string getPropertyType();
 			void setPropertyType(std::string type);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
-			
+
 			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 			virtual bool editorEvent(QEvent* evt);
 
 			virtual void childPropertyUpdated();
-			
+
 			PropertyTreeWidget* tree;
-			
+
 			std::string propertyName;
 			std::string propertyType;
 		};
 
 		class StringPropertyItem: public PropertyItem{
-		  public:
+		public:
 			StringPropertyItem(PropertyTreeWidget* tree, QString name);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
 			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 
-		  private:
+		private:
 			std::string val;
 		};
 
 		class InstancePropertyItem: public PropertyItem{
-		  public:
+		public:
 			InstancePropertyItem(PropertyTreeWidget* tree, QString name);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 
-		  private:
-		    shared_ptr<Instance::Instance> val;
+		private:
+			shared_ptr<Instance::Instance> val;
 		};
 
 		class BoolPropertyItem: public PropertyItem{
-		  public:
-		    BoolPropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			BoolPropertyItem(PropertyTreeWidget* tree, QString name);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
 			virtual bool editorEvent(QEvent* evt);
 
-		  private:
-		    bool val;
+		private:
+			bool val;
 		};
 
 		class IntPropertyItem: public PropertyItem{
-		  public:
-		    IntPropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			IntPropertyItem(PropertyTreeWidget* tree, QString name);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
-		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 
-		  private:
-		    int val;
+		private:
+			int val;
 		};
 
 		class DoublePropertyItem: public PropertyItem{
-		  public:
-		    DoublePropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			DoublePropertyItem(PropertyTreeWidget* tree, QString name);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
-		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 
-		  private:
-		    double val;
+		private:
+			double val;
 		};
 
 		class FloatPropertyItem: public PropertyItem{
-		  public:
-		    FloatPropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			FloatPropertyItem(PropertyTreeWidget* tree, QString name);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
-		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 
-		  private:
-		    float val;
+		private:
+			float val;
 		};
 
 		class Color3PropertyItem: public PropertyItem{
-		  public:
-		    Color3PropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			Color3PropertyItem(PropertyTreeWidget* tree, QString name);
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 
-		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 
-		  private:
-		    shared_ptr<Type::Color3> val;
+		private:
+			shared_ptr<Type::Color3> val;
 		};
 
 		class ChildDoublePropertyItem: public PropertyItem{
-		  public:
-		    ChildDoublePropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			ChildDoublePropertyItem(PropertyTreeWidget* tree, QString name);
 
 			double getDValue();
 			void setDValue(double val);
-			
-		    virtual QString getTextValue();
 
-		    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
+			virtual QString getTextValue();
+
+			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
 			virtual void setEditorData(QWidget* editor);
 			virtual void setModelData(QWidget* editor);
 
-		  private:
-		    double val;
+		private:
+			double val;
 		};
 
 		class Vector3PropertyItem: public PropertyItem{
-		  public:
-		    Vector3PropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			Vector3PropertyItem(PropertyTreeWidget* tree, QString name);
 			~Vector3PropertyItem();
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
 			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
@@ -202,7 +202,7 @@ namespace OB{
 
 			virtual void childPropertyUpdated();
 
-		  private:
+		private:
 			shared_ptr<Type::Vector3> val;
 
 			ChildDoublePropertyItem* xVal;
@@ -211,13 +211,13 @@ namespace OB{
 		};
 
 		class Vector2PropertyItem: public PropertyItem{
-		  public:
-		    Vector2PropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			Vector2PropertyItem(PropertyTreeWidget* tree, QString name);
 			~Vector2PropertyItem();
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
 			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
@@ -226,7 +226,7 @@ namespace OB{
 
 			virtual void childPropertyUpdated();
 
-		  private:
+		private:
 			shared_ptr<Type::Vector2> val;
 
 			ChildDoublePropertyItem* xVal;
@@ -234,13 +234,13 @@ namespace OB{
 		};
 
 		class UDimPropertyItem: public PropertyItem{
-		  public:
-		    UDimPropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			UDimPropertyItem(PropertyTreeWidget* tree, QString name);
 			~UDimPropertyItem();
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
 			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
@@ -249,7 +249,7 @@ namespace OB{
 
 			virtual void childPropertyUpdated();
 
-		  private:
+		private:
 			shared_ptr<Type::UDim> val;
 
 			ChildDoublePropertyItem* scale;
@@ -257,13 +257,13 @@ namespace OB{
 		};
 
 		class UDim2PropertyItem: public PropertyItem{
-		  public:
-		    UDim2PropertyItem(PropertyTreeWidget* tree, QString name);
+		public:
+			UDim2PropertyItem(PropertyTreeWidget* tree, QString name);
 			~UDim2PropertyItem();
 
 			virtual shared_ptr<Type::VarWrapper> getValue();
 			virtual void setValue(shared_ptr<Type::VarWrapper> val);
-		    virtual QString getTextValue();
+			virtual QString getTextValue();
 			virtual void setTextValue(QString val);
 
 			virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option);
@@ -272,7 +272,7 @@ namespace OB{
 
 			virtual void childPropertyUpdated();
 
-		  private:
+		private:
 			shared_ptr<Type::UDim2> val;
 
 			ChildDoublePropertyItem* xscale;
@@ -284,3 +284,7 @@ namespace OB{
 }
 
 #endif
+
+// Local Variables:
+// mode: c++
+// End:

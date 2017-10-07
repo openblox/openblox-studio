@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OB_STUDIO_STUDIOWINDOW_H_
@@ -36,8 +36,8 @@
 
 namespace OB{
 	namespace Studio{
-	    class StudioWindow: public QMainWindow{
-		  public:
+		class StudioWindow: public QMainWindow{
+		public:
 			StudioWindow();
 
 			static std::string pathToStudioExecutable;
@@ -47,7 +47,7 @@ namespace OB{
 
 			QTabWidget* tabWidget;
 			StudioTabWidget* curTab;
-			
+
 			QTextEdit* output;
 			InstanceTree* explorer;
 			PropertyTreeWidget* properties;
@@ -58,19 +58,19 @@ namespace OB{
 
 			QSettings* settingsInst;
 
-			//Actions
+			// Actions
 			QAction* saveAction;
 			QAction* saveAsAction;
 
 			QAction* deleteAction;
-			
+
 			QAction* ungroupAct;
 			QAction* groupAct;
 
 			void updateSelectionFromLua(OBEngine* eng);
 			void update_toolbar_usability();
 			void populateBasicObjects();
-			
+
 			OBEngine* getCurrentEngine();
 			StudioGLWidget* getCurrentGLWidget(OBEngine* eng);
 			void tickEngines();
@@ -80,28 +80,32 @@ namespace OB{
 
 			void loadGame(QString toOpen);
 
-		    public slots:
-				void about();
-				void showSettings();
-				void newInstance();
-				void closeStudio();
-				void commandBarReturn();
-				void selectionChanged();
-				void insertInstance();
-				
-				void tabChanged();
+		public slots:
+			void about();
+			void showSettings();
+			void newInstance();
+			void closeStudio();
+			void commandBarReturn();
+			void selectionChanged();
+			void insertInstance();
 
-				void explorerContextMenu(const QPoint &pos);
+			void tabChanged();
 
-				//Action handlers
-				void deleteSelection();
-				void groupSelection();
-				void ungroupSelection();
+			void explorerContextMenu(const QPoint &pos);
 
-				void saveAct();
-				void saveAsAct();
-				void openGame();
+			//Action handlers
+			void deleteSelection();
+			void groupSelection();
+			void ungroupSelection();
+
+			void saveAct();
+			void saveAsAct();
+			void openGame();
 		};
 	}
 }
 #endif
+
+// Local Variables:
+// mode: c++
+// End:

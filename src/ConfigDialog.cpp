@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "ConfigDialog.h"
@@ -30,7 +30,7 @@ namespace OB{
 	namespace Studio{
 		ConfigDialog::ConfigDialog(QWidget* parent) : QDialog(parent){
 			this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
-			
+
 			contentsWidget = new QListWidget();
 			contentsWidget->setViewMode(QListView::IconMode);
 			contentsWidget->setIconSize(QSize(96, 84));
@@ -43,9 +43,9 @@ namespace OB{
 			pagesWidget->addWidget(new OutputConfigPage(this));
 
 			QPushButton* closeButton = new QPushButton("Close");
-		    applyButton = new QPushButton("Apply");
+			applyButton = new QPushButton("Apply");
 			applyButton->setEnabled(false);
-		    saveButton = new QPushButton("Save");
+			saveButton = new QPushButton("Save");
 			saveButton->setEnabled(false);
 
 			createIcons();
@@ -85,11 +85,11 @@ namespace OB{
 			generalConfig->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
 			QListWidgetItem* outputConfig = new QListWidgetItem(contentsWidget);
-		    outputConfig->setText("Output");
-		    outputConfig->setTextAlignment(Qt::AlignHCenter);
-		    outputConfig->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-			
-		    connect(contentsWidget, &QListWidget::currentItemChanged, this, &ConfigDialog::changePage);
+			outputConfig->setText("Output");
+			outputConfig->setTextAlignment(Qt::AlignHCenter);
+			outputConfig->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+			connect(contentsWidget, &QListWidget::currentItemChanged, this, &ConfigDialog::changePage);
 		}
 
 		void ConfigDialog::optionChanged(){
@@ -102,7 +102,7 @@ namespace OB{
 			applyButtonAct();
 			close();
 		}
-		
+
 		void ConfigDialog::applyButtonAct(){
 			if(opt_changed){
 				opt_changed = false;

@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "InstanceTree.h"
@@ -37,7 +37,7 @@ namespace OB{
 			setColumnCount(2);
 			setSelectionBehavior(QAbstractItemView::SelectRows);
 			setSelectionMode(QAbstractItemView::NoSelection);
-			
+
 			setAcceptDrops(false);
 			setDragEnabled(false);
 			setSortingEnabled(true);
@@ -58,14 +58,14 @@ namespace OB{
 			setItemDelegate(new PropertyTreeItemDelegate(this));
 		}
 
-	    PropertyTreeWidget::~PropertyTreeWidget(){}
+		PropertyTreeWidget::~PropertyTreeWidget(){}
 
 		void PropertyTreeWidget::updateSelection(std::vector<shared_ptr<Instance::Instance>> selectedInstances){
 			editingInstances = selectedInstances;
 
-		    if(!editingInstances.empty()){
+			if(!editingInstances.empty()){
 				std::set<std::string> sharedProperties;
-			    std::map<std::string, Instance::_PropertyInfo> props = editingInstances[0]->getProperties();
+				std::map<std::string, Instance::_PropertyInfo> props = editingInstances[0]->getProperties();
 
 				// Push names of all properties to sharedProperties
 				for(auto it = props.begin(); it != props.end(); ++it){
@@ -83,7 +83,7 @@ namespace OB{
 						for(auto it = sharedProperties.begin(); it != sharedProperties.end();){
 							auto fIt = tprops.find(*it);
 							if(fIt == tprops.end()){
-							    it = sharedProperties.erase(it);
+								it = sharedProperties.erase(it);
 							}else{
 								Instance::_PropertyInfo pInfo = fIt->second;
 								if(!pInfo.isPublic){
@@ -101,8 +101,8 @@ namespace OB{
 					}
 				}
 
-			    //Remove properties that aren't valid anymore
-			    for(auto i = curProps.begin(); i != curProps.end();){
+				// Remove properties that aren't valid anymore
+				for(auto i = curProps.begin(); i != curProps.end();){
 					if(std::find(sharedProperties.begin(), sharedProperties.end(), i->first) == sharedProperties.end()){
 						invisibleRootItem()->removeChild(i->second);
 						delete i->second;
@@ -117,7 +117,7 @@ namespace OB{
 
 					Instance::_PropertyInfo pInfo = props[propName];
 
-				    PropertyItem* oldItem = curProps[propName];
+					PropertyItem* oldItem = curProps[propName];
 					if(oldItem){
 						if(oldItem->getPropertyType() == pInfo.type){
 							updateValue(propName);
@@ -130,7 +130,7 @@ namespace OB{
 					}
 
 					if(pInfo.type == "string"){
-					    StringPropertyItem* pi = new StringPropertyItem(this, QString(propName.c_str()));
+						StringPropertyItem* pi = new StringPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -140,7 +140,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "bool"){
-					    BoolPropertyItem* pi = new BoolPropertyItem(this, QString(propName.c_str()));
+						BoolPropertyItem* pi = new BoolPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -150,7 +150,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "int"){
-					    IntPropertyItem* pi = new IntPropertyItem(this, QString(propName.c_str()));
+						IntPropertyItem* pi = new IntPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -160,7 +160,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "double"){
-					    DoublePropertyItem* pi = new DoublePropertyItem(this, QString(propName.c_str()));
+						DoublePropertyItem* pi = new DoublePropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -170,7 +170,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "float"){
-					    FloatPropertyItem* pi = new FloatPropertyItem(this, QString(propName.c_str()));
+						FloatPropertyItem* pi = new FloatPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -180,7 +180,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "Color3"){
-					    Color3PropertyItem* pi = new Color3PropertyItem(this, QString(propName.c_str()));
+						Color3PropertyItem* pi = new Color3PropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -190,7 +190,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "Vector3"){
-					    Vector3PropertyItem* pi = new Vector3PropertyItem(this, QString(propName.c_str()));
+						Vector3PropertyItem* pi = new Vector3PropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -200,7 +200,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "Vector2"){
-					    Vector2PropertyItem* pi = new Vector2PropertyItem(this, QString(propName.c_str()));
+						Vector2PropertyItem* pi = new Vector2PropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -210,7 +210,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "UDim"){
-					    UDimPropertyItem* pi = new UDimPropertyItem(this, QString(propName.c_str()));
+						UDimPropertyItem* pi = new UDimPropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -220,7 +220,7 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "UDim2"){
-					    UDim2PropertyItem* pi = new UDim2PropertyItem(this, QString(propName.c_str()));
+						UDim2PropertyItem* pi = new UDim2PropertyItem(this, QString(propName.c_str()));
 						if(pInfo.readOnly){
 							pi->setFlags(pi->flags() & ~Qt::ItemIsEnabled);
 						}
@@ -230,24 +230,24 @@ namespace OB{
 						continue;
 					}
 					if(pInfo.type == "Instance"){
-					    InstancePropertyItem* pi = new InstancePropertyItem(this, QString(propName.c_str()));
+						InstancePropertyItem* pi = new InstancePropertyItem(this, QString(propName.c_str()));
 						curProps[propName] = pi;
 						addTopLevelItem(pi);
 						updateValue(propName);
 						continue;
 					}
 				}
-		    }else{
+			}else{
 				for(auto i = curProps.begin(); i != curProps.end();){
-				   invisibleRootItem()->removeChild(i->second);
-				   delete i->second;
-				   i = curProps.erase(i);
+					invisibleRootItem()->removeChild(i->second);
+					delete i->second;
+					i = curProps.erase(i);
 				}
 			}
 		}
 
 		void PropertyTreeWidget::updateValue(std::string prop){
-		    PropertyItem* propItem = curProps[prop];
+			PropertyItem* propItem = curProps[prop];
 			if(propItem){
 				shared_ptr<Type::VarWrapper> toSet;
 				bool firstPass = true;
@@ -262,7 +262,7 @@ namespace OB{
 							firstPass = false;
 						}else{
 							if(!iVal->valueEquals(toSet)){
-							    hasMultiple = true;
+								hasMultiple = true;
 								break;
 							}
 						}

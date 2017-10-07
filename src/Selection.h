@@ -10,11 +10,11 @@
  *
  * OpenBlox is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <instance/Instance.h>
@@ -25,28 +25,27 @@
 namespace OB{
 	namespace Instance{
 		class Selection: public Instance{
-			public:
-			    Selection(OBEngine* eng);
-				virtual ~Selection();
+		public:
+			Selection(OBEngine* eng);
+			virtual ~Selection();
 
-				shared_ptr<Type::Event> getSelectionChanged();
+			shared_ptr<Type::Event> getSelectionChanged();
 
-				std::vector<shared_ptr<Instance>> Get();
+			std::vector<shared_ptr<Instance>> Get();
 
-				DECLARE_LUA_METHOD(Get);
+			DECLARE_LUA_METHOD(Get);
 
-				static void register_lua_methods(lua_State* L);
-				static void register_lua_events(lua_State* L);
-				
-				DECLARE_CLASS(Selection);
+			static void register_lua_methods(lua_State* L);
+			static void register_lua_events(lua_State* L);
 
-				shared_ptr<Type::Event> SelectionChanged;
+			DECLARE_CLASS(Selection);
+
+			shared_ptr<Type::Event> SelectionChanged;
 		};
 	}
 }
 
 #endif // OB_INST_SELECTION
-
 
 // Local Variables:
 // mode: c++

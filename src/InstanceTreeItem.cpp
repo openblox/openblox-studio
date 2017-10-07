@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "InstanceTreeItem.h"
@@ -39,11 +39,11 @@ namespace OB{
 			if(!inst->ParentLocked){
 				flags = flags | Qt::ItemIsDragEnabled;
 			}
-			
+
 			setFlags(flags);
 		}
 
-	    shared_ptr<Instance::Instance> InstanceTreeItem::GetInstance(){
+		shared_ptr<Instance::Instance> InstanceTreeItem::GetInstance(){
 			return inst;
 		}
 	}

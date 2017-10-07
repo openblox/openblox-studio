@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OB_STUDIO_INSTANCETREEITEM_H_
@@ -27,18 +27,22 @@
 namespace OB{
 	namespace Studio{
 		class InstanceTreeItem: public QTreeWidgetItem{
-		  public:
+		public:
 			InstanceTreeItem(shared_ptr<Instance::Instance> inst, QTreeWidget* parent = 0);
 			virtual ~InstanceTreeItem();
 
 			void updateFlags();
 
-		    shared_ptr<Instance::Instance> GetInstance();
+			shared_ptr<Instance::Instance> GetInstance();
 
-		  private:
-		    shared_ptr<Instance::Instance> inst;
+		private:
+			shared_ptr<Instance::Instance> inst;
 		};
 	}
 }
 
 #endif
+
+// Local Variables:
+// mode: c++
+// End:

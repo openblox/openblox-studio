@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "PropertyItem.h"
@@ -37,24 +37,24 @@ namespace OB{
 	namespace Studio{
 		PropertyItem::PropertyItem(PropertyTreeWidget* tree, QString name){
 			this->tree = tree;
-		    propertyName = name.toStdString();
-		    propertyType = "unknown";
+			propertyName = name.toStdString();
+			propertyType = "unknown";
 
 			setText(0, name);
 			setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 			setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
 		}
 
-	    PropertyItem::~PropertyItem(){}
+		PropertyItem::~PropertyItem(){}
 
 		std::string PropertyItem::getPropertyName(){
 			return propertyName;
 		}
-		
+
 		std::string PropertyItem::getPropertyType(){
 			return propertyType;
 		}
-		
+
 		void PropertyItem::setPropertyType(std::string type){
 			propertyType = type;
 		}
@@ -62,22 +62,22 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> PropertyItem::getValue(){
 			return NULL;
 		}
-		
+
 		void PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){}
-		
+
 		QString PropertyItem::getTextValue(){
 			return "unknown";
 		}
-		
+
 		void PropertyItem::setTextValue(QString val){}
 
 		QWidget* PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-		    return NULL;
+			return NULL;
 		}
 
 		void PropertyItem::setEditorData(QWidget* editor){}
 
-	    void PropertyItem::setModelData(QWidget* editor){}
+		void PropertyItem::setModelData(QWidget* editor){}
 
 		bool PropertyItem::editorEvent(QEvent* evt){
 			return false;
@@ -87,7 +87,7 @@ namespace OB{
 
 		// StringPropertyItem
 
-	    StringPropertyItem::StringPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		StringPropertyItem::StringPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("string");
 			val = "";
 			setText(1, "");
@@ -96,16 +96,16 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> StringPropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void StringPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asString();
 			setText(1, getTextValue());
 		}
-		
+
 		QString StringPropertyItem::getTextValue(){
 			return QString(val.c_str());
 		}
-		
+
 		void StringPropertyItem::setTextValue(QString val){
 			this->val = val.toStdString();
 			setText(1, getTextValue());
@@ -116,7 +116,7 @@ namespace OB{
 				QLineEdit* lineEdit = new QLineEdit(parent);
 				lineEdit->setGeometry(option.rect);
 				lineEdit->setFrame(false);
-			
+
 				return lineEdit;
 			}else{
 				return NULL;
@@ -130,7 +130,7 @@ namespace OB{
 			}
 		}
 
-	    void StringPropertyItem::setModelData(QWidget* editor){
+		void StringPropertyItem::setModelData(QWidget* editor){
 			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
 
 			if(lineEdit){
@@ -142,24 +142,24 @@ namespace OB{
 
 		// InstancePropertyItem
 
-	    InstancePropertyItem::InstancePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		InstancePropertyItem::InstancePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("Instance");
 			val = NULL;
 			setText(1, "");
-			
+
 			setFlags(flags() & ~Qt::ItemIsEnabled);
 		}
 
 		shared_ptr<Type::VarWrapper> InstancePropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void InstancePropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asInstance();
-			
+
 			setText(1, getTextValue());
 		}
-		
+
 		QString InstancePropertyItem::getTextValue(){
 			if(val){
 				return QString(val->getName().c_str());
@@ -167,13 +167,13 @@ namespace OB{
 				return "";
 			}
 		}
-		
+
 		// BoolPropertyItem
 
-	    QIcon getCheckBox(int val, bool disabled){
+		QIcon getCheckBox(int val, bool disabled){
 			QPixmap pixmap;
 			if(!QPixmapCache::find(QString("CheckBoxState%1-%2").arg(val).arg(disabled), &pixmap)){
-			    QStyleOptionButton opt;
+				QStyleOptionButton opt;
 				if(val < 0){
 					opt.state |= QStyle::State_NoChange;
 				}else{
@@ -204,7 +204,7 @@ namespace OB{
 			return QIcon(pixmap);
 		}
 
-	    BoolPropertyItem::BoolPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		BoolPropertyItem::BoolPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("bool");
 			val = false;
 			setIcon(1, getCheckBox(val, flags() & Qt::ItemIsEnabled));
@@ -213,22 +213,22 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> BoolPropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void BoolPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asBool();
 			setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
 		}
-		
+
 		QString BoolPropertyItem::getTextValue(){
-		    if(val){
+			if(val){
 				return "true";
 			}else{
 				return "false";
 			}
 		}
-		
+
 		void BoolPropertyItem::setTextValue(QString val){
-		    if(val == "true"){
+			if(val == "true"){
 				val = true;
 			}else{
 				val = false;
@@ -236,13 +236,13 @@ namespace OB{
 			setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
 		}
 
-	    bool BoolPropertyItem::editorEvent(QEvent* evt){
+		bool BoolPropertyItem::editorEvent(QEvent* evt){
 			if((flags() & Qt::ItemIsEnabled) && (evt->type() == QEvent::MouseButtonRelease)){
 				QMouseEvent* mEvt = static_cast<QMouseEvent*>(evt);
 				if(mEvt && (mEvt->button() & Qt::LeftButton)){
 					val = !val;
 					setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
-					
+
 					tree->setProp(propertyName, getValue());
 				}
 			}
@@ -250,7 +250,7 @@ namespace OB{
 
 		// IntPropertyItem
 
-	    IntPropertyItem::IntPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		IntPropertyItem::IntPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("int");
 			val = 0;
 			setText(1, getTextValue());
@@ -259,52 +259,52 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> IntPropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void IntPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asInt();
 			setText(1, getTextValue());
 		}
-		
+
 		QString IntPropertyItem::getTextValue(){
 			return QString::number(val);
 		}
-		
+
 		void IntPropertyItem::setTextValue(QString val){
 			this->val = val.toInt();
 			setText(1, getTextValue());
 		}
 
 		QWidget* IntPropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-		    QSpinBox* spinBox = new QSpinBox(parent);
-		    spinBox->setGeometry(option.rect);
-		    spinBox->setFrame(false);
+			QSpinBox* spinBox = new QSpinBox(parent);
+			spinBox->setGeometry(option.rect);
+			spinBox->setFrame(false);
 			spinBox->setMinimum(INT_MIN);
 			spinBox->setMaximum(INT_MAX);
-			
-		    return spinBox;
+
+			return spinBox;
 		}
 
 		void IntPropertyItem::setEditorData(QWidget* editor){
-		    QSpinBox* spinBox = dynamic_cast<QSpinBox*>(editor);
+			QSpinBox* spinBox = dynamic_cast<QSpinBox*>(editor);
 			if(spinBox){
-			    spinBox->setValue(val);
+				spinBox->setValue(val);
 			}
 		}
 
-	    void IntPropertyItem::setModelData(QWidget* editor){
-		    QSpinBox* spinBox = dynamic_cast<QSpinBox*>(editor);
+		void IntPropertyItem::setModelData(QWidget* editor){
+			QSpinBox* spinBox = dynamic_cast<QSpinBox*>(editor);
 
 			if(spinBox){
-			    val = spinBox->value();
+				val = spinBox->value();
 				setText(1, getTextValue());
-				
+
 				tree->setProp(propertyName, getValue());
 			}
 		}
 
 		// DoublePropertyItem
 
-	    DoublePropertyItem::DoublePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		DoublePropertyItem::DoublePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("double");
 			val = 0;
 			setText(1, getTextValue());
@@ -313,52 +313,52 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> DoublePropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void DoublePropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asDouble();
 			setText(1, getTextValue());
 		}
-		
+
 		QString DoublePropertyItem::getTextValue(){
 			return QString::number(val);
 		}
-		
+
 		void DoublePropertyItem::setTextValue(QString val){
 			this->val = val.toDouble();
 			setText(1, getTextValue());
 		}
 
 		QWidget* DoublePropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-		    QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
-		    spinBox->setGeometry(option.rect);
-		    spinBox->setFrame(false);
+			QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+			spinBox->setGeometry(option.rect);
+			spinBox->setFrame(false);
 			spinBox->setMinimum(-DBL_MAX);
 			spinBox->setMaximum(DBL_MAX);
-			
-		    return spinBox;
+
+			return spinBox;
 		}
 
 		void DoublePropertyItem::setEditorData(QWidget* editor){
-		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+			QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
 			if(spinBox){
-			    spinBox->setValue(val);
+				spinBox->setValue(val);
 			}
 		}
 
-	    void DoublePropertyItem::setModelData(QWidget* editor){
-		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+		void DoublePropertyItem::setModelData(QWidget* editor){
+			QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
 
 			if(spinBox){
-			    val = spinBox->value();
+				val = spinBox->value();
 				setText(1, getTextValue());
-				
+
 				tree->setProp(propertyName, getValue());
 			}
 		}
 
 		// FloatPropertyItem
 
-	    FloatPropertyItem::FloatPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		FloatPropertyItem::FloatPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("float");
 			val = 0;
 			setText(1, getTextValue());
@@ -367,51 +367,51 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> FloatPropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void FloatPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asFloat();
 			setText(1, getTextValue());
 		}
-		
+
 		QString FloatPropertyItem::getTextValue(){
 			return QString::number(val);
 		}
-		
+
 		void FloatPropertyItem::setTextValue(QString val){
 			this->val = val.toFloat();
 			setText(1, getTextValue());
 		}
 
 		QWidget* FloatPropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-		    QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
-		    spinBox->setGeometry(option.rect);
-		    spinBox->setFrame(false);
+			QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+			spinBox->setGeometry(option.rect);
+			spinBox->setFrame(false);
 			spinBox->setMinimum(-FLT_MAX);
 			spinBox->setMaximum(FLT_MAX);
-			
-		    return spinBox;
+
+			return spinBox;
 		}
 
 		void FloatPropertyItem::setEditorData(QWidget* editor){
-		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+			QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
 			if(spinBox){
-			    spinBox->setValue((double)val);
+				spinBox->setValue((double)val);
 			}
 		}
 
-	    void FloatPropertyItem::setModelData(QWidget* editor){
-		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+		void FloatPropertyItem::setModelData(QWidget* editor){
+			QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
 
 			if(spinBox){
-			    val = (float)spinBox->value();
+				val = (float)spinBox->value();
 				setText(1, getTextValue());
-				
+
 				tree->setProp(propertyName, getValue());
 			}
 		}
 
 		// Color3PropertyItem
-		
+
 		QIcon getColorAsIcon(const QColor &color){
 			QImage img(12, 12, QImage::Format_ARGB32_Premultiplied);
 			img.fill(0);
@@ -426,7 +426,7 @@ namespace OB{
 			return QPixmap::fromImage(img);
 		}
 
-	    Color3PropertyItem::Color3PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		Color3PropertyItem::Color3PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("Color3");
 			val = make_shared<Type::Color3>();
 			setIcon(1, getColorAsIcon(QColor(0, 0, 0)));
@@ -436,44 +436,44 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> Color3PropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void Color3PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asColor3();
 			if(!this->val){
 				this->val = make_shared<Type::Color3>();
 			}
-			
+
 			setIcon(1, getColorAsIcon(QColor(this->val->getRi(), this->val->getGi(), this->val->getBi())));
 			setText(1, getTextValue());
 		}
-		
+
 		QString Color3PropertyItem::getTextValue(){
 			return QString("[%1, %2, %3]").arg(this->val->getRi()).arg(this->val->getGi()).arg(this->val->getBi());
 		}
 
 		QWidget* Color3PropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-		    ColorDialog* colorDialog = new ColorDialog(StudioWindow::static_win);
+			ColorDialog* colorDialog = new ColorDialog(StudioWindow::static_win);
 			colorDialog->setModal(true);
-			
-		    return colorDialog;
+
+			return colorDialog;
 		}
 
 		void Color3PropertyItem::setEditorData(QWidget* editor){
-		    ColorDialog* colorDialog = dynamic_cast<ColorDialog*>(editor);
+			ColorDialog* colorDialog = dynamic_cast<ColorDialog*>(editor);
 			if(colorDialog){
-			    colorDialog->setCurrentColor(QColor(this->val->getRi(), this->val->getGi(), this->val->getBi()));
+				colorDialog->setCurrentColor(QColor(this->val->getRi(), this->val->getGi(), this->val->getBi()));
 			}
 		}
 
-	    void Color3PropertyItem::setModelData(QWidget* editor){
-		    ColorDialog* colorDialog = dynamic_cast<ColorDialog*>(editor);
+		void Color3PropertyItem::setModelData(QWidget* editor){
+			ColorDialog* colorDialog = dynamic_cast<ColorDialog*>(editor);
 
 			if(colorDialog){
-			    QColor col = colorDialog->selectedColor();
+				QColor col = colorDialog->selectedColor();
 				if(col.isValid()){
 					val = make_shared<Type::Color3>(col.red(), col.green(), col.blue());
 					setText(1, getTextValue());
-				
+
 					tree->setProp(propertyName, getValue());
 				}
 			}
@@ -481,13 +481,13 @@ namespace OB{
 
 		// ChildDoublePropertyItem
 
-	    ChildDoublePropertyItem::ChildDoublePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		ChildDoublePropertyItem::ChildDoublePropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("double");
 			val = 0;
 			setText(1, getTextValue());
 		}
 
-	    double ChildDoublePropertyItem::getDValue(){
+		double ChildDoublePropertyItem::getDValue(){
 			return val;
 		}
 
@@ -495,36 +495,36 @@ namespace OB{
 			this->val = val;
 			setText(1, getTextValue());
 		}
-		
+
 		QString ChildDoublePropertyItem::getTextValue(){
 			return QString::number(val);
 		}
 
 		QWidget* ChildDoublePropertyItem::createEditor(QWidget* parent, const QStyleOptionViewItem &option){
-		    QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
-		    spinBox->setGeometry(option.rect);
-		    spinBox->setFrame(false);
+			QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+			spinBox->setGeometry(option.rect);
+			spinBox->setFrame(false);
 			spinBox->setMinimum(-DBL_MAX);
 			spinBox->setMaximum(DBL_MAX);
-			
-		    return spinBox;
+
+			return spinBox;
 		}
 
 		void ChildDoublePropertyItem::setEditorData(QWidget* editor){
-		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+			QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
 			if(spinBox){
-			    spinBox->setValue(val);
+				spinBox->setValue(val);
 			}
 		}
 
-	    void ChildDoublePropertyItem::setModelData(QWidget* editor){
-		    QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
+		void ChildDoublePropertyItem::setModelData(QWidget* editor){
+			QDoubleSpinBox* spinBox = dynamic_cast<QDoubleSpinBox*>(editor);
 
 			if(spinBox){
-			    val = spinBox->value();
+				val = spinBox->value();
 				setText(1, getTextValue());
 
-			    QTreeWidgetItem* par = parent();
+				QTreeWidgetItem* par = parent();
 				if(par){
 					((PropertyItem*)par)->childPropertyUpdated();
 				}
@@ -533,7 +533,7 @@ namespace OB{
 
 		// Vector3PropertyItem
 
-	    Vector3PropertyItem::Vector3PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		Vector3PropertyItem::Vector3PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("Vector3");
 			val = make_shared<Type::Vector3>();
 			setText(1, getTextValue());
@@ -556,20 +556,20 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> Vector3PropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void Vector3PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asVector3();
 			if(!this->val){
 				this->val = make_shared<Type::Vector3>();
 			}
-		    
+
 			setText(1, getTextValue());
-			
+
 			xVal->setDValue(this->val->getX());
 			yVal->setDValue(this->val->getY());
 			zVal->setDValue(this->val->getZ());
 		}
-		
+
 		QString Vector3PropertyItem::getTextValue(){
 			return QString("%1, %2, %3").arg(this->val->getX()).arg(this->val->getY()).arg(this->val->getZ());
 		}
@@ -581,7 +581,7 @@ namespace OB{
 				QString yStr = valSplit[1].trimmed();
 				QString zStr = valSplit[2].trimmed();
 
-			    double nX = this->val->getX();
+				double nX = this->val->getX();
 				double nY = this->val->getY();
 				double nZ = this->val->getZ();
 
@@ -614,7 +614,7 @@ namespace OB{
 				this->val = make_shared<Type::Vector3>(nX, nY, nZ);
 
 				setText(1, getTextValue());
-				
+
 				xVal->setDValue(nX);
 				yVal->setDValue(nY);
 				zVal->setDValue(nZ);
@@ -626,7 +626,7 @@ namespace OB{
 				QLineEdit* lineEdit = new QLineEdit(parent);
 				lineEdit->setGeometry(option.rect);
 				lineEdit->setFrame(false);
-			
+
 				return lineEdit;
 			}else{
 				return NULL;
@@ -640,7 +640,7 @@ namespace OB{
 			}
 		}
 
-	    void Vector3PropertyItem::setModelData(QWidget* editor){
+		void Vector3PropertyItem::setModelData(QWidget* editor){
 			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
 
 			if(lineEdit){
@@ -663,7 +663,7 @@ namespace OB{
 
 		// Vector2PropertyItem
 
-	    Vector2PropertyItem::Vector2PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		Vector2PropertyItem::Vector2PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("Vector2");
 			val = make_shared<Type::Vector2>();
 			setText(1, getTextValue());
@@ -683,19 +683,19 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> Vector2PropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void Vector2PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asVector2();
 			if(!this->val){
 				this->val = make_shared<Type::Vector2>();
 			}
-		    
+
 			setText(1, getTextValue());
-			
+
 			xVal->setDValue(this->val->getX());
 			yVal->setDValue(this->val->getY());
 		}
-		
+
 		QString Vector2PropertyItem::getTextValue(){
 			return QString("%1, %2").arg(this->val->getX()).arg(this->val->getY());
 		}
@@ -706,7 +706,7 @@ namespace OB{
 				QString xStr = valSplit[0].trimmed();
 				QString yStr = valSplit[1].trimmed();
 
-			    double nX = this->val->getX();
+				double nX = this->val->getX();
 				double nY = this->val->getY();
 
 				bool validDouble = true;
@@ -730,7 +730,7 @@ namespace OB{
 				this->val = make_shared<Type::Vector2>(nX, nY);
 
 				setText(1, getTextValue());
-				
+
 				xVal->setDValue(nX);
 				yVal->setDValue(nY);
 			}
@@ -741,7 +741,7 @@ namespace OB{
 				QLineEdit* lineEdit = new QLineEdit(parent);
 				lineEdit->setGeometry(option.rect);
 				lineEdit->setFrame(false);
-			
+
 				return lineEdit;
 			}else{
 				return NULL;
@@ -755,7 +755,7 @@ namespace OB{
 			}
 		}
 
-	    void Vector2PropertyItem::setModelData(QWidget* editor){
+		void Vector2PropertyItem::setModelData(QWidget* editor){
 			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
 
 			if(lineEdit){
@@ -777,19 +777,19 @@ namespace OB{
 
 		// UDimPropertyItem
 
-	    UDimPropertyItem::UDimPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		UDimPropertyItem::UDimPropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("UDim");
 			val = make_shared<Type::UDim>();
 			setText(1, getTextValue());
 
 			scale = new ChildDoublePropertyItem(tree, "Scale");
-		    offset = new ChildDoublePropertyItem(tree, "Offset");
+			offset = new ChildDoublePropertyItem(tree, "Offset");
 
 			addChild(scale);
 			addChild(offset);
 		}
 
-	    UDimPropertyItem::~UDimPropertyItem(){
+		UDimPropertyItem::~UDimPropertyItem(){
 			delete scale;
 			delete offset;
 		}
@@ -797,19 +797,19 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> UDimPropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void UDimPropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asUDim();
 			if(!this->val){
 				this->val = make_shared<Type::UDim>();
 			}
-		    
+
 			setText(1, getTextValue());
-			
+
 			scale->setDValue(this->val->getScale());
-		    offset->setDValue(this->val->getOffset());
+			offset->setDValue(this->val->getOffset());
 		}
-		
+
 		QString UDimPropertyItem::getTextValue(){
 			return QString("%1, %2").arg(this->val->getScale()).arg(this->val->getOffset());
 		}
@@ -820,13 +820,13 @@ namespace OB{
 				QString scaleStr = valSplit[0].trimmed();
 				QString offsetStr = valSplit[1].trimmed();
 
-			    double nScale = this->val->getScale();
+				double nScale = this->val->getScale();
 				double nOffset = this->val->getOffset();
 
 				bool validDouble = true;
 
 				if(scaleStr.length() > 0){
-				    nScale = scaleStr.toDouble(&validDouble);
+					nScale = scaleStr.toDouble(&validDouble);
 				}
 
 				if(!validDouble){
@@ -844,9 +844,9 @@ namespace OB{
 				this->val = make_shared<Type::UDim>(nScale, nOffset);
 
 				setText(1, getTextValue());
-				
-			    scale->setDValue(nScale);
-			    offset->setDValue(nOffset);
+
+				scale->setDValue(nScale);
+				offset->setDValue(nOffset);
 			}
 		}
 
@@ -855,7 +855,7 @@ namespace OB{
 				QLineEdit* lineEdit = new QLineEdit(parent);
 				lineEdit->setGeometry(option.rect);
 				lineEdit->setFrame(false);
-			
+
 				return lineEdit;
 			}else{
 				return NULL;
@@ -869,7 +869,7 @@ namespace OB{
 			}
 		}
 
-	    void UDimPropertyItem::setModelData(QWidget* editor){
+		void UDimPropertyItem::setModelData(QWidget* editor){
 			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
 
 			if(lineEdit){
@@ -891,15 +891,15 @@ namespace OB{
 
 		// UDim2PropertyItem
 
-	    UDim2PropertyItem::UDim2PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
+		UDim2PropertyItem::UDim2PropertyItem(PropertyTreeWidget* tree, QString name) : PropertyItem(tree, name){
 			setPropertyType("UDim2");
 			val = make_shared<Type::UDim2>();
 			setText(1, getTextValue());
 
 			xscale = new ChildDoublePropertyItem(tree, "X Scale");
-		    xoffset = new ChildDoublePropertyItem(tree, "X Offset");
+			xoffset = new ChildDoublePropertyItem(tree, "X Offset");
 			yscale = new ChildDoublePropertyItem(tree, "Y Scale");
-		    yoffset = new ChildDoublePropertyItem(tree, "Y Offset");
+			yoffset = new ChildDoublePropertyItem(tree, "Y Offset");
 
 			addChild(xscale);
 			addChild(xoffset);
@@ -907,7 +907,7 @@ namespace OB{
 			addChild(yoffset);
 		}
 
-	    UDim2PropertyItem::~UDim2PropertyItem(){
+		UDim2PropertyItem::~UDim2PropertyItem(){
 			delete xscale;
 			delete xoffset;
 			delete yscale;
@@ -917,24 +917,24 @@ namespace OB{
 		shared_ptr<Type::VarWrapper> UDim2PropertyItem::getValue(){
 			return make_shared<Type::VarWrapper>(val);
 		}
-		
+
 		void UDim2PropertyItem::setValue(shared_ptr<Type::VarWrapper> val){
 			this->val = val->asUDim2();
 			if(!this->val){
 				this->val = make_shared<Type::UDim2>();
 			}
-		    
+
 			setText(1, getTextValue());
 
 			shared_ptr<Type::UDim> uX = this->val->getX();
 			shared_ptr<Type::UDim> uY = this->val->getY();
-			
+
 			xscale->setDValue(uX->getScale());
-		    xoffset->setDValue(uX->getOffset());
+			xoffset->setDValue(uX->getOffset());
 			yscale->setDValue(uY->getScale());
-		    yoffset->setDValue(uY->getOffset());
+			yoffset->setDValue(uY->getOffset());
 		}
-		
+
 		QString UDim2PropertyItem::getTextValue(){
 			shared_ptr<Type::UDim> uX = this->val->getX();
 			shared_ptr<Type::UDim> uY = this->val->getY();
@@ -951,8 +951,8 @@ namespace OB{
 
 				shared_ptr<Type::UDim> uX = this->val->getX();
 				shared_ptr<Type::UDim> uY = this->val->getY();
-				
-			    double nxScale = uX->getScale();
+
+				double nxScale = uX->getScale();
 				double nxOffset = uX->getOffset();
 				double nyScale = uY->getScale();
 				double nyOffset = uY->getOffset();
@@ -994,11 +994,11 @@ namespace OB{
 				this->val = make_shared<Type::UDim2>(nxScale, nxOffset, nyScale, nyOffset);
 
 				setText(1, getTextValue());
-				
-			    xscale->setDValue(nxScale);
-			    xoffset->setDValue(nxOffset);
+
+				xscale->setDValue(nxScale);
+				xoffset->setDValue(nxOffset);
 				yscale->setDValue(nyScale);
-			    yoffset->setDValue(nyOffset);
+				yoffset->setDValue(nyOffset);
 			}
 		}
 
@@ -1007,7 +1007,7 @@ namespace OB{
 				QLineEdit* lineEdit = new QLineEdit(parent);
 				lineEdit->setGeometry(option.rect);
 				lineEdit->setFrame(false);
-			
+
 				return lineEdit;
 			}else{
 				return NULL;
@@ -1021,7 +1021,7 @@ namespace OB{
 			}
 		}
 
-	    void UDim2PropertyItem::setModelData(QWidget* editor){
+		void UDim2PropertyItem::setModelData(QWidget* editor){
 			QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
 
 			if(lineEdit){

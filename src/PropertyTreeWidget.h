@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OB_STUDIO_PROPERTYTREEWIDGET_H_
@@ -27,10 +27,10 @@
 namespace OB{
 	namespace Studio{
 		class PropertyItem;
-		
+
 		class PropertyTreeWidget: public QTreeWidget{
-		  public:
-		    PropertyTreeWidget();
+		public:
+			PropertyTreeWidget();
 			virtual ~PropertyTreeWidget();
 
 			void updateSelection(std::vector<shared_ptr<Instance::Instance>> selectedInstances);
@@ -39,7 +39,7 @@ namespace OB{
 
 			PropertyItem* propertyItemAt(const QModelIndex &index);
 
-		  private:
+		private:
 			std::vector<shared_ptr<Instance::Instance>> editingInstances;
 			std::map<std::string, PropertyItem*> curProps;
 		};
@@ -47,3 +47,7 @@ namespace OB{
 }
 
 #endif
+
+// Local Variables:
+// mode: c++
+// End:

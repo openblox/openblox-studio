@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OB_STUDIO_CONFIGPAGE_H_
@@ -26,39 +26,43 @@
 namespace OB{
 	namespace Studio{
 		class ConfigDialog;
-		
+
 		class ConfigPage: public QWidget{
-		  public:
+		public:
 			ConfigPage(ConfigDialog* dia);
 
 			ConfigDialog* getConfigDialog();
-			
-		    virtual void saveChanges() = 0;
 
-		  private:
+			virtual void saveChanges() = 0;
+
+		private:
 			ConfigDialog* dia;
 		};
 
 		class GeneralConfigPage: public ConfigPage{
-		  public:
+		public:
 			GeneralConfigPage(ConfigDialog* dia);
 
 			virtual void saveChanges();
-			
-		  private:
+
+		private:
 			QCheckBox* opt_useDarkTheme;
 		};
 
 		class OutputConfigPage: public ConfigPage{
-		  public:
+		public:
 			OutputConfigPage(ConfigDialog* dia);
 
 			virtual void saveChanges();
 
-		  private:
-		    QSpinBox* opt_history;
+		private:
+			QSpinBox* opt_history;
 		};
 	}
 }
 
 #endif
+
+// Local Variables:
+// mode: c++
+// End:

@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "ConfigPage.h"
@@ -34,17 +34,17 @@ namespace OB{
 		ConfigDialog* ConfigPage::getConfigDialog(){
 			return dia;
 		}
-		
-	    GeneralConfigPage::GeneralConfigPage(ConfigDialog* dia) : ConfigPage(dia){
+
+		GeneralConfigPage::GeneralConfigPage(ConfigDialog* dia) : ConfigPage(dia){
 			QVBoxLayout* mainLayout = new QVBoxLayout();
 
-		    opt_useDarkTheme = new QCheckBox("Use dark theme (Requires restart)");
+			opt_useDarkTheme = new QCheckBox("Use dark theme (Requires restart)");
 			mainLayout->addWidget(opt_useDarkTheme);
 
 			StudioWindow* win = StudioWindow::static_win;
 			if(win){
 				if(win->settingsInst){
-				    opt_useDarkTheme->setChecked(win->settingsInst->value("dark_theme").toBool());
+					opt_useDarkTheme->setChecked(win->settingsInst->value("dark_theme").toBool());
 				}
 			}
 
@@ -56,11 +56,11 @@ namespace OB{
 		}
 
 		void GeneralConfigPage::saveChanges(){
-		    StudioWindow* win = StudioWindow::static_win;
+			StudioWindow* win = StudioWindow::static_win;
 			if(win){
 				if(win->settingsInst){
 					QSettings* settings = win->settingsInst;
-				    settings->setValue("dark_theme", opt_useDarkTheme->isChecked());
+					settings->setValue("dark_theme", opt_useDarkTheme->isChecked());
 					settings->sync();
 				}
 			}
@@ -71,10 +71,10 @@ namespace OB{
 
 			QLabel* historyLabel = new QLabel("Max command history");
 			mainLayout->addWidget(historyLabel);
-			
-		    opt_history = new QSpinBox();
-		    opt_history->setMinimum(0);
-		    opt_history->setMaximum(INT_MAX);
+
+			opt_history = new QSpinBox();
+			opt_history->setMinimum(0);
+			opt_history->setMaximum(INT_MAX);
 			mainLayout->addWidget(opt_history);
 
 			StudioWindow* win = StudioWindow::static_win;
@@ -92,16 +92,16 @@ namespace OB{
 		}
 
 		void OutputConfigPage::saveChanges(){
-		    StudioWindow* win = StudioWindow::static_win;
+			StudioWindow* win = StudioWindow::static_win;
 			if(win){
 				if(win->cmdBar){
-				    win->cmdBar->setMaxCount(opt_history->value());
+					win->cmdBar->setMaxCount(opt_history->value());
 				}
 				if(win->settingsInst){
 					QSettings* settings = win->settingsInst;
 					settings->beginGroup("command_history");
 					{
-					    settings->setValue("max_history", opt_history->value());
+						settings->setValue("max_history", opt_history->value());
 					}
 					settings->endGroup();
 				}

@@ -10,11 +10,11 @@
  *
  * OpenBlox is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "Selection.h"
@@ -31,14 +31,14 @@ namespace OB{
 			registerLuaClass(eng, LuaClassName, register_lua_metamethods, register_lua_methods, register_lua_property_getters, register_lua_property_setters, register_lua_events);
 		}
 
-	    Selection::Selection(OBEngine* eng) : Instance(eng){
+		Selection::Selection(OBEngine* eng) : Instance(eng){
 			Name = ClassName;
 			netId = OB_NETID_NOT_REPLICATED;
 
-		    SelectionChanged = make_shared<Type::Event>("SelectionChanged");
+			SelectionChanged = make_shared<Type::Event>("SelectionChanged");
 		}
 
-	    Selection::~Selection(){}
+		Selection::~Selection(){}
 
 		shared_ptr<Type::Event> Selection::getSelectionChanged(){
 			return SelectionChanged;
@@ -48,7 +48,7 @@ namespace OB{
 			return NULL;
 		}
 
-	    std::vector<shared_ptr<Instance>> Selection::Get(){
+		std::vector<shared_ptr<Instance>> Selection::Get(){
 			Studio::StudioWindow* win = Studio::StudioWindow::static_win;
 
 			if(win){
@@ -77,7 +77,7 @@ namespace OB{
 							lua_rawseti(L, -2, lIndex++);
 						}
 					}
-					
+
 					return 1;
 				}
 			}
@@ -87,7 +87,7 @@ namespace OB{
 
 		void Selection::register_lua_methods(lua_State* L){
 			Instance::register_lua_methods(L);
-			
+
 			luaL_Reg methods[] = {
 				{"Get", lua_Get},
 				{NULL, NULL}
@@ -97,7 +97,7 @@ namespace OB{
 
 		void Selection::register_lua_events(lua_State* L){
 			Instance::register_lua_events(L);
-			
+
 			luaL_Reg events[] = {
 				{"SelectionChanged", WRAP_EVT(Selection, SelectionChanged)},
 				{NULL, NULL}

@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <openblox.h>
@@ -56,19 +56,19 @@ int main(int argc, char** argv){
 	app.setOrganizationDomain("openblox.org");
 	app.setOrganizationName("OpenBlox");
 
-	#ifdef _WIN32
+#ifdef _WIN32
 	QSettings* settings = new QSettings("OpenBlox", "OpenBloxStudio");
-	#elif defined(__linux)
+#elif defined(__linux)
 	QSettings* settings = new QSettings("openblox-studio", "openblox-studio");
-	#else
+#else
 	QSettings* settings = new QSettings();
-	#endif
+#endif
 	bool firstRun = settings->value("first_run", true).toBool();
 	if(firstRun){
 		defaultValues(settings);
 	}
 
-    bool useDarkTheme = settings->value("dark_theme", DARK_THEME_DEFAULT).toBool();
+	bool useDarkTheme = settings->value("dark_theme", DARK_THEME_DEFAULT).toBool();
 
 	if(useDarkTheme){
 		QFile f(":qdarkstyle/style.qss");
@@ -92,11 +92,11 @@ int main(int argc, char** argv){
 	parser.addOption(serverOpt);
 
 	QCommandLineOption clientOpt("client", "Starts a NetworkClient on initialization.");
-    clientOpt.setDefaultValue("localhost:4490");
+	clientOpt.setDefaultValue("localhost:4490");
 	parser.addOption(clientOpt);
 
 	parser.addPositionalArgument("file", "The file to open.");
-	
+
 	parser.process(app);
 
 	OB::ClassFactory::registerCoreClasses();
@@ -138,10 +138,10 @@ int main(int argc, char** argv){
 
 		if(parser.isSet(serverOpt)){
 			bool isInt;
-		    int port = parser.value(serverOpt).toInt(&isInt);
+			int port = parser.value(serverOpt).toInt(&isInt);
 
 			if(!isInt){
-			    port = OB_STUDIO_DEFAULT_PORT;
+				port = OB_STUDIO_DEFAULT_PORT;
 			}
 
 			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
@@ -154,11 +154,11 @@ int main(int argc, char** argv){
 		}
 
 		if(parser.isSet(clientOpt)){
-		    QStringList hostParts = parser.value(clientOpt).split(":");
+			QStringList hostParts = parser.value(clientOpt).split(":");
 
 			std::string hostName = "localhost";
-		    int hostPort = OB_STUDIO_DEFAULT_PORT;
-			
+			int hostPort = OB_STUDIO_DEFAULT_PORT;
+
 			if(hostParts.size() > 0){
 				hostName = hostParts[0].toStdString();
 				if(hostParts.size() > 1){
@@ -180,11 +180,11 @@ int main(int argc, char** argv){
 		}
 	}
 
-    QStringList posArgs = parser.positionalArguments();
+	QStringList posArgs = parser.positionalArguments();
 	if(!posArgs.isEmpty()){
 		for(int i = 0; i < posArgs.size(); i++){
-		    QString toOpen = posArgs.at(i);
-		    win->loadGame(toOpen);
+			QString toOpen = posArgs.at(i);
+			win->loadGame(toOpen);
 		}
 	}
 
@@ -204,11 +204,9 @@ int main(int argc, char** argv){
 	settings->beginGroup("command_history");
 	{
 		settings->setValue("max_history", cmdBar->maxCount());
-	    settings->setValue("history", ((QStringListModel*)(cmdBar->model()))->stringList());
+		settings->setValue("history", ((QStringListModel*)(cmdBar->model()))->stringList());
 	}
 	settings->endGroup();
 
 	return 0;
 }
-
-

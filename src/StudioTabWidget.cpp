@@ -10,11 +10,11 @@
  *
  * OpenBlox Studio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License
- * along with OpenBlox Studio.	 If not, see <https://www.gnu.org/licenses/>.
+ * along with OpenBlox Studio. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "StudioTabWidget.h"
@@ -25,7 +25,7 @@
 namespace OB{
 	namespace Studio{
 		StudioTabWidget::StudioTabWidget(OBEngine* eng) : QWidget(NULL){
-		    this->eng = eng;
+			this->eng = eng;
 		}
 
 		StudioTabWidget::~StudioTabWidget(){}
@@ -34,7 +34,7 @@ namespace OB{
 			return eng;
 		}
 
-	    void StudioTabWidget::remove_focus(){
+		void StudioTabWidget::remove_focus(){
 			StudioWindow* win = StudioWindow::static_win;
 			if(win){
 				StudioGLWidget* gW = win->getCurrentGLWidget(eng);
@@ -43,7 +43,7 @@ namespace OB{
 				}
 			}
 		}
-		
+
 		void StudioTabWidget::gain_focus(){
 			StudioWindow* win = StudioWindow::static_win;
 			if(win){
