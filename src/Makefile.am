@@ -15,12 +15,13 @@ openblox_studio_SOURCES = OpenBloxStudio.cpp \
 	ColorDialog.cpp \
 	Selection.cpp \
 	qrc_resources.cpp
+
 # Linker options
 openblox_studio_LDADD = $(LOPENBLOX_LIBS) $(LIRRLICHT_LIBS) $(LBULLET_LIBS) $(LQT_LIBS) $(LGL_LIB)
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
-openblox_studio_CPPFLAGS = $(LOPENBLOX_CPPFLAGS) $(LBULLET_CFLAGS) $(LQT_CFLAGS) -fPIC -std=c++11
+openblox_studio_CPPFLAGS = $(LOPENBLOX_CFLAGS) $(LBULLET_CFLAGS) $(LQT_CFLAGS) -fPIC -std=c++11
 
 qrc_%.cpp: %.qrc
 	$(RCC) -o $@ $<
