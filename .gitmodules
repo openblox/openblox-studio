@@ -1,0 +1,3 @@
+[submodule "rc/class_icons"]
+	path = rc/class_icons
+	url = ../../openblox/class-icons.git
