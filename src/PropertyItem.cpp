@@ -229,9 +229,9 @@ namespace OB{
 
 		void BoolPropertyItem::setTextValue(QString val){
 			if(val == "true"){
-				val = true;
+				this->val = true;
 			}else{
-				val = false;
+				this->val = false;
 			}
 			setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
 		}
