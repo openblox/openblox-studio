@@ -1,0 +1,8 @@
+image: registry.splentity.com/openblox/ci-build-environment/ob:latest
+
+build:
+  script:
+    - ./prepare_ci.sh
+    - ./autoconf.sh
+    - ./configure --with-libopenblox=./libopenblox.pc
+    - make
