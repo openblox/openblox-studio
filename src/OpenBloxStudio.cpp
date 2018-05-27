@@ -35,6 +35,8 @@
 
 #include "Selection.h"
 
+#include <memory>
+
 #define DARK_THEME_DEFAULT true
 #ifndef _WIN32
 #undef DARK_THEME_DEFAULT
@@ -144,9 +146,9 @@ int main(int argc, char** argv){
 				port = OB_STUDIO_DEFAULT_PORT;
 			}
 
-			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
+			std::shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
 			if(dm){
-				shared_ptr<OB::Instance::NetworkServer> ns = dynamic_pointer_cast<OB::Instance::NetworkServer>(dm->GetService("NetworkServer"));
+				std::shared_ptr<OB::Instance::NetworkServer> ns = std::dynamic_pointer_cast<OB::Instance::NetworkServer>(dm->GetService("NetworkServer"));
 				if(ns){
 					ns->Start(port);
 				}
@@ -170,9 +172,9 @@ int main(int argc, char** argv){
 				}
 			}
 
-			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
+			std::shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
 			if(dm){
-				shared_ptr<OB::Instance::NetworkClient> nc = dynamic_pointer_cast<OB::Instance::NetworkClient>(dm->GetService("NetworkClient"));
+				std::shared_ptr<OB::Instance::NetworkClient> nc = std::dynamic_pointer_cast<OB::Instance::NetworkClient>(dm->GetService("NetworkClient"));
 				if(nc){
 					nc->Connect(hostName, hostPort);
 				}
