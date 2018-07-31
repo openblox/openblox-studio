@@ -244,8 +244,12 @@ namespace OB{
 					setIcon(1, getCheckBox(this->val, !(flags() & Qt::ItemIsEnabled)));
 
 					tree->setProp(propertyName, getValue());
+
+					return true;
 				}
 			}
+
+			return false;
 		}
 
 		// IntPropertyItem
