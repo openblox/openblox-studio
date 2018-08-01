@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource>
         <file>../rc/class_icons/Camera.png</file>
         <file>../rc/class_icons/ContentProvider.png</file>
         <file>../rc/class_icons/CoreGui.png</file>
@@ -34,6 +34,7 @@
         <file>../rc/class_icons/NumberValue.png</file>
         <file>../rc/class_icons/ReplicatedFirst.png</file>
         <file>../rc/class_icons/ReplicatedStorage.png</file>
+        <file>../rc/openblox.png</file>
     </qresource>
     <qresource prefix="/qss_icons">
         <file>../rc/up_arrow_disabled.png</file>

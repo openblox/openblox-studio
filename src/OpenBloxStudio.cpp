@@ -58,6 +58,8 @@ int main(int argc, char** argv){
 #endif
 	QApplication app(argc, argv);
 
+	app.setWindowIcon(QIcon(":/rc/openblox.png"));
+
 	OB::Studio::StudioWindow::pathToStudioExecutable = std::string(argv[0]);
 
 	app.setApplicationName("OpenBlox Studio");
