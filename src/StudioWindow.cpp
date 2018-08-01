@@ -432,8 +432,10 @@ namespace OB{
 					if(selected_inst){
 						shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selected_inst);
 						if(selected_model){
-							if(selected_model->GetChildren().size() > 0){
-								ungroupAct->setEnabled(true);
+							if(!dynamic_pointer_cast<Instance::Workspace>(selected_model)){
+								if(selected_model->GetChildren().size() > 0){
+									ungroupAct->setEnabled(true);
+								}
 							}
 						}
 					}
@@ -758,6 +760,9 @@ namespace OB{
 			if(selectedInst){
 				shared_ptr<Instance::Model> selected_model = dynamic_pointer_cast<Instance::Model>(selectedInst);
 				if(selected_model){
+					if(dynamic_pointer_cast<Instance::Workspace>(selected_model)){
+						return;
+					}
 					newPar = selected_model->getParent();
 				}
 			}
