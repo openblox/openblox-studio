@@ -49,6 +49,13 @@ void defaultValues(QSettings* settings){
 }
 
 int main(int argc, char** argv){
+	//dirty hack
+#ifdef _MSC_VER
+	if (argc < 2)
+	{
+		FreeConsole();
+	}
+#endif
 	QApplication app(argc, argv);
 
 	OB::Studio::StudioWindow::pathToStudioExecutable = std::string(argv[0]);
