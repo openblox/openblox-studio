@@ -81,6 +81,7 @@ namespace OB{
 
 			tabWidget = new QTabWidget();
 			tabWidget->setMinimumSize(320, 240);
+			tabWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 			tabWidget->setTabsClosable(true);
 			tabWidget->setMovable(true);
 			connect(tabWidget, &QTabWidget::currentChanged, this, &StudioWindow::tabChanged);
@@ -197,6 +198,7 @@ namespace OB{
 
 			dock->setWidget(output);
 			addDockWidget(Qt::BottomDockWidgetArea, dock);
+			resizeDocks({dock}, {40}, Qt::Horizontal);
 
 			viewMenu->addAction(dock->toggleViewAction());
 
@@ -214,6 +216,8 @@ namespace OB{
 			connect(explorer, &QTreeWidget::itemSelectionChanged, this, &StudioWindow::selectionChanged);
 
 			dock->setWidget(explorer);
+
+			// HORRIBLE WORKAROUND FOR QT BUG
 			addDockWidget(Qt::RightDockWidgetArea, dock);
 
 			viewMenu->addAction(dock->toggleViewAction());
@@ -499,12 +503,8 @@ namespace OB{
 			}
 
 			if(curTab){
-				StudioGLWidget* gW = NULL;
-				if((gW = dynamic_cast<StudioGLWidget*>(curTab))){
-					OBEngine* eng = gW->getEngine();
-					if(eng){
-						eng->render();
-					}
+				if(StudioGLWidget* gW = dynamic_cast<StudioGLWidget*>(curTab)){
+				    gW->do_render();
 				}
 			}
 		}

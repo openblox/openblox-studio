@@ -39,6 +39,8 @@ namespace OB{
 
 			setUpdatesEnabled(false);
 
+			draw_axis = false;
+
 			has_focus = false;
 			logHist = "";
 		}
@@ -63,6 +65,8 @@ namespace OB{
 			eng->setWindowId((void*)winId());
 			eng->init();
 
+			eng->setPostRenderFunc(std::bind(&StudioGLWidget::post_render_func, this, _1));
+
 			StudioWindow* win = StudioWindow::static_win;
 
 			shared_ptr<OB::Instance::DataModel> dm = eng->getDataModel();
@@ -73,6 +77,56 @@ namespace OB{
 					ls->getMessageOut()->Connect(lsb);
 				}
 			}
+		}
+
+		void StudioGLWidget::do_render(){
+			if(eng){
+				eng->render();
+			}
+		}
+
+		void StudioGLWidget::post_render_func(irr::video::IVideoDriver* videoDriver){
+			if(draw_axis){
+				puts("Drawing");
+
+				glViewport(0, 0, 50, 50);
+
+				glMatrixMode(GL_PROJECTION);
+				glPushMatrix();
+
+				GLdouble fH = tan(45.0 / 360 * M_PI) * 0.1;
+				GLdouble fW = fH * 1.0;
+				glFrustum(-fW, fW, -fH, fH, 0.1, 20);
+
+				glMatrixMode(GL_MODELVIEW);
+				glPushMatrix();
+
+				//TODO: Grab this from the CurrentCamera
+				//gluLookAt(10.0f, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.0f);
+
+				glColor3f(1.0f, 0.0f, 0.0f);
+				glEnable(GL_LINE_SMOOTH);
+				glLineWidth( 1.5 );
+				glBegin(GL_LINES);
+				glVertex3f(-1000, 0, 0);
+				glVertex3f(1000, 0, 0);
+				glEnd();
+
+				//Restore View
+				glMatrixMode(GL_MODELVIEW);
+				glPopMatrix();
+				glMatrixMode(GL_PROJECTION);
+				glPopMatrix();
+				glViewport(0, 0, 960, 600);
+			}
+		}
+
+		void StudioGLWidget::setAxisWidgetVisible(bool axisWidgetVisible){
+			draw_axis = axisWidgetVisible;
+		}
+
+	    bool StudioGLWidget::isAxisWidgetVisible(){
+			return draw_axis;
 		}
 
 		void StudioGLWidget::remove_focus(){

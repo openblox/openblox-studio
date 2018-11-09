@@ -38,6 +38,10 @@ namespace OB{
 			QSize sizeHint() const;
 
 			void do_init();
+			void do_render();
+
+			void setAxisWidgetVisible(bool axisWidgetVisible);
+		    bool isAxisWidgetVisible();
 
 			virtual void remove_focus();
 			virtual void gain_focus();
@@ -64,6 +68,8 @@ namespace OB{
 
 			QMap<shared_ptr<Instance::Instance>, InstanceTreeItem*> treeItemMap;
 
+			void post_render_func(irr::video::IVideoDriver* videoDriver);
+
 			void instance_changed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, InstanceTreeItem* kidItem);
 			void instance_child_added_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem);
 			void instance_child_removed_evt(std::vector<shared_ptr<Type::VarWrapper>> evec, QTreeWidgetItem* kidItem);
@@ -79,6 +85,7 @@ namespace OB{
 			void mouseMoveEvent(QMouseEvent* event);
 
 			bool has_focus;
+			bool draw_axis;
 
 		private:
 			QString logHist;
