@@ -41,6 +41,7 @@ namespace OB{
 			StudioWindow();
 
 			static std::string pathToStudioExecutable;
+			static QSettings* appSettings;
 			static StudioWindow* static_win;
 
 			static QIcon getClassIcon(QString className);
@@ -79,6 +80,8 @@ namespace OB{
 			void sendOutput(QString str, QColor col);
 
 			void loadGame(QString toOpen);
+
+			void closeEvent(QCloseEvent* evt);
 
 		public slots:
 			void about();

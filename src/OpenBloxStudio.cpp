@@ -67,13 +67,15 @@ int main(int argc, char** argv){
 	app.setOrganizationDomain("openblox.org");
 	app.setOrganizationName("OpenBlox");
 
+	//Windows is *special*
 #ifdef _WIN32
 	QSettings* settings = new QSettings("OpenBlox", "OpenBloxStudio");
-#elif defined(__linux)
-	QSettings* settings = new QSettings("openblox-studio", "openblox-studio");
 #else
-	QSettings* settings = new QSettings();
+	QSettings* settings = new QSettings("openblox-studio", "openblox-studio");
 #endif
+
+	OB::Studio::StudioWindow::appSettings = settings;
+
 	bool firstRun = settings->value("first_run", true).toBool();
 	if(firstRun){
 		defaultValues(settings);
@@ -204,20 +206,6 @@ int main(int argc, char** argv){
 		win->tickEngines();
 		QThread::msleep(10);
 	}
-
-	settings->beginGroup("main_window");
-	{
-		settings->setValue("geometry", win->saveGeometry());
-		settings->setValue("state", win->saveState());
-	}
-	settings->endGroup();
-
-	settings->beginGroup("command_history");
-	{
-		settings->setValue("max_history", cmdBar->maxCount());
-		settings->setValue("history", ((QStringListModel*)(cmdBar->model()))->stringList());
-	}
-	settings->endGroup();
 
 	return 0;
 }

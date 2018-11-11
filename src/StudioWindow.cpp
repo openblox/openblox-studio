@@ -48,6 +48,7 @@
 namespace OB{
 	namespace Studio{
 		std::string StudioWindow::pathToStudioExecutable = "";
+		QSettings* StudioWindow::appSettings = NULL;
 		StudioWindow* StudioWindow::static_win = NULL;
 
 		QMap<QString, QIcon> classIconMap;
@@ -310,6 +311,8 @@ namespace OB{
 
 			addToolBar(Qt::TopToolBarArea, modelToolbar);
 			// End Model toolbar
+
+			setDockOptions(dockOptions() | QMainWindow::GroupedDragging);
 		}
 
 		void StudioWindow::about(){
@@ -326,7 +329,7 @@ namespace OB{
 		}
 
 		void StudioWindow::closeStudio(){
-			close();
+		    close();
 		}
 
 		void StudioWindow::newInstance(){
@@ -911,6 +914,28 @@ namespace OB{
 			}
 
 			loadGame(toOpen);
+		}
+
+		void StudioWindow::closeEvent(QCloseEvent* evt){
+			//TODO: If unsaved changes exist, ask if user wants to save
+
+			appSettings->beginGroup("main_window");
+			{
+				appSettings->setValue("geometry", saveGeometry());
+				appSettings->setValue("state", saveState());
+			}
+			appSettings->endGroup();
+
+			appSettings->beginGroup("command_history");
+			{
+				appSettings->setValue("max_history", cmdBar->maxCount());
+				appSettings->setValue("history", ((QStringListModel*)(cmdBar->model()))->stringList());
+			}
+			appSettings->endGroup();
+
+			appSettings->sync();
+
+			QMainWindow::closeEvent(evt);
 		}
 	}
 }
