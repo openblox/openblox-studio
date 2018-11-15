@@ -5,6 +5,7 @@ build:
     - git submodule init
     - git submodule update
     - find rc
+    - cd .. && git clone https://git.openblox.org/openblox/class-icons.git && cd openblox-studio
     - ./prepare_ci.sh
     - ./autoconf.sh
     - ./configure --with-libopenblox=./libopenblox.pc
