@@ -38,6 +38,7 @@ namespace OB{
 			setAutoFillBackground(false);
 
 			setUpdatesEnabled(false);
+			setMouseTracking(true);
 
 			draw_axis = false;
 
@@ -133,6 +134,13 @@ namespace OB{
 			has_focus = false;
 
 			StudioWindow::static_win->explorer->invisibleRootItem()->takeChildren();
+
+			if(eng){
+				OBInputEventReceiver* ier = eng->getInputEventReceiver();
+				if(ier){
+					ier->unfocus();
+				}
+			}
 		}
 
 		void StudioGLWidget::gain_focus(){
@@ -149,6 +157,13 @@ namespace OB{
 			if(win->output){
 				win->output->setHtml(logHist);
 			}
+
+			if(eng){
+				OBInputEventReceiver* ier = eng->getInputEventReceiver();
+				if(ier){
+					ier->focus();
+				}
+			}
 		}
 
 		void StudioGLWidget::resizeEvent(QResizeEvent* evt){
@@ -160,8 +175,98 @@ namespace OB{
 			}
 		}
 
-		void StudioGLWidget::mousePressEvent(QMouseEvent* event){}
-		void StudioGLWidget::mouseMoveEvent(QMouseEvent* event){}
+		void StudioGLWidget::mousePressEvent(QMouseEvent* event){
+			if(eng){
+				OBInputEventReceiver* ier = eng->getInputEventReceiver();
+				if(ier){
+					OB::Enum::MouseButton mbtn = OB::Enum::MouseButton::Unknown;
+
+					switch(event->button()){
+						case Qt::LeftButton: {
+							mbtn = OB::Enum::MouseButton::Left;
+							break;
+						}
+						case Qt::MidButton: {
+							mbtn = OB::Enum::MouseButton::Middle;
+							break;
+						}
+						case Qt::RightButton: {
+							mbtn = OB::Enum::MouseButton::Right;
+							break;
+						}
+						case Qt::BackButton: {
+							mbtn = OB::Enum::MouseButton::X1;
+							break;
+						}
+						case Qt::ForwardButton: {
+							mbtn = OB::Enum::MouseButton::X2;
+							break;
+						}
+					}
+
+					ier->input_mouseButton(mbtn, true);
+				}
+			}
+		}
+
+		void StudioGLWidget::mouseReleaseEvent(QMouseEvent* event){
+			if(eng){
+				OBInputEventReceiver* ier = eng->getInputEventReceiver();
+				if(ier){
+					OB::Enum::MouseButton mbtn = OB::Enum::MouseButton::Unknown;
+
+					switch(event->button()){
+						case Qt::LeftButton: {
+							mbtn = OB::Enum::MouseButton::Left;
+							break;
+						}
+						case Qt::MidButton: {
+							mbtn = OB::Enum::MouseButton::Middle;
+							break;
+						}
+						case Qt::RightButton: {
+							mbtn = OB::Enum::MouseButton::Right;
+							break;
+						}
+						case Qt::BackButton: {
+							mbtn = OB::Enum::MouseButton::X1;
+							break;
+						}
+						case Qt::ForwardButton: {
+							mbtn = OB::Enum::MouseButton::X2;
+							break;
+						}
+					}
+
+					ier->input_mouseButton(mbtn, true);
+				}
+			}
+		}
+
+		void StudioGLWidget::mouseMoveEvent(QMouseEvent* event){
+			if(eng){
+				OBInputEventReceiver* ier = eng->getInputEventReceiver();
+				if(ier){
+					QPoint mousePos = event->pos();
+
+					ier->input_mouseMoved(make_shared<OB::Type::Vector2>(mousePos.x(), mousePos.y()), NULL);
+				}
+			}
+		}
+
+		void StudioGLWidget::wheelEvent(QWheelEvent* event){
+			if(eng){
+				OBInputEventReceiver* ier = eng->getInputEventReceiver();
+				if(ier){
+					QPoint wheelDelta = event->angleDelta() / 8;
+
+					if(!wheelDelta.isNull()){
+					    QPoint numSteps = wheelDelta / 15;
+						ier->input_mouseWheel(make_shared<OB::Type::Vector2>(numSteps.x(), numSteps.y()));
+					}
+				}
+			}
+		}
 
 		// Explorer/log handling
 		void StudioGLWidget::sendOutput(QString msg){
