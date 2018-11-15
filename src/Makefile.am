@@ -24,4 +24,6 @@ openblox_studio_LDADD = $(LOPENBLOX_LIBS) $(LIRRLICHT_LIBS) $(LBULLET_LIBS) $(LQ
 openblox_studio_CPPFLAGS = $(LOPENBLOX_CFLAGS) $(LBULLET_CFLAGS) $(LQT_CFLAGS) -fPIC -std=c++11
 
 qrc_%.cpp: %.qrc
+	echo "qrc in dir"
+	echo $(pwd)
 	$(RCC) -o $@ $<

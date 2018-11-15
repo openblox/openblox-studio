@@ -1,11 +1,10 @@
 image: registry.splentity.com/openblox/ci-build-environment/ob:latest
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 build:
   script:
-    - git submodule init
-    - git submodule update
-    - find rc
-    - cd .. && mkdir rc && cd rc && git clone https://git.openblox.org/openblox/class-icons.git && cd ../openblox-studio
     - ./prepare_ci.sh
     - ./autoconf.sh
     - ./configure --with-libopenblox=./libopenblox.pc
