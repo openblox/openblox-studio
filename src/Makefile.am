@@ -26,4 +26,5 @@ openblox_studio_CPPFLAGS = $(LOPENBLOX_CFLAGS) $(LBULLET_CFLAGS) $(LQT_CFLAGS) -
 qrc_%.cpp: %.qrc
 	echo "qrc in dir"
 	pwd
+	ls -lah ../rc/class_icons/
 	$(RCC) -o $@ $<
