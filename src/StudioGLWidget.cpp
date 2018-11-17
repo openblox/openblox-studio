@@ -203,11 +203,11 @@ namespace OB{
 							break;
 						}
 						case Qt::BackButton: {
-							mbtn = OB::Enum::MouseButton::X1;
+							mbtn = OB::Enum::MouseButton::X2;
 							break;
 						}
 						case Qt::ForwardButton: {
-							mbtn = OB::Enum::MouseButton::X2;
+							mbtn = OB::Enum::MouseButton::X1;
 							break;
 						}
 					}
