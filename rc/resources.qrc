@@ -1,39 +1,39 @@
 <RCC>
     <qresource>
+        <file>class_icons/BasePart.png</file>
+        <file>class_icons/BaseScript.png</file>
+        <file>class_icons/BaseValue.png</file>
+        <file>class_icons/BindableEvent.png</file>
         <file>class_icons/Camera.png</file>
+        <file>class_icons/Color3Value.png</file>
         <file>class_icons/ContentProvider.png</file>
         <file>class_icons/CoreGui.png</file>
         <file>class_icons/Folder.png</file>
         <file>class_icons/Frame.png</file>
+        <file>class_icons/Humanoid.png</file>
         <file>class_icons/ImageLabel.png</file>
         <file>class_icons/Instance.png</file>
         <file>class_icons/Lighting.png</file>
         <file>class_icons/LogService.png</file>
+        <file>class_icons/Model.png</file>
         <file>class_icons/NetworkClient.png</file>
         <file>class_icons/NetworkReplicator.png</file>
         <file>class_icons/NetworkServer.png</file>
         <file>class_icons/Player.png</file>
         <file>class_icons/Players.png</file>
-        <file>class_icons/RunService.png</file>
-        <file>class_icons/ScreenGui.png</file>
-        <file>class_icons/Sound.png</file>
-        <file>class_icons/StarterGui.png</file>
-        <file>class_icons/Workspace.png</file>
-        <file>class_icons/BasePart.png</file>
-        <file>class_icons/Model.png</file>
-        <file>class_icons/Color3Value.png</file>
-        <file>class_icons/Humanoid.png</file>
-        <file>class_icons/BindableFunction.png</file>
-        <file>class_icons/BindableEvent.png</file>
-        <file>class_icons/RemoteFunction.png</file>
         <file>class_icons/RemoteEvent.png</file>
-        <file>class_icons/BoolValue.png</file>
-        <file>class_icons/DoubleConstrainedValue.png</file>
-        <file>class_icons/IntConstrainedValue.png</file>
-        <file>class_icons/IntValue.png</file>
-        <file>class_icons/NumberValue.png</file>
+        <file>class_icons/RemoteFunction.png</file>
         <file>class_icons/ReplicatedFirst.png</file>
         <file>class_icons/ReplicatedStorage.png</file>
+        <file>class_icons/RunService.png</file>
+        <file>class_icons/ScreenGui.png</file>
+        <file>class_icons/Selection.png</file>
+        <file>class_icons/Sky.png</file>
+        <file>class_icons/Sound.png</file>
+        <file>class_icons/StarterGui.png</file>
+        <file>class_icons/UserInputService.png</file>
+        <file>class_icons/Workspace.png</file>
+        
         <file>openblox.png</file>
     </qresource>
     <qresource prefix="/qss_icons">
