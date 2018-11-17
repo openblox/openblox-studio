@@ -85,6 +85,8 @@ namespace OB{
 			void mouseReleaseEvent(QMouseEvent* event);
 			void mouseMoveEvent(QMouseEvent* event);
 			void wheelEvent(QWheelEvent* event);
+			void keyPressEvent(QKeyEvent* event);
+			void keyReleaseEvent(QKeyEvent* event);
 
 			bool has_focus;
 			bool draw_axis;
