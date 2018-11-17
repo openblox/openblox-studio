@@ -64,7 +64,7 @@ namespace OB{
 				return ico;
 			}
 
-			QString icop = ":rc/class_icons/" + className + ".png";
+			QString icop = ":class_icons/" + className + ".png";
 
 			if(QFile(icop).exists()){
 				ico = QIcon(icop);
