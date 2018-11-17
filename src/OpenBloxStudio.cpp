@@ -58,7 +58,7 @@ int main(int argc, char** argv){
 #endif
 	QApplication app(argc, argv);
 
-	app.setWindowIcon(QIcon(":/rc/openblox.png"));
+	app.setWindowIcon(QIcon(":/openblox.png"));
 
 	OB::Studio::StudioWindow::pathToStudioExecutable = std::string(argv[0]);
 
