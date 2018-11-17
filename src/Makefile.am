@@ -22,6 +22,3 @@ openblox_studio_LDADD = $(LOPENBLOX_LIBS) $(LIRRLICHT_LIBS) $(LBULLET_LIBS) $(LQ
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
 openblox_studio_CPPFLAGS = $(LOPENBLOX_CFLAGS) $(LBULLET_CFLAGS) $(LQT_CFLAGS) -fPIC -std=c++11
-
-qrc_resources.cpp:
-	../buildqrc.sh $(PWD) $(RCC)

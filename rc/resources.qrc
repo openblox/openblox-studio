@@ -33,6 +33,9 @@
         <file>class_icons/StarterGui.png</file>
         <file>class_icons/UserInputService.png</file>
         <file>class_icons/Workspace.png</file>
+
+        <file>studio_icon/icon_group.png</file>
+        <file>studio_icon/icon_ungroup.png</file>
         
         <file>openblox.png</file>
     </qresource>
