@@ -29,6 +29,8 @@ namespace OB{
 			Selection(OBEngine* eng);
 			virtual ~Selection();
 
+		    virtual void setArchivable(bool archivable);
+
 			shared_ptr<Type::Event> getSelectionChanged();
 
 			std::vector<shared_ptr<Instance>> Get();

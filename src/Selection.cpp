@@ -22,6 +22,8 @@
 #include <OBEngine.h>
 #include <instance/DataModel.h>
 
+#include <OBException.h>
+
 #include "StudioWindow.h"
 #include "StudioGLWidget.h"
 
@@ -35,10 +37,16 @@ namespace OB{
 			Name = ClassName;
 			netId = OB_NETID_NOT_REPLICATED;
 
+			Archivable = false;
+
 			SelectionChanged = make_shared<Type::Event>("SelectionChanged");
 		}
 
 		Selection::~Selection(){}
+
+	    void Selection::setArchivable(bool archivable){
+			throw new OBException("The Archivable property of Selection is read-only.");
+		}
 
 		shared_ptr<Type::Event> Selection::getSelectionChanged(){
 			return SelectionChanged;

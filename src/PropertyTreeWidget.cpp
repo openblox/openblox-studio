@@ -28,6 +28,10 @@
 
 #include "PropertyItem.h"
 
+#include "StudioWindow.h"
+
+#include <OBException.h>
+
 namespace OB{
 	namespace Studio{
 		PropertyTreeWidget::PropertyTreeWidget(){
@@ -281,7 +285,19 @@ namespace OB{
 			for(auto i = editingInstances.begin(); i != editingInstances.end(); ++i){
 				shared_ptr<Instance::Instance> inst = *i;
 				if(inst){
-					inst->setProperty(prop, val);
+					try{
+						inst->setProperty(prop, val);
+					}catch(OBException* ex){
+						OBEngine* eng = inst->getEngine();
+						if(eng){
+							StudioGLWidget* glWidget = StudioWindow::static_win->getCurrentGLWidget(eng);
+							if(glWidget){
+								// Still temporary
+								QColor errorCol(255, 51, 0);
+								glWidget->sendOutput(QString(ex->getMessage().c_str()), errorCol);
+							}
+						}
+					}
 				}
 			}
 		}
