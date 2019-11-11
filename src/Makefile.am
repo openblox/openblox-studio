@@ -7,6 +7,7 @@ openblox_studio_SOURCES = OpenBloxStudio.cpp \
 	StudioWindow.cpp \
 	InstanceTree.cpp \
 	InstanceTreeItem.cpp \
+	InsertAction.cpp \
 	PropertyItem.cpp \
 	PropertyTreeItemDelegate.cpp \
 	PropertyTreeWidget.cpp \

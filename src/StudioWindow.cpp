@@ -24,6 +24,7 @@
 // Studio Widgets
 #include "InstanceTreeItem.h"
 #include "ConfigDialog.h"
+#include "InsertAction.h"
 
 // Studio services
 #include "Selection.h"
@@ -139,23 +140,33 @@ namespace OB{
 
 			editMenu->addSeparator();
 
-			QAction* cutAction = editMenu->addAction("Cut");
+		    cutAction = editMenu->addAction("Cut");
 			explorerCtxMenu->addAction(cutAction);
 			cutAction->setIcon(QIcon::fromTheme("edit-cut"));
 			cutAction->setEnabled(false);
 			cutAction->setShortcut(QKeySequence::Cut);
+			connect(cutAction, &QAction::triggered, this, &StudioWindow::cutSelection);
 
-			QAction* copyAction = editMenu->addAction("Copy");
+		    copyAction = editMenu->addAction("Copy");
 			explorerCtxMenu->addAction(copyAction);
 			copyAction->setIcon(QIcon::fromTheme("edit-copy"));
 			copyAction->setEnabled(false);
 			copyAction->setShortcut(QKeySequence::Copy);
+			connect(copyAction, &QAction::triggered, this, &StudioWindow::copySelection);
 
-			QAction* pasteAction = editMenu->addAction("Paste");
+			pasteAction = editMenu->addAction("Paste Into");
 			explorerCtxMenu->addAction(pasteAction);
 			pasteAction->setIcon(QIcon::fromTheme("edit-paste"));
 			pasteAction->setEnabled(false);
 			pasteAction->setShortcut(QKeySequence::Paste);
+			connect(pasteAction, &QAction::triggered, this, &StudioWindow::pasteIntoSelection);
+
+			duplicateAction = editMenu->addAction("Duplicate");
+			explorerCtxMenu->addAction(duplicateAction);
+		    duplicateAction->setIcon(QIcon::fromTheme("edit-copy"));
+		    duplicateAction->setEnabled(false);
+		    duplicateAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
+			connect(duplicateAction, &QAction::triggered, this, &StudioWindow::duplicateSelection);
 
 			deleteAction = editMenu->addAction("Delete");
 			explorerCtxMenu->addAction(deleteAction);
@@ -163,6 +174,12 @@ namespace OB{
 			deleteAction->setEnabled(false);
 			deleteAction->setShortcut(QKeySequence::Delete);
 			connect(deleteAction, &QAction::triggered, this, &StudioWindow::deleteSelection);
+
+		    renameAction = editMenu->addAction("Rename");
+			explorerCtxMenu->addAction(renameAction);
+		    renameAction->setEnabled(false);
+		    renameAction->setShortcut(QKeySequence(Qt::Key_F2));
+			connect(renameAction, &QAction::triggered, this, &StudioWindow::renameSelection);
 
 			editMenu->addSeparator();
 
@@ -302,15 +319,47 @@ namespace OB{
 			groupAct = modelToolbar->addAction("Group");
 			groupAct->setIcon(QIcon::fromTheme("object-group", QIcon(":studio_icon/icon_group.png")));
 			groupAct->setEnabled(false);
+			groupAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_G));
 			connect(groupAct, &QAction::triggered, this, &StudioWindow::groupSelection);
 
 			ungroupAct = modelToolbar->addAction("Ungroup");
 			ungroupAct->setIcon(QIcon::fromTheme("object-ungroup", QIcon(":studio_icon/icon_ungroup.png")));
 			ungroupAct->setEnabled(false);
+			ungroupAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
 			connect(ungroupAct, &QAction::triggered, this, &StudioWindow::ungroupSelection);
+
+		    selectChildrenAct = modelToolbar->addAction("Select Children");
+		    selectChildrenAct->setEnabled(false);
+			connect(selectChildrenAct, &QAction::triggered, this, &StudioWindow::selectChildren);
+
+		    insertPartAct = modelToolbar->addAction("Insert Part");
+		    insertPartAct->setEnabled(false);
+			connect(insertPartAct, &QAction::triggered, this, &StudioWindow::insertPart);
+
+			basicObjectsMenu = new QMenu("Insert Object");
+			basicObjectsMenu->setEnabled(false);
+
+		    insertFromFileAct = modelToolbar->addAction("Insert From File");
+		    insertFromFileAct->setEnabled(false);
+			connect(insertFromFileAct, &QAction::triggered, this, &StudioWindow::insertFromFile);
 
 			addToolBar(Qt::TopToolBarArea, modelToolbar);
 			// End Model toolbar
+
+			explorerPopupMenu = new QMenu();
+			explorerPopupMenu->insertActions(NULL, explorerCtxMenu->actions());
+
+			explorerPopupMenu->addSeparator();
+
+			explorerPopupMenu->addAction(groupAct);
+			explorerPopupMenu->addAction(ungroupAct);
+			explorerPopupMenu->addAction(selectChildrenAct);
+
+			explorerPopupMenu->addSeparator();
+
+			explorerPopupMenu->addAction(insertPartAct);
+			explorerPopupMenu->addMenu(basicObjectsMenu);
+			explorerPopupMenu->addAction(insertFromFileAct);
 
 			setDockOptions(dockOptions() | QMainWindow::GroupedDragging);
 		}
@@ -399,7 +448,36 @@ namespace OB{
 
 			const int numSelected = selectedInstances.size();
 			if(numSelected > 0){
+				cutAction->setEnabled(true);
+			    copyAction->setEnabled(true);
+			    duplicateAction->setEnabled(true);
 				deleteAction->setEnabled(true);
+
+				if(numSelected == 1){
+					pasteAction->setEnabled(true);
+					renameAction->setEnabled(true);
+					insertPartAct->setEnabled(true);
+					basicObjectsMenu->setEnabled(true);
+					insertFromFileAct->setEnabled(true);
+
+					shared_ptr<Instance::Instance> selectedInst = gW->selectedInstances.at(0);
+					if(selectedInst){
+						if(selectedInst->GetChildren().size() > 0){
+							selectChildrenAct->setEnabled(true);
+						}else{
+							selectChildrenAct->setEnabled(false);
+						}
+					}else{
+						selectChildrenAct->setEnabled(false);
+					}
+				}else{
+					pasteAction->setEnabled(false);
+					renameAction->setEnabled(false);
+					selectChildrenAct->setEnabled(false);
+					insertPartAct->setEnabled(false);
+					basicObjectsMenu->setEnabled(false);
+					insertFromFileAct->setEnabled(false);
+				}
 
 				if(numSelected > 1){
 					basicObjects->setEnabled(false);
@@ -607,6 +685,10 @@ namespace OB{
 					QString classQstr = QString(classstr.c_str());
 					QListWidgetItem* wi = new QListWidgetItem(getClassIcon(classQstr), classQstr);
 					basicObjects->addItem(wi);
+
+					InsertAction* iA = new InsertAction(classQstr);
+					iA->setIcon(getClassIcon(classQstr));
+					basicObjectsMenu->addAction(iA);
 				}
 			}
 		}
@@ -624,6 +706,82 @@ namespace OB{
 			StudioGLWidget* gW = getCurrentGLWidget(getCurrentEngine());
 			if(gW){
 				gW->sendOutput(msg, col);
+			}
+		}
+
+		void StudioWindow::cutSelection(){
+			StudioGLWidget* sW = getCurrentGLWidget(getCurrentEngine());
+			if(!sW){
+				return;
+			}
+
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
+
+			if(selectedInstances.size() == 1){
+				shared_ptr<Instance::Instance> inst = selectedInstances.at(0);
+				if(inst){
+					// TODO
+				}
+			}
+		}
+
+		void StudioWindow::copySelection(){
+			StudioGLWidget* sW = getCurrentGLWidget(getCurrentEngine());
+			if(!sW){
+				return;
+			}
+
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
+
+			if(selectedInstances.size() == 1){
+				shared_ptr<Instance::Instance> inst = selectedInstances.at(0);
+				if(inst){
+					// TODO
+				}
+			}
+		}
+
+		void StudioWindow::pasteIntoSelection(){
+			StudioGLWidget* sW = getCurrentGLWidget(getCurrentEngine());
+			if(!sW){
+				return;
+			}
+
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
+
+			if(selectedInstances.size() == 1){
+				shared_ptr<Instance::Instance> inst = selectedInstances.at(0);
+				if(inst){
+					// TODO
+				}
+			}
+		}
+
+		void StudioWindow::duplicateSelection(){
+			StudioGLWidget* sW = getCurrentGLWidget(getCurrentEngine());
+			if(!sW){
+				return;
+			}
+
+		    std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
+
+			if(selectedInstances.size() > 0){
+				for(int i = 0; i < selectedInstances.size(); i++){
+					shared_ptr<Instance::Instance> inst = selectedInstances.at(i);
+					if(inst){
+						// Let's make a few classes safe..
+						std::string className = inst->getClassName();
+						if(className != "Workspace" &&
+						   className != "Lighting" &&
+						   className != "ContentProvider" &&
+						   className != "LogService" &&
+						   className != "RunService" &&
+						   className != "ReplicatedFirst"){
+							shared_ptr<Instance::Instance> clonedInst = inst->Clone();
+						    clonedInst->setParent(inst->getParent(), false);
+						}
+					}
+				}
 			}
 		}
 
@@ -654,9 +812,35 @@ namespace OB{
 			}
 		}
 
+		void StudioWindow::renameSelection(){
+			StudioGLWidget* sW = getCurrentGLWidget(getCurrentEngine());
+			if(!sW){
+				return;
+			}
+
+			std::vector<shared_ptr<Instance::Instance>> selectedInstances = sW->selectedInstances;
+
+			if(selectedInstances.size() == 1){
+				shared_ptr<Instance::Instance> inst = selectedInstances.at(0);
+				if(inst){
+					// Let's make a few classes safe..
+					std::string className = inst->getClassName();
+					if(className != "Workspace" &&
+					   className != "Lighting" &&
+					   className != "ContentProvider" &&
+					   className != "LogService" &&
+					   className != "RunService" &&
+					   className != "ReplicatedFirst"){
+						QTreeWidgetItem* selectedItem = explorer->selectedItems().first();
+					    explorer->editItem(selectedItem);
+					}
+				}
+			}
+		}
+
 		void StudioWindow::explorerContextMenu(const QPoint &pos){
-			if(explorerCtxMenu){
-				explorerCtxMenu->popup(explorer->mapToGlobal(pos));
+			if(explorerPopupMenu){
+			    explorerPopupMenu->popup(explorer->mapToGlobal(pos));
 			}
 		}
 
@@ -788,6 +972,60 @@ namespace OB{
 				gW->selectedInstances = allKids;
 				updateSelectionFromLua(eng);
 				update_toolbar_usability();
+			}
+		}
+
+		void StudioWindow::selectChildren(){
+		    OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* gW = getCurrentGLWidget(eng);
+			if(!gW){
+				return;
+			}
+
+			shared_ptr<Instance::Instance> selectedInst = gW->selectedInstances.at(0);
+			if(selectedInst){
+				std::vector<shared_ptr<Instance::Instance>> allKids = selectedInst->GetChildren();
+				if(allKids.size() > 0){
+					gW->selectedInstances = allKids;
+					updateSelectionFromLua(eng);
+					update_toolbar_usability();
+				}
+			}
+		}
+
+		void StudioWindow::insertPart(){
+		    insertBasicObject("Part");
+		}
+
+		void StudioWindow::insertFromFile(){
+		    OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* gW = getCurrentGLWidget(eng);
+			if(!gW){
+				return;
+			}
+
+			shared_ptr<Instance::Instance> selectedInst = gW->selectedInstances.at(0);
+			if(selectedInst){
+				//TODO:
+			}
+		}
+
+		void StudioWindow::insertBasicObject(QString className){
+			OBEngine* eng = getCurrentEngine();
+			StudioGLWidget* gW = getCurrentGLWidget(eng);
+			if(!gW){
+				return;
+			}
+
+			shared_ptr<Instance::Instance> selectedInst = gW->selectedInstances.at(0);
+			if(selectedInst){
+				std::string instanceType = className.toStdString();
+
+				shared_ptr<Instance::Instance> newInst = ClassFactory::create(instanceType, eng);
+
+				if(newInst){
+					newInst->setParent(selectedInst, true);
+				}
 			}
 		}
 

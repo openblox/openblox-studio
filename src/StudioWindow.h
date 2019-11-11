@@ -54,7 +54,9 @@ namespace OB{
 			PropertyTreeWidget* properties;
 			QComboBox* cmdBar;
 			QListWidget* basicObjects;
+			QMenu* basicObjectsMenu;
 
+			QMenu* explorerPopupMenu;
 			QMenu* explorerCtxMenu;
 
 			QSettings* settingsInst;
@@ -63,10 +65,20 @@ namespace OB{
 			QAction* saveAction;
 			QAction* saveAsAction;
 
+			QAction* cutAction;
+			QAction* copyAction;
+			QAction* pasteAction;
+			QAction* duplicateAction;
 			QAction* deleteAction;
+			QAction* renameAction;
 
 			QAction* ungroupAct;
 			QAction* groupAct;
+			QAction* selectChildrenAct;
+
+			QAction* insertPartAct;
+			QMenu* insertObjectMenu;
+			QAction* insertFromFileAct;
 
 			void updateSelectionFromLua(OBEngine* eng);
 			void update_toolbar_usability();
@@ -97,9 +109,18 @@ namespace OB{
 			void explorerContextMenu(const QPoint &pos);
 
 			//Action handlers
+			void cutSelection();
+			void copySelection();
+			void pasteIntoSelection();
+			void duplicateSelection();
 			void deleteSelection();
+			void renameSelection();
 			void groupSelection();
 			void ungroupSelection();
+			void selectChildren();
+			void insertPart();
+			void insertFromFile();
+			void insertBasicObject(QString className);
 
 			void saveAct();
 			void saveAsAct();
