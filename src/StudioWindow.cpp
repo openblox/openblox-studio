@@ -328,21 +328,6 @@ namespace OB{
 			ungroupAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
 			connect(ungroupAct, &QAction::triggered, this, &StudioWindow::ungroupSelection);
 
-		    selectChildrenAct = modelToolbar->addAction("Select Children");
-		    selectChildrenAct->setEnabled(false);
-			connect(selectChildrenAct, &QAction::triggered, this, &StudioWindow::selectChildren);
-
-		    insertPartAct = modelToolbar->addAction("Insert Part");
-		    insertPartAct->setEnabled(false);
-			connect(insertPartAct, &QAction::triggered, this, &StudioWindow::insertPart);
-
-			basicObjectsMenu = new QMenu("Insert Object");
-			basicObjectsMenu->setEnabled(false);
-
-		    insertFromFileAct = modelToolbar->addAction("Insert From File");
-		    insertFromFileAct->setEnabled(false);
-			connect(insertFromFileAct, &QAction::triggered, this, &StudioWindow::insertFromFile);
-
 			addToolBar(Qt::TopToolBarArea, modelToolbar);
 			// End Model toolbar
 
@@ -353,13 +338,24 @@ namespace OB{
 
 			explorerPopupMenu->addAction(groupAct);
 			explorerPopupMenu->addAction(ungroupAct);
-			explorerPopupMenu->addAction(selectChildrenAct);
+
+			selectChildrenAct = explorerPopupMenu->addAction("Select Children");
+		    selectChildrenAct->setEnabled(false);
+			connect(selectChildrenAct, &QAction::triggered, this, &StudioWindow::selectChildren);
 
 			explorerPopupMenu->addSeparator();
 
-			explorerPopupMenu->addAction(insertPartAct);
-			explorerPopupMenu->addMenu(basicObjectsMenu);
-			explorerPopupMenu->addAction(insertFromFileAct);
+		    insertPartAct = explorerPopupMenu->addAction("Insert Part");
+		    insertPartAct->setEnabled(false);
+			insertPartAct->setIcon(getClassIcon("Part"));
+			connect(insertPartAct, &QAction::triggered, this, &StudioWindow::insertPart);
+
+			basicObjectsMenu = new QMenu("Insert Object");
+			basicObjectsMenu->setEnabled(false);
+
+		    insertFromFileAct = explorerPopupMenu->addAction("Insert From File");
+		    insertFromFileAct->setEnabled(false);
+			connect(insertFromFileAct, &QAction::triggered, this, &StudioWindow::insertFromFile);
 
 			setDockOptions(dockOptions() | QMainWindow::GroupedDragging);
 		}
@@ -1048,7 +1044,7 @@ namespace OB{
 					return;
 				}
 
-				std::string strToWrite = serializer->SaveInMemory();
+				std::string strToWrite = serializer->SaveInMemory_XML();
 				if(strToWrite.length() == 0){
 					QString errMsg = "Failed to serialize game.";
 					statusBar()->showMessage(errMsg);
